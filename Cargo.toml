@@ -1,0 +1,10 @@
+[package]
+name = "warframe_optimizer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3

@@ -1,10 +1,10 @@
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
-struct WeaponMod {
-    name: String,
-    stats: Vec<ModStat>
+pub struct WeaponMod {
+    pub name: String,
+    pub stats: Vec<ModStat>
 }
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
-enum StatType {
+pub enum StatType {
     None,
     Damage,
     Heat,
@@ -28,15 +28,15 @@ enum StatType {
     SemiAutoCondition
 }
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
-struct ModStat {
-    stat_type: StatType,
-    stat_value: i16
+pub struct ModStat {
+    pub stat_type: StatType,
+    pub stat_value: i16
 }
 
-struct RifleMods;
+pub struct RifleMods;
 impl RifleMods {
-    const MOD_COUNT: usize = 30;
-    const ALL_MODS: [WeaponMod; RifleMods::MOD_COUNT] = [
+    pub const MOD_COUNT: usize = 30;
+    pub const ALL_MODS: [WeaponMod; RifleMods::MOD_COUNT] = [
         WeaponMod {  // 0
             name: "Amalgam Serration".into_string(),
             stats: vec![ModStat{stat_type: StatType::Damage, stat_value: 155}]
@@ -206,11 +206,11 @@ impl RifleMods {
             stats: vec![ModStat{stat_type: StatType::FireRate, stat_value: 45}]
         }
     ];
-    const CANNONADE_INDEX: usize = 21;
-    const DAMAGE_MODS: [usize; 2] = [0, 8];
-    const ELE_DAMAGE_MODS: [usize; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
-    const MULTISHOT_MODS: [usize; 2] = [5, 28];
-    const CRIT_CHANCE_MODS: [usize; 2] = [6, 3];
-    const CRIT_DAMAGE_MODS: [usize; 3] = [26, 2, 7];
-    const FIRE_RATE_MODS: [usize; 4] = [25, 17, 22, 29];
+    pub const CANNONADE_INDEX: usize = 21;
+    pub const DAMAGE_MODS: [usize; 2] = [0, 8];
+    pub const ELE_DAMAGE_MODS: [usize; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
+    pub const MULTISHOT_MODS: [usize; 2] = [5, 28];
+    pub const CRIT_CHANCE_MODS: [usize; 2] = [6, 3];
+    pub const CRIT_DAMAGE_MODS: [usize; 3] = [26, 2, 7];
+    pub const FIRE_RATE_MODS: [usize; 4] = [25, 17, 22, 29];
 }

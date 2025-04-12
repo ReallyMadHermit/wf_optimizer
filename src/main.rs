@@ -1,11 +1,12 @@
-use std::env;
-use std::fs;
+use std::io::stdin;
 
-mod json_parser;
-use json_parser::*;
 mod mod_structs;
 
 fn main() {
-    let contents = fs::read_to_string("mod_data.json").expect("errrr, oops");
-    let lex = lexer(&contents);
+    let mut buffer = String::new();
+    for _ in 0..4 {
+        let _ = stdin().read_line(&mut buffer);
+        println!("back at you: {}", buffer);
+        buffer.clear();
+    };
 }

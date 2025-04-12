@@ -1,9 +1,9 @@
-#[derive(Hash, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 struct WeaponMod {
     name: String,
     stats: Vec<ModStat>
 }
-#[derive(Hash, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 enum StatType {
     None,
     Damage,
@@ -27,7 +27,7 @@ enum StatType {
     PunchThrough,
     SemiAutoCondition
 }
-#[derive(Hash, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 struct ModStat {
     stat_type: StatType,
     stat_value: i16

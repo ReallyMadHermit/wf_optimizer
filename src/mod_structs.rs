@@ -35,7 +35,7 @@ struct ModStat {
 
 struct RifleMods;
 impl RifleMods {
-    const MOD_COUNT: usize = 28;
+    const MOD_COUNT: usize = 30;
     const ALL_MODS: [WeaponMod; RifleMods::MOD_COUNT] = [
         WeaponMod {  // 0
             name: "Amalgam Serration".into_string(),
@@ -196,95 +196,21 @@ impl RifleMods {
                 ModStat{stat_type: StatType::Heat, stat_value: 60},
                 ModStat{stat_type: StatType::MagazineCapacity, stat_value: 20}
             ]
-        }
-    ];
-    const DAMAGE_MODS: [WeaponMod; 2] = [
-        WeaponMod {
-            name: "Serration".into_string(),
-            stats: vec![ModStat {stat_type: StatType::Damage, stat_value: 155}]
         },
-        WeaponMod {
-            name: "Heavy Caliber".into_string(),
-            stats: vec![ModStat {stat_type: StatType::Damage, stat_value: 165}]
-        }
-    ];
-    const ELE_DAMAGE_MODS: [WeaponMod; 4] = [
-        WeaponMod {
-            name: "Primed Cryo Rounds".into_string(),
-            stats: vec![ModStat {stat_type: StatType::Cold, stat_value: 110}]
-        },
-        WeaponMod {
-            name: "Flat Ele Damage 1".into_string(),
-            stats: vec![ModStat {stat_type: StatType::Heat, stat_value: 110}]
-        },
-        WeaponMod {
-            name: "Flat Ele Damage 2".into_string(),
-            stats: vec![ModStat {stat_type: StatType::Toxic, stat_value: 110}]
-        },
-        WeaponMod {
-            name: "Flat Ele Damage 3".into_string(),
-            stats: vec![ModStat {stat_type: StatType::Heat, stat_value: 110}]
-        }
-    ];
-    const MULTISHOT_MODS: [WeaponMod; 2] = [
-        WeaponMod {
-            name: "Galvanized Chamber".into_string(),
-            stats: vec![
-                ModStat{stat_type: StatType::Multishot, stat_value: 80},
-                ModStat{stat_type: StatType::OnKillBonus, stat_value: 150}
-            ]
-        },
-        WeaponMod {
+        WeaponMod {  // 28
             name: "Vigilante Armaments".into_string(),
             stats: vec![ModStat{stat_type: StatType::Multishot, stat_value: 60}]
-        }
-    ];
-    const CRIT_CHANCE_MODS: [WeaponMod; 2] = [
-        WeaponMod {
-            name: "Critical Delay".into_string(),
-            stats: vec![
-                ModStat{stat_type: StatType::CritChance, stat_value: 200},
-                ModStat{stat_type: StatType::FireRate, stat_value: -20}
-            ]
         },
-        WeaponMod {
-            name: "Point Strike".into_string(),
-            stats: vec![ModStat{stat_type: StatType::CritChance, stat_value: 150}]
-        }
-    ];
-    const CRIT_DAMAGE_MODS: [WeaponMod; 3] = [
-        WeaponMod {
-            name: "Vital Sense".into_string(),
-            stats: vec![ModStat{stat_type: StatType::CritDamage, stat_value: 120}]
-        },
-        WeaponMod {
-            name: "Bladed Rounds".into_string(),
-            stats: vec![ModStat{stat_type: StatType::CritDamage, stat_value: 120}]
-        },
-        WeaponMod {
-            name: "Hammer Shot".into_string(),
-            stats: vec![ModStat{stat_type: StatType::CritDamage, stat_value: 60}]
-        }
-    ];
-    const FIRE_RATE_MODS: [WeaponMod; 4] = [
-        WeaponMod {
-            name: "Vile Acceleration".into_string(),
-            stats: vec![
-                ModStat{stat_type: StatType::FireRate, stat_value: 90},
-                ModStat{stat_type: StatType::Damage, stat_value: -15}
-            ]
-        },
-        WeaponMod {
-            name: "Speed Trigger".into_string(),
-            stats: vec![ModStat{stat_type: StatType::FireRate, stat_value: 60}]
-        },
-        WeaponMod {
-            name: "Primed Shred".into_string(),
-            stats: vec![ModStat{stat_type: StatType::FireRate, stat_value: 55}]
-        },
-        WeaponMod {
+        WeaponMod {  // 29
             name: "Vigilante Fervor".into_string(),
             stats: vec![ModStat{stat_type: StatType::FireRate, stat_value: 45}]
         }
     ];
+    const CANNONADE_INDEX: usize = 21;
+    const DAMAGE_MODS: [usize; 2] = [0, 8];
+    const ELE_DAMAGE_MODS: [usize; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
+    const MULTISHOT_MODS: [usize; 2] = [5, 28];
+    const CRIT_CHANCE_MODS: [usize; 2] = [6, 3];
+    const CRIT_DAMAGE_MODS: [usize; 3] = [26, 2, 7];
+    const FIRE_RATE_MODS: [usize; 4] = [25, 17, 22, 29];
 }

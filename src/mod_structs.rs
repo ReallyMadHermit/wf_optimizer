@@ -19,7 +19,9 @@ pub enum StatType {
     FireRate,
     StatusChance,
     ConditionOverload,  // always conditional
-    OnKillBonus,  // added to previous stat if conditions allow
+    CritChanceOnKill,
+    CritDamageOnKill,
+    MultishotOnKill,
     MagazineCapacity,
     ReloadSpeed,
     AcuityBonus,  // crit chance + weak point damage
@@ -49,7 +51,7 @@ impl RifleMods {
             name: "Bladed Rounds".into_string(),
             stats: vec![
                 ModStat{stat_type: StatType::CritDamage, stat_value: 0},
-                ModStat{stat_type: StatType::OnKillBonus, stat_value: 120}
+                ModStat{stat_type: StatType::CritDamageOnKill, stat_value: 120}
             ]
         },
         WeaponMod {  // 3
@@ -70,14 +72,14 @@ impl RifleMods {
             name: "Galvanized Chamber".into_string(),
             stats: vec![
                 ModStat{stat_type: StatType::Multishot, stat_value: 80},
-                ModStat{stat_type: StatType::OnKillBonus, stat_value: 150}
+                ModStat{stat_type: StatType::MultishotOnKill, stat_value: 150}
             ]
         },
         WeaponMod {  // 6
             name: "Galvanized Scope".into_string(),
             stats: vec![
                 ModStat{stat_type: StatType::CritChance, stat_value: 120},
-                ModStat{stat_type: StatType::OnKillBonus, stat_value: 200}
+                ModStat{stat_type: StatType::CritChanceOnKill, stat_value: 200}
             ]
         },
         WeaponMod {  // 7

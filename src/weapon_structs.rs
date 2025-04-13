@@ -7,6 +7,15 @@ struct HitStats {
     crit_damage: f32,
     status: f32
 }
+
+fn apply_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
+    base_stat * ((mod_sum + 100) as f32 / 100.0)
+}
+
+fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
+    base_stat / ((mod_sum + 100) as f32 / 100.0)
+}
+
 #[derive(Clone)]
 struct GunStats {
     fire_rate: f32,
@@ -14,6 +23,47 @@ struct GunStats {
     magazine: f32,
     reload: f32,
     hit_stats: Vec<HitStats>
+} impl GunStats {
+    fn apply_stat_sums(&self, stat_sum: &GunStatModSums) -> Self {
+        let mut modded_self = self.clone();
+        modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sum.fire_rate);
+        modded_self.multishot = apply_stat_sum(self.multishot, stat_sum.multishot);
+        modded_self.magazine = apply_stat_sum(self.magazine, stat_sum.magazine);
+        modded_self.reload = apply_inverse_stat_sum(self.reload, stat_sum.reload);
+        for i in 0..self.hit_stats.len() {
+            let mut modded_hit = &mut modded_self.hit_stats[i];
+            let self_hit = &self.hit_stats[i];
+            modded_hit.damage = apply_stat_sum(self_hit.damage, stat_sum.damage);
+            modded_hit.crit_chance = apply_stat_sum(self_hit.damage, stat_sum.damage);
+            modded_hit.crit_damage = apply_stat_sum(self_hit.crit_damage, stat_sum.crit_damage);
+            modded_hit.status = apply_stat_sum(self_hit.status, stat_sum.status);
+        };
+        return modded_self;
+    }
+
+    fn gun_lookup(weapon_name: &str) -> Self {
+        match weapon_name {
+            "Prism Gorgon" => GunStats::PRISMA_GORGON,
+            _ => {
+                println!("Weapon not found! Have a Prisma Gorgon instead!");
+                GunStats::PRISMA_GORGON
+            }
+        }
+    }
+    const PRISMA_GORGON: GunStats = GunStats {
+        fire_rate: 14.7,
+        multishot: 1.0,
+        magazine: 120.0,
+        reload: 3.0,
+        hit_stats: vec![
+            HitStats {
+                damage: 23.0,
+                crit_chance: 0.3,
+                crit_damage: 2.3,
+                status: 0.15
+            }
+        ]
+    };
 }
 #[derive(Clone)]
 enum GunType {
@@ -26,6 +76,7 @@ struct GunStatModSums {
     multishot: i16,
     crit_chance: i16,
     crit_damage: i16,
+    status: i16,
     fire_rate: i16,
     magazine: i16,
     reload: i16,
@@ -40,6 +91,7 @@ struct GunStatModSums {
             multishot: 0,
             crit_chance: 0,
             crit_damage: 0,
+            status: 0,
             fire_rate: 0,
             magazine: 0,
             reload: 0,
@@ -83,6 +135,9 @@ struct GunStatModSums {
                 StatType::Radiation | StatType::Magnetic => {
                     self.ele_damage += mod_stat.stat_value;
                 },
+                StatType::StatusChance => {
+                    self.status += mod_stat.stat_value;
+                }
                 StatType::Multishot => {
                     self.multishot += mod_stat.stat_value;
                 },

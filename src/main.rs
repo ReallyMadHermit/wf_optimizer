@@ -2,6 +2,7 @@ use std::io::stdin;
 
 mod mod_structs;
 mod weapon_structs;
+mod supporting_functions;
 
 fn main() {
     let mut buffer = String::new();

@@ -53,7 +53,8 @@ struct GunStats {
 
     fn gun_lookup(weapon_name: &str) -> Self {
         match weapon_name {
-            "Prism Gorgon" => GunStats::PRISMA_GORGON,
+            "Prisma Gorgon" => GunStats::PRISMA_GORGON,
+            "Trumna Prime" => GunStats::TRUMNA_PRIME,
             _ => {
                 println!("Weapon not found! Have a Prisma Gorgon instead!");
                 GunStats::PRISMA_GORGON
@@ -72,6 +73,26 @@ struct GunStats {
                 crit_chance: 0.3,
                 crit_damage: 2.3,
                 status: 0.15
+            }
+        ]
+    };
+    const TRUMNA_PRIME: GunStats = GunStats {
+        fire_rate: 4.67,
+        multishot: 1.0,
+        magazine: 250.0,
+        reload: 4.0,
+        hit_stats: vec![
+            HitStats {
+                damage: 85.0,
+                crit_chance: 0.24,
+                crit_damage: 2.4,
+                status: 0.34
+            },
+            HitStats {
+                damage: 50.0,
+                crit_chance: 0.24,
+                crit_damage: 2.4,
+                status: 0.34
             }
         ]
     };

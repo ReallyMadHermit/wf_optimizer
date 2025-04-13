@@ -25,6 +25,15 @@ struct GunStats {
     hit_stats: Vec<HitStats>
 } impl GunStats {
 
+    fn calculate_burst_dps(&self) -> f32 {
+        let hits_per_second = self.fire_rate * self.multishot;
+        let mut hit_sum = 0.0;
+        for hit in self.hit_stats {
+            hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
+        };
+        hit_sum * hits_per_second
+    }
+
     fn apply_stat_sums(&self, stat_sum: &GunStatModSums) -> Self {
         let mut modded_self = self.clone();
         modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sum.fire_rate);

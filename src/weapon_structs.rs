@@ -25,13 +25,23 @@ struct GunStats {
     hit_stats: Vec<HitStats>
 } impl GunStats {
 
-    fn calculate_burst_dps(&self) -> f32 {
-        let hits_per_second = self.fire_rate * self.multishot;
+    fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;
         for hit in self.hit_stats {
             hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
         };
-        hit_sum * hits_per_second
+        return hit_sum;
+    }
+
+    fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
+        let hits_per_second = self.fire_rate * self.multishot;
+        shot_damage * hits_per_second
+    }
+
+    fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
+        let mag_time = self.magazine / self.fire_rate;
+        let firing_ratio = (mag_time + self.reload) / mag_time;
+        firing_ratio * burst_dps
     }
 
     fn apply_stat_sums(&self, stat_sum: &GunStatModSums) -> Self {

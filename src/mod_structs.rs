@@ -3,6 +3,7 @@ pub struct WeaponMod {
     pub name: String,
     pub mod_stats: Vec<ModStat>
 }
+
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum StatType {
     None,
@@ -30,11 +31,13 @@ pub enum StatType {
     StatusDamage,
     PunchThrough
 }
+
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct ModStat {
     pub stat_type: StatType,
     pub stat_value: i16
 }
+
 pub struct PrimaryArcanes;
 impl PrimaryArcanes {
     pub const ARCANE_COUNT: usize = 1;
@@ -45,9 +48,12 @@ impl PrimaryArcanes {
         }
     ];
 }
+
 pub struct RifleMods;
 impl RifleMods {
+
     pub const MOD_COUNT: usize = 30;
+
     pub const ALL_MODS: [WeaponMod; RifleMods::MOD_COUNT] = [
         WeaponMod {  // 0
             name: "Amalgam Serration".into_string(),
@@ -218,6 +224,7 @@ impl RifleMods {
             mod_stats: vec![ModStat{stat_type: StatType::FireRate, stat_value: 45}]
         }
     ];
+
     pub const CANNONADE_INDEX: usize = 21;
     pub const DAMAGE_MODS: [usize; 2] = [0, 8];
     pub const ELE_DAMAGE_MODS: [usize; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
@@ -225,4 +232,5 @@ impl RifleMods {
     pub const CRIT_CHANCE_MODS: [usize; 2] = [6, 3];
     pub const CRIT_DAMAGE_MODS: [usize; 3] = [26, 2, 7];
     pub const FIRE_RATE_MODS: [usize; 4] = [25, 17, 22, 29];
+
 }

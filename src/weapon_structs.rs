@@ -24,6 +24,7 @@ struct GunStats {
     reload: f32,
     hit_stats: Vec<HitStats>
 } impl GunStats {
+
     fn apply_stat_sums(&self, stat_sum: &GunStatModSums) -> Self {
         let mut modded_self = self.clone();
         modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sum.fire_rate);
@@ -50,6 +51,7 @@ struct GunStats {
             }
         }
     }
+
     const PRISMA_GORGON: GunStats = GunStats {
         fire_rate: 14.7,
         multishot: 1.0,
@@ -64,11 +66,14 @@ struct GunStats {
             }
         ]
     };
+
 }
+
 #[derive(Clone)]
 enum GunType {
     Rifle
 }
+
 #[derive(Clone)]
 struct GunStatModSums {
     damage: i16,
@@ -177,6 +182,7 @@ struct GunStatModSums {
     }
 
 }
+
 #[derive(Clone)]
 struct ModList {
     index_array: [u8; 8],

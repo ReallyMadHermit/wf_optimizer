@@ -225,12 +225,14 @@ struct GunStatModSums {
 
 #[derive(Clone)]
 struct ModList {
-    index_array: [u8; 8],
+    index_array: [i8; 8],
+    arcane_index: i8,
     gun_type: GunType
 } impl ModList {
     fn new(gun_type: GunType) -> Self {
         ModList {
-            index_array: [0; 8],
+            index_array: [-1; 8],
+            arcane_index: -1,
             gun_type
         }
     }

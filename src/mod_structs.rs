@@ -8,6 +8,7 @@ pub enum StatType {
     None,
     Damage,
     DamageForSemiAuto,
+    DamageOnKill,
     Heat,
     Cold,
     Toxic,
@@ -34,7 +35,16 @@ pub struct ModStat {
     pub stat_type: StatType,
     pub stat_value: i16
 }
-
+pub struct PrimaryArcanes;
+impl PrimaryArcanes {
+    pub const ARCANE_COUNT: usize = 1;
+    pub const RIFLE_ARCANES: [WeaponMod; PrimaryArcanes::ARCANE_COUNT] = [
+        WeaponMod {
+            name: "Steel Path Arcane".into_string(),
+            mod_stats: vec![ModStat{stat_type: StatType::DamageOnKill, stat_value: 360}]
+        }
+    ];
+}
 pub struct RifleMods;
 impl RifleMods {
     pub const MOD_COUNT: usize = 30;

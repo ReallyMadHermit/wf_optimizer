@@ -73,6 +73,11 @@ struct GunStatModSums {
                         self.damage += mod_stat.stat_value;
                     };
                 },
+                StatType::DamageOnKill => {
+                    if kills {
+                        self.damage += mod_stat.stat_value;
+                    };
+                },
                 StatType::Cold | StatType::Toxic |
                 StatType::Heat | StatType::Shock |
                 StatType::Radiation | StatType::Magnetic => {

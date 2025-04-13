@@ -44,19 +44,19 @@ struct GunStats {
         firing_ratio * burst_dps
     }
 
-    fn apply_stat_sums(&self, stat_sum: &GunStatModSums) -> Self {
+    fn apply_stat_sums(&self, stat_sums: &GunStatModSums) -> Self {
         let mut modded_self = self.clone();
-        modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sum.fire_rate);
-        modded_self.multishot = apply_stat_sum(self.multishot, stat_sum.multishot);
-        modded_self.magazine = apply_stat_sum(self.magazine, stat_sum.magazine);
-        modded_self.reload = apply_inverse_stat_sum(self.reload, stat_sum.reload);
+        modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sums.fire_rate);
+        modded_self.multishot = apply_stat_sum(self.multishot, stat_sums.multishot);
+        modded_self.magazine = apply_stat_sum(self.magazine, stat_sums.magazine);
+        modded_self.reload = apply_inverse_stat_sum(self.reload, stat_sums.reload);
         for i in 0..self.hit_stats.len() {
             let mut modded_hit = &mut modded_self.hit_stats[i];
             let self_hit = &self.hit_stats[i];
-            modded_hit.damage = apply_stat_sum(self_hit.damage, stat_sum.damage);
-            modded_hit.crit_chance = apply_stat_sum(self_hit.damage, stat_sum.damage);
-            modded_hit.crit_damage = apply_stat_sum(self_hit.crit_damage, stat_sum.crit_damage);
-            modded_hit.status = apply_stat_sum(self_hit.status, stat_sum.status);
+            modded_hit.damage = apply_stat_sum(self_hit.damage, stat_sums.damage);
+            modded_hit.crit_chance = apply_stat_sum(self_hit.damage, stat_sums.damage);
+            modded_hit.crit_damage = apply_stat_sum(self_hit.crit_damage, stat_sums.crit_damage);
+            modded_hit.status = apply_stat_sum(self_hit.status, stat_sums.status);
         };
         return modded_self;
     }

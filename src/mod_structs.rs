@@ -27,9 +27,11 @@ pub enum StatType {
     ConditionOverload,  // always conditional
     MagazineCapacity,
     ReloadSpeed,
+    ReloadSpeedOnKill,
     AcuityBonus,  // crit chance + weak point damage
     StatusDamage,
-    PunchThrough
+    PunchThrough,
+    AmmoEfficiency
 }
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
@@ -38,15 +40,77 @@ pub struct ModStat {
     pub stat_value: i16
 }
 
-pub struct PrimaryArcanes;
-impl PrimaryArcanes {
-    pub const ARCANE_COUNT: usize = 1;
-    pub const RIFLE_ARCANES: [WeaponMod; PrimaryArcanes::ARCANE_COUNT] = [
+pub struct WeaponArcanes;
+impl WeaponArcanes {
+
+    pub const RIFLE_ARCANE_COUNT: usize = 4;
+    pub const RIFLE_ARCANES: [WeaponMod; WeaponArcanes::RIFLE_ARCANE_COUNT] = [
         WeaponMod {
             name: "Steel Path Arcane".into_string(),
             mod_stats: vec![ModStat{stat_type: StatType::DamageOnKill, stat_value: 360}]
+        },
+        WeaponMod {
+            name: "Primary Frostbite".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::CritDamage, stat_value: 120},
+                ModStat{stat_type: StatType::Multishot, stat_value: 90}
+            ]
+        },
+        WeaponMod {
+            name: "Primary Blight".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::CritDamage, stat_value: 144},
+                ModStat{stat_type: StatType::Multishot, stat_value: 72}
+            ]
+        },
+        WeaponMod {
+            name: "Primary Crux".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::StatusChance, stat_value: 300},
+                ModStat{stat_type: StatType::AmmoEfficiency, stat_value: 60}
+            ]
         }
     ];
+
+    pub const SHOTGUN_ARCANE_COUNT: usize = 5;
+    pub const SHOTGUN_ARCANES: [WeaponMod; WeaponArcanes::SHOTGUN_ARCANE_COUNT] = [
+        WeaponMod {
+            name: "Steel Path Arcane".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::DamageOnKill, stat_value: 360},
+                ModStat{stat_type: StatType::ReloadSpeed, stat_value: 30}
+            ]
+        },
+        WeaponMod {
+            name: "Primary Frostbite".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::CritDamage, stat_value: 120},
+                ModStat{stat_type: StatType::Multishot, stat_value: 90}
+            ]
+        },
+        WeaponMod {
+            name: "Primary Blight".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::CritDamage, stat_value: 144},
+                ModStat{stat_type: StatType::Multishot, stat_value: 72}
+            ]
+        },
+        WeaponMod {
+            name: "Primary Crux".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::StatusChance, stat_value: 300},
+                ModStat{stat_type: StatType::AmmoEfficiency, stat_value: 60}
+            ]
+        },
+        WeaponMod {
+            name: "Shotgun Vendetta".into_string(),
+            mod_stats: vec![
+                ModStat{stat_type: StatType::MultishotOnKill, stat_value: 180},
+                ModStat{stat_type: StatType::ReloadSpeedOnKill, stat_value: 75}
+            ]
+        }
+    ];
+
 }
 
 pub struct RifleMods;

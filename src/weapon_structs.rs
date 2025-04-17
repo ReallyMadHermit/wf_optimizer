@@ -30,13 +30,13 @@ fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
 
 #[derive(Clone)]
 pub struct GunStats {
-    fire_rate: f32,
-    multishot: f32,
-    magazine: f32,
-    reload: f32,
-    semi: bool,
-    gun_type: GunType,
-    hit_stats: [HitStats; 2]
+    pub fire_rate: f32,
+    pub multishot: f32,
+    pub magazine: f32,
+    pub reload: f32,
+    pub semi: bool,
+    pub gun_type: GunType,
+    pub hit_stats: [HitStats; 2]
 } impl GunStats {
 
     pub fn calculate_shot_damage(&self) -> f32 {
@@ -88,7 +88,7 @@ pub struct GunStats {
         }
     }
     
-    const EMPTY_GUN: GunStats = GunStats {
+    pub const EMPTY_GUN: GunStats = GunStats {
         fire_rate: 0.0,
         multishot: 0.0,
         magazine: 0.0,

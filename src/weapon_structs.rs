@@ -6,6 +6,18 @@ struct HitStats {
     crit_chance: f32,
     crit_damage: f32,
     status: f32
+} impl HitStats {
+    
+    const fn new(damage: f32, crit_chance: f32, crit_damage: f32, status: f32) -> Self {
+        HitStats {
+            damage, crit_chance, crit_damage, status
+        }
+    }
+    
+    const fn empty() -> Self {
+        HitStats::new(0.0, 0.0, 0.0, 0.0)
+    }
+    
 }
 
 fn apply_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
@@ -17,34 +29,36 @@ fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
 }
 
 #[derive(Clone)]
-struct GunStats {
+pub struct GunStats {
     fire_rate: f32,
     multishot: f32,
     magazine: f32,
     reload: f32,
-    hit_stats: Vec<HitStats>
+    semi: bool,
+    gun_type: GunType,
+    hit_stats: [HitStats; 2]
 } impl GunStats {
 
-    fn calculate_shot_damage(&self) -> f32 {
+    pub fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;
-        for hit in self.hit_stats {
+        for hit in &self.hit_stats {
             hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
         };
         return hit_sum;
     }
 
-    fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
+    pub fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
         let hits_per_second = self.fire_rate * self.multishot;
         shot_damage * hits_per_second
     }
 
-    fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
+    pub fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
         let mag_time = self.magazine / self.fire_rate;
         let firing_ratio = (mag_time + self.reload) / mag_time;
         firing_ratio * burst_dps
     }
 
-    fn apply_stat_sums(&self, stat_sums: &GunStatModSums) -> Self {
+    pub fn apply_stat_sums(&self, stat_sums: &GunStatModSums) -> Self {
         let mut modded_self = self.clone();
         modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sums.fire_rate);
         modded_self.multishot = apply_stat_sum(self.multishot, stat_sums.multishot);
@@ -60,30 +74,48 @@ struct GunStats {
         };
         return modded_self;
     }
+    
+    pub const RIFLE_LIST: [&'static str; 2] = [
+        "Prisma Gorgon",
+        "Trumna Prime"
+    ];
 
-    fn gun_lookup(weapon_name: &str) -> Self {
+    pub fn gun_lookup(weapon_name: &str) -> Self {
         match weapon_name {
             "Prisma Gorgon" => GunStats::PRISMA_GORGON,
             "Trumna Prime" => GunStats::TRUMNA_PRIME,
-            _ => {
-                println!("Weapon not found! Have a Prisma Gorgon instead!");
-                GunStats::PRISMA_GORGON
-            }
+            _ => GunStats::EMPTY_GUN
         }
     }
+    
+    const EMPTY_GUN: GunStats = GunStats {
+        fire_rate: 0.0,
+        multishot: 0.0,
+        magazine: 0.0,
+        reload: 0.0,
+        semi: false,
+        gun_type: GunType::Rifle,
+        hit_stats: [
+            HitStats::empty(),
+            HitStats::empty()
+        ]
+    };
 
     const PRISMA_GORGON: GunStats = GunStats {
         fire_rate: 14.7,
         multishot: 1.0,
         magazine: 120.0,
         reload: 3.0,
-        hit_stats: vec![
+        semi: false,
+        gun_type: GunType::Rifle,
+        hit_stats: [
             HitStats {
                 damage: 23.0,
                 crit_chance: 0.3,
                 crit_damage: 2.3,
                 status: 0.15
-            }
+            },
+            HitStats::empty()
         ]
     };
     const TRUMNA_PRIME: GunStats = GunStats {
@@ -91,7 +123,9 @@ struct GunStats {
         multishot: 1.0,
         magazine: 250.0,
         reload: 4.0,
-        hit_stats: vec![
+        semi: false,
+        gun_type: GunType::Rifle,
+        hit_stats: [
             HitStats {
                 damage: 85.0,
                 crit_chance: 0.24,
@@ -115,7 +149,7 @@ enum GunType {
 }
 
 #[derive(Clone)]
-struct GunStatModSums {
+pub struct GunStatModSums {
     damage: i16,
     ele_damage: i16,
     multishot: i16,
@@ -129,7 +163,7 @@ struct GunStatModSums {
     semi: bool
 } impl GunStatModSums {
 
-    fn new(kills: bool, semi: bool) -> Self {
+    pub fn new(kills: bool, semi: bool) -> Self {
         GunStatModSums {
             damage: 0,
             ele_damage: 0,
@@ -145,9 +179,9 @@ struct GunStatModSums {
         }
     }
 
-    fn from_mod_list(mod_list: ModList, kills: bool, semi: bool) -> Self {
+    pub fn from_mod_list(mod_list: ModList, gun_type: GunType, kills: bool, semi: bool) -> Self {
         let mut mod_sums = GunStatModSums::new(kills, semi);
-        let global_mod_list = match mod_list.gun_type {
+        let global_mod_list = match gun_type {
             GunType::Rifle => &RifleMods::ALL_MODS
         };
         for mod_id in mod_list.index_array {
@@ -160,8 +194,9 @@ struct GunStatModSums {
     fn add_mod(
         &mut self, weapon_mod: &WeaponMod, kills: bool, semi: bool
     ) {
-        for mod_stat in weapon_mod.mod_stats {
+        for mod_stat in &weapon_mod.mod_stats {
             match mod_stat.stat_type {
+                StatType::None => {continue},
                 StatType::Damage => {
                     self.damage += mod_stat.stat_value;
                 },
@@ -224,16 +259,16 @@ struct GunStatModSums {
 }
 
 #[derive(Clone)]
-struct ModList {
-    index_array: [i8; 8],
-    arcane_index: i8,
-    gun_type: GunType
+pub struct ModList {
+    pub index_array: [i8; 8],
+    pub arcane_index: i8,
 } impl ModList {
-    fn new(gun_type: GunType) -> Self {
+
+    pub fn new() -> Self {
         ModList {
             index_array: [-1; 8],
-            arcane_index: -1,
-            gun_type
+            arcane_index: -1
         }
     }
+
 }

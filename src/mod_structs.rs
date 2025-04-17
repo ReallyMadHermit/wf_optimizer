@@ -1,7 +1,7 @@
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct WeaponMod {
-    pub name: String,
-    pub mod_stats: Vec<ModStat>
+    pub name: &'static str,
+    pub mod_stats: [ModStat; 2]
 }
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
@@ -38,6 +38,22 @@ pub enum StatType {
 pub struct ModStat {
     pub stat_type: StatType,
     pub stat_value: i16
+} impl ModStat {
+    
+    const fn new(stat_type: StatType, stat_value: i16) -> Self {
+        ModStat {
+            stat_type,
+            stat_value
+        }
+    }
+    
+    const fn empty() -> Self {
+        ModStat {
+            stat_type: StatType::None,
+            stat_value: 0
+        }
+    }
+    
 }
 
 pub struct WeaponArcanes;
@@ -46,26 +62,29 @@ impl WeaponArcanes {
     pub const RIFLE_ARCANE_COUNT: usize = 4;
     pub const RIFLE_ARCANES: [WeaponMod; WeaponArcanes::RIFLE_ARCANE_COUNT] = [
         WeaponMod {
-            name: "Steel Path Arcane".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::DamageOnKill, stat_value: 360}]
+            name: "Steel Path Arcane",
+            mod_stats: [
+                ModStat{stat_type: StatType::DamageOnKill, stat_value: 360},
+                ModStat::empty()
+            ]
         },
         WeaponMod {
-            name: "Primary Frostbite".into_string(),
-            mod_stats: vec![
+            name: "Primary Frostbite",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritDamage, stat_value: 120},
                 ModStat{stat_type: StatType::Multishot, stat_value: 90}
             ]
         },
         WeaponMod {
-            name: "Primary Blight".into_string(),
-            mod_stats: vec![
+            name: "Primary Blight",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritDamage, stat_value: 144},
                 ModStat{stat_type: StatType::Multishot, stat_value: 72}
             ]
         },
         WeaponMod {
-            name: "Primary Crux".into_string(),
-            mod_stats: vec![
+            name: "Primary Crux",
+            mod_stats: [
                 ModStat{stat_type: StatType::StatusChance, stat_value: 300},
                 ModStat{stat_type: StatType::AmmoEfficiency, stat_value: 60}
             ]
@@ -75,36 +94,36 @@ impl WeaponArcanes {
     pub const SHOTGUN_ARCANE_COUNT: usize = 5;
     pub const SHOTGUN_ARCANES: [WeaponMod; WeaponArcanes::SHOTGUN_ARCANE_COUNT] = [
         WeaponMod {
-            name: "Steel Path Arcane".into_string(),
-            mod_stats: vec![
+            name: "Steel Path Arcane",
+            mod_stats: [
                 ModStat{stat_type: StatType::DamageOnKill, stat_value: 360},
                 ModStat{stat_type: StatType::ReloadSpeed, stat_value: 30}
             ]
         },
         WeaponMod {
-            name: "Primary Frostbite".into_string(),
-            mod_stats: vec![
+            name: "Primary Frostbite",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritDamage, stat_value: 120},
                 ModStat{stat_type: StatType::Multishot, stat_value: 90}
             ]
         },
         WeaponMod {
-            name: "Primary Blight".into_string(),
-            mod_stats: vec![
+            name: "Primary Blight",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritDamage, stat_value: 144},
                 ModStat{stat_type: StatType::Multishot, stat_value: 72}
             ]
         },
         WeaponMod {
-            name: "Primary Crux".into_string(),
-            mod_stats: vec![
+            name: "Primary Crux",
+            mod_stats: [
                 ModStat{stat_type: StatType::StatusChance, stat_value: 300},
                 ModStat{stat_type: StatType::AmmoEfficiency, stat_value: 60}
             ]
         },
         WeaponMod {
-            name: "Shotgun Vendetta".into_string(),
-            mod_stats: vec![
+            name: "Shotgun Vendetta",
+            mod_stats: [
                 ModStat{stat_type: StatType::MultishotOnKill, stat_value: 180},
                 ModStat{stat_type: StatType::ReloadSpeedOnKill, stat_value: 75}
             ]
@@ -120,181 +139,222 @@ impl RifleMods {
 
     pub const ALL_MODS: [WeaponMod; RifleMods::MOD_COUNT] = [
         WeaponMod {  // 0
-            name: "Amalgam Serration".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::Damage, stat_value: 155}]
+            name: "Amalgam Serration",
+            mod_stats: [
+                ModStat{stat_type: StatType::Damage, stat_value: 155},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 1
-            name: "Argon Scope".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::CritChance, stat_value: 135}]
+            name: "Argon Scope",
+            mod_stats: [
+                ModStat{stat_type: StatType::CritChance, stat_value: 135},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 2
-            name: "Bladed Rounds".into_string(),
-            mod_stats: vec![
+            name: "Bladed Rounds",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritDamage, stat_value: 0},
                 ModStat{stat_type: StatType::CritDamageOnKill, stat_value: 120}
             ]
         },
         WeaponMod {  // 3
-            name: "Critical Delay".into_string(),
-            mod_stats: vec![
+            name: "Critical Delay",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritChance, stat_value: 200},
                 ModStat{stat_type: StatType::FireRate, stat_value: -20}
             ]
         },
         WeaponMod {  // 4
-            name: "Galvanized Aptitude".into_string(),
-            mod_stats: vec![
+            name: "Galvanized Aptitude",
+            mod_stats: [
                 ModStat{stat_type: StatType::StatusChance, stat_value: 80},
                 ModStat{stat_type: StatType::ConditionOverload, stat_value: 80}
             ]
         },
         WeaponMod {  // 5
-            name: "Galvanized Chamber".into_string(),
-            mod_stats: vec![
+            name: "Galvanized Chamber",
+            mod_stats: [
                 ModStat{stat_type: StatType::Multishot, stat_value: 80},
                 ModStat{stat_type: StatType::MultishotOnKill, stat_value: 150}
             ]
         },
         WeaponMod {  // 6
-            name: "Galvanized Scope".into_string(),
-            mod_stats: vec![
+            name: "Galvanized Scope",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritChance, stat_value: 120},
                 ModStat{stat_type: StatType::CritChanceOnKill, stat_value: 200}
             ]
         },
         WeaponMod {  // 7
-            name: "Hammer Shot".into_string(),
-            mod_stats: vec![
+            name: "Hammer Shot",
+            mod_stats: [
                 ModStat{stat_type: StatType::CritDamage, stat_value: 60},
                 ModStat{stat_type: StatType::StatusChance, stat_value: 80}
             ]
         },
         WeaponMod {  // 8
-            name: "Heavy Caliber".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::Damage, stat_value: 165}]
+            name: "Heavy Caliber",
+            mod_stats: [
+                ModStat{stat_type: StatType::Damage, stat_value: 165},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 9
-            name: "Hellfire".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::Heat, stat_value: 110}]
+            name: "Hellfire",
+            mod_stats: [
+                ModStat{stat_type: StatType::Heat, stat_value: 110},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 10
-            name: "High Voltage".into_string(),
-            mod_stats: vec![
+            name: "High Voltage",
+            mod_stats: [
                 ModStat{stat_type: StatType::Shock, stat_value: 60},
                 ModStat{stat_type: StatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 11
-            name: "Infected Clip".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::Toxic, stat_value: 110}]
+            name: "Infected Clip",
+            mod_stats: [
+                ModStat{stat_type: StatType::Toxic, stat_value: 110},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 12
-            name: "Magnetic Capacity".into_string(),
-            mod_stats: vec![
+            name: "Magnetic Capacity",
+            mod_stats: [
                 ModStat{stat_type: StatType::Magnetic, stat_value: 60},
                 ModStat{stat_type: StatType::MagazineCapacity, stat_value: 40}
             ]
         },
         WeaponMod {  // 13
-            name: "Malignant Force".into_string(),
-            mod_stats: vec![
+            name: "Malignant Force",
+            mod_stats: [
                 ModStat{stat_type: StatType::Toxic, stat_value: 60},
                 ModStat{stat_type: StatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 14
-            name: "Point Strike".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::CritChance, stat_value: 150}]
+            name: "Point Strike",
+            mod_stats: [
+                ModStat{stat_type: StatType::CritChance, stat_value: 150},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 15
-            name: "Primary Acuity".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::AcuityBonus, stat_value: 350}]
+            name: "Primary Acuity",
+            mod_stats: [ModStat{stat_type: StatType::AcuityBonus, stat_value: 350},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 16
-            name: "Primed Cryo Rounds".into_string(),
-            mod_stats: vec![ModStat {stat_type: StatType::Cold, stat_value: 165}]
+            name: "Primed Cryo Rounds",
+            mod_stats: [
+                ModStat {stat_type: StatType::Cold, stat_value: 165},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 17
-            name: "Primed Shred".into_string(),
-            mod_stats: vec![
+            name: "Primed Shred",
+            mod_stats: [
                 ModStat{stat_type: StatType::FireRate, stat_value: 55},
                 ModStat{stat_type: StatType::PunchThrough, stat_value: 12}
             ]
         },
         WeaponMod {  // 18
-            name: "Radiated Reload".into_string(),
-            mod_stats: vec![
+            name: "Radiated Reload",
+            mod_stats: [
                 ModStat{stat_type: StatType::Radiation, stat_value: 60},
                 ModStat{stat_type: StatType::ReloadSpeed, stat_value: 60}
             ]
         },
         WeaponMod {  // 19
-            name: "Rifle Elementalist".into_string(),
-            mod_stats: vec![ModStat {stat_type: StatType::StatusDamage, stat_value: 90}]
+            name: "Rifle Elementalist",
+            mod_stats: [
+                ModStat {stat_type: StatType::StatusDamage, stat_value: 90},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 20
-            name: "Rime Rounds".into_string(),
-            mod_stats: vec![
+            name: "Rime Rounds",
+            mod_stats: [
                 ModStat{stat_type: StatType::Cold, stat_value: 60},
                 ModStat{stat_type: StatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 21
-            name: "Semi-Rifle Cannonade".into_string(),
-            mod_stats: vec![
+            name: "Semi-Rifle Cannonade",
+            mod_stats: [
                 ModStat{stat_type: StatType::Damage, stat_value: 0},
                 ModStat{stat_type: StatType::DamageForSemiAuto, stat_value: 240}
             ]
         },
         WeaponMod {  // 22
-            name: "Speed Trigger".into_string(),
-            mod_stats: vec![ModStat {stat_type: StatType::FireRate, stat_value: 60}]
+            name: "Speed Trigger",
+            mod_stats: [
+                ModStat {stat_type: StatType::FireRate, stat_value: 60},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 23
-            name: "Stormbringer".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::Shock, stat_value: 110}]
+            name: "Stormbringer",
+            mod_stats: [
+                ModStat{stat_type: StatType::Shock, stat_value: 110},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 24
-            name: "Thermite Rounds".into_string(),
-            mod_stats: vec![
+            name: "Thermite Rounds",
+            mod_stats: [
                 ModStat{stat_type: StatType::Heat, stat_value: 60},
                 ModStat{stat_type: StatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 25
-            name: "Vile Acceleration".into_string(),
-            mod_stats: vec![
+            name: "Vile Acceleration",
+            mod_stats: [
                 ModStat{stat_type: StatType::FireRate, stat_value: 90},
                 ModStat{stat_type: StatType::Damage, stat_value: -15}
             ]
         },
         WeaponMod {  // 26
-            name: "Vital Sense".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::CritDamage, stat_value: 120}]
+            name: "Vital Sense",
+            mod_stats: [
+                ModStat{stat_type: StatType::CritDamage, stat_value: 120},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 27
-            name: "Wildfire".into_string(),
-            mod_stats: vec![
+            name: "Wildfire",
+            mod_stats: [
                 ModStat{stat_type: StatType::Heat, stat_value: 60},
                 ModStat{stat_type: StatType::MagazineCapacity, stat_value: 20}
             ]
         },
         WeaponMod {  // 28
-            name: "Vigilante Armaments".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::Multishot, stat_value: 60}]
+            name: "Vigilante Armaments",
+            mod_stats: [
+                ModStat{stat_type: StatType::Multishot, stat_value: 60},
+                ModStat::empty()
+            ]
         },
         WeaponMod {  // 29
-            name: "Vigilante Fervor".into_string(),
-            mod_stats: vec![ModStat{stat_type: StatType::FireRate, stat_value: 45}]
+            name: "Vigilante Fervor",
+            mod_stats: [
+                ModStat{stat_type: StatType::FireRate, stat_value: 45},
+                ModStat::empty()
+            ]
         }
     ];
 
-    pub const CANNONADE_INDEX: usize = 21;
-    pub const DAMAGE_MODS: [usize; 2] = [0, 8];
-    pub const ELE_DAMAGE_MODS: [usize; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
-    pub const MULTISHOT_MODS: [usize; 2] = [5, 28];
-    pub const CRIT_CHANCE_MODS: [usize; 2] = [6, 3];
-    pub const CRIT_DAMAGE_MODS: [usize; 3] = [26, 2, 7];
-    pub const FIRE_RATE_MODS: [usize; 4] = [25, 17, 22, 29];
+    pub const CANNONADE_INDEX: i8 = 21;
+    pub const DAMAGE_MODS_INDEX: [i8; 2] = [0, 8];
+    pub const ELE_DAMAGE_MODS_INDEX: [i8; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
+    pub const MULTISHOT_MODS_INDEX: [i8; 2] = [5, 28];
+    pub const CRIT_CHANCE_MODS_INDEX: [i8; 2] = [6, 3];
+    pub const CRIT_DAMAGE_MODS_INDEX: [i8; 3] = [26, 2, 7];
+    pub const FIRE_RATE_MODS_INDEX: [i8; 4] = [25, 17, 22, 29];
 
 }

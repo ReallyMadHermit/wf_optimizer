@@ -3,6 +3,8 @@ use std::io::stdin;
 mod mod_structs;
 mod weapon_structs;
 mod supporting_functions;
+mod brute_force_solution;
+
 use supporting_functions::{weapon_select_loop};
 use crate::supporting_functions::fill_empty_mod_slots;
 use crate::weapon_structs::{ModList, Criteria};

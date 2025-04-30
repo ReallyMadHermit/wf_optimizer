@@ -1,4 +1,5 @@
 use crate::mod_structs::{RifleMods, WeaponMod, StatType};
+use crate::supporting_functions::take_input;
 
 #[derive(Clone)]
 struct HitStats {
@@ -44,12 +45,12 @@ pub struct GunStats {
         for hit in &self.hit_stats {
             hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
         };
+        hit_sum *= self.multishot;
         return hit_sum;
     }
 
     pub fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
-        let hits_per_second = self.fire_rate * self.multishot;
-        shot_damage * hits_per_second
+        self.fire_rate * shot_damage
     }
 
     pub fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
@@ -68,26 +69,29 @@ pub struct GunStats {
             let mut modded_hit = &mut modded_self.hit_stats[i];
             let self_hit = &self.hit_stats[i];
             modded_hit.damage = apply_stat_sum(self_hit.damage, stat_sums.damage);
-            modded_hit.crit_chance = apply_stat_sum(self_hit.damage, stat_sums.damage);
+            modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
+            modded_hit.crit_chance = apply_stat_sum(self_hit.crit_chance, stat_sums.crit_chance);
             modded_hit.crit_damage = apply_stat_sum(self_hit.crit_damage, stat_sums.crit_damage);
             modded_hit.status = apply_stat_sum(self_hit.status, stat_sums.status);
         };
         return modded_self;
     }
     
-    pub const RIFLE_LIST: [&'static str; 2] = [
+    pub const RIFLE_LIST: [&'static str; 3] = [
         "Prisma Gorgon",
-        "Trumna Prime"
+        "Trumna Prime",
+        "Acceltra Prime"
     ];
 
     pub fn gun_lookup(weapon_name: &str) -> Self {
         match weapon_name {
             "Prisma Gorgon" => GunStats::PRISMA_GORGON,
             "Trumna Prime" => GunStats::TRUMNA_PRIME,
+            "Acceltra Prime" => GunStats::ACCELTRA_PRIME,
             _ => GunStats::EMPTY_GUN
         }
     }
-    
+
     pub const EMPTY_GUN: GunStats = GunStats {
         fire_rate: 0.0,
         multishot: 0.0,
@@ -140,11 +144,33 @@ pub struct GunStats {
             }
         ]
     };
+    const ACCELTRA_PRIME: GunStats = GunStats {
+        fire_rate: 10.0,
+        multishot: 1.0,
+        magazine: 48.0,
+        reload: 1.6,
+        semi: false,
+        gun_type: GunType::Rifle,
+        hit_stats: [
+            HitStats {
+                damage: 44.0,
+                crit_chance: 0.34,
+                crit_damage: 3.0,
+                status: 0.18
+            }, 
+            HitStats {
+                damage: 53.0,
+                crit_chance: 0.34,
+                crit_damage: 3.0,
+                status: 0.18
+            }
+        ]
+    };
 
 }
 
 #[derive(Clone)]
-enum GunType {
+pub enum GunType {
     Rifle
 }
 
@@ -179,19 +205,24 @@ pub struct GunStatModSums {
         }
     }
 
-    pub fn from_mod_list(mod_list: ModList, gun_type: GunType, kills: bool, semi: bool) -> Self {
-        let mut mod_sums = GunStatModSums::new(kills, semi);
-        let global_mod_list = match gun_type {
+    pub fn from_mod_list(mod_list: &ModList, gun_stats: &GunStats) -> Self {
+        let mut mod_sums = GunStatModSums::new(
+            mod_list.criteria.kills(), gun_stats.semi
+        );
+        let global_mod_list = match gun_stats.gun_type {
             GunType::Rifle => &RifleMods::ALL_MODS
         };
         for mod_id in mod_list.index_array {
+            if mod_id < 0 {
+                continue
+            };
             let weapon_mod: &WeaponMod = &global_mod_list[mod_id as usize];
-            mod_sums.add_mod(&weapon_mod, kills, semi);
+            mod_sums.add_mod(&weapon_mod, mod_list.criteria.kills(), gun_stats.semi);
         };
         return mod_sums;
     }
 
-    fn add_mod(
+    pub fn add_mod(
         &mut self, weapon_mod: &WeaponMod, kills: bool, semi: bool
     ) {
         for mod_stat in &weapon_mod.mod_stats {
@@ -256,18 +287,135 @@ pub struct GunStatModSums {
         };
     }
 
+    pub fn remove_mod(
+        &mut self, weapon_mod: &WeaponMod, kills: bool, semi: bool
+    ) {
+        for mod_stat in &weapon_mod.mod_stats {
+            match mod_stat.stat_type {
+                StatType::None => {continue},
+                StatType::Damage => {
+                    self.damage -= mod_stat.stat_value;
+                },
+                StatType::DamageForSemiAuto => {
+                    if semi {
+                        self.damage -= mod_stat.stat_value;
+                    };
+                },
+                StatType::DamageOnKill => {
+                    if kills {
+                        self.damage -= mod_stat.stat_value;
+                    };
+                },
+                StatType::Cold | StatType::Toxic |
+                StatType::Heat | StatType::Shock |
+                StatType::Radiation | StatType::Magnetic => {
+                    self.ele_damage -= mod_stat.stat_value;
+                },
+                StatType::StatusChance => {
+                    self.status -= mod_stat.stat_value;
+                }
+                StatType::Multishot => {
+                    self.multishot -= mod_stat.stat_value;
+                },
+                StatType::MultishotOnKill => {
+                    if kills {
+                        self.multishot -= mod_stat.stat_value;
+                    };
+                },
+                StatType::CritChance => {
+                    self.crit_chance -= mod_stat.stat_value;
+                },
+                StatType::CritChanceOnKill => {
+                    if kills {
+                        self.crit_chance -= mod_stat.stat_value;
+                    };
+                },
+                StatType::CritDamage => {
+                    self.crit_damage -= mod_stat.stat_value;
+                },
+                StatType::CritDamageOnKill => {
+                    if kills {
+                        self.crit_damage -= mod_stat.stat_value;
+                    };
+                },
+                StatType::FireRate => {
+                    self.fire_rate -= mod_stat.stat_value;
+                },
+                StatType::MagazineCapacity => {
+                    self.magazine -= mod_stat.stat_value;
+                },
+                StatType::ReloadSpeed => {
+                    self.reload -= mod_stat.stat_value;
+                },
+                _ => {}
+            };
+        };
+    }
+
+}
+
+#[derive(Clone, Eq, PartialEq)]
+pub enum Criteria {
+    PerShot,
+    BurstDPS,
+    SustainedDPS,
+    PerShotNoKills,
+    BurstDPSNoKills,
+    SustainedDPSNoKills
+} impl Criteria {
+
+    pub fn kills(&self) -> bool {
+        match self {
+            Criteria::PerShot | Criteria::BurstDPS | Criteria::SustainedDPS => {
+                true
+            },
+            _ => {
+                false
+            }
+        }
+    }
+
+    pub fn determine_criteria() -> Criteria {
+        println!();
+        println!("Okay, what are we optimizing this for?");
+        println!("1: Per-Shot Damage");
+        println!("2: Burst DPS");
+        println!("3: Sustained DPS");
+        println!("4: Per-Shot Damage, without kills");
+        println!("5: Burst DPS, without kills");
+        println!("6: Sustained DPS, without kills");
+        let input = take_input(
+            "If you fuck this up, we assume you want 'Per-Shot Damage'"
+        );
+        return if let Ok(index) = input.parse::<u8>() {
+            match index {
+                1 => Criteria::PerShot,
+                2 => Criteria::BurstDPS,
+                3 => Criteria::SustainedDPS,
+                4 => Criteria::PerShotNoKills,
+                5 => Criteria::BurstDPSNoKills,
+                6 => Criteria::SustainedDPSNoKills,
+                _ => Criteria::PerShot
+            }
+        } else {
+            Criteria::PerShot
+        };
+    }
+
 }
 
 #[derive(Clone)]
 pub struct ModList {
     pub index_array: [i8; 8],
     pub arcane_index: i8,
+    pub criteria: Criteria
 } impl ModList {
 
-    pub fn new() -> Self {
+    pub fn new(criteria: Criteria) -> Self {
         ModList {
             index_array: [-1; 8],
-            arcane_index: -1
+            arcane_index: -1,
+            criteria
         }
     }
 

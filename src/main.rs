@@ -3,7 +3,9 @@ use std::io::stdin;
 mod mod_structs;
 mod weapon_structs;
 mod supporting_functions;
-use supporting_functions::weapon_select_loop;
+use supporting_functions::{weapon_select_loop};
+use crate::supporting_functions::fill_empty_mod_slots;
+use crate::weapon_structs::{ModList, Criteria};
 
 fn main() {
     cli();

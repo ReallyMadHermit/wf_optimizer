@@ -8,7 +8,7 @@ pub fn weapon_select_loop() -> GunStats {
     while !selected {
         println!("Please enter a weapon name.");
         let mut input = take_input(
-            "Or, press enter for a list of supported weapons..."
+            "Or, press enter for a list of supported weapons:"
         );
         gun_stats = if input.len() > 0 {
             println!("Looking up '{}'...", input);
@@ -18,7 +18,7 @@ pub fn weapon_select_loop() -> GunStats {
             use_weapon_list()
         };
         selected = gun_stats.fire_rate != 0.0;
-    }
+    };
     return gun_stats;
 }
 
@@ -27,8 +27,8 @@ fn use_weapon_list() -> GunStats {
     println!("Enter the number that corresponds with your weapon:");
     for (index, weapon_name) in GunStats::RIFLE_LIST.iter().enumerate() {
         println!("{}: {}", index, weapon_name)
-    }
-    let input = take_input("Leave blank, or fuck up the input to go back...");
+    };
+    let input = take_input("Leave blank, or fuck up the input to go back:");
     
     return if let Ok(index) = input.parse::<usize>() {
         GunStats::gun_lookup(GunStats::RIFLE_LIST[index])

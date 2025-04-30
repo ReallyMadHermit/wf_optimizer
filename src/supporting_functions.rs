@@ -138,6 +138,6 @@ fn identify_weakest_mod_slot(mod_list: &ModList, base_gun_stats: &GunStats) -> i
     return weak_index;
 }
 
-fn test_for_better_mods(&mut mod_list: &ModList, base_gun_stats: &GunStats) -> {
-    
-}
+// fn test_for_better_mods(&mut mod_list: &ModList, base_gun_stats: &GunStats) -> {
+// 
+// }

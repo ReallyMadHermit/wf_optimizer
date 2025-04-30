@@ -1,3 +1,5 @@
+use crate::weapon_structs::GunType;
+
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct WeaponMod {
     pub name: &'static str,
@@ -349,12 +351,30 @@ impl RifleMods {
         }
     ];
 
-    pub const CANNONADE_INDEX: i8 = 21;
+    pub const CANNONADE_MODS_INDEX: [i8; 1] = [21];
     pub const DAMAGE_MODS_INDEX: [i8; 2] = [0, 8];
     pub const ELE_DAMAGE_MODS_INDEX: [i8; 4] = [16, 11, 9, 23];  // cold, toxic, heat, shock
     pub const MULTISHOT_MODS_INDEX: [i8; 2] = [5, 28];
     pub const CRIT_CHANCE_MODS_INDEX: [i8; 2] = [6, 3];
     pub const CRIT_DAMAGE_MODS_INDEX: [i8; 3] = [26, 2, 7];
     pub const FIRE_RATE_MODS_INDEX: [i8; 4] = [25, 17, 22, 29];
+    
+    pub const MOD_INDEXES_REFERENCES: [&'static [i8]; 7] = [
+        &RifleMods::CANNONADE_MODS_INDEX,
+        &RifleMods::DAMAGE_MODS_INDEX,
+        &RifleMods::ELE_DAMAGE_MODS_INDEX,
+        &RifleMods::MULTISHOT_MODS_INDEX,
+        &RifleMods::CRIT_CHANCE_MODS_INDEX,
+        &RifleMods::CRIT_DAMAGE_MODS_INDEX,
+        &RifleMods::FIRE_RATE_MODS_INDEX
+    ];
 
+}
+
+pub fn lookup_mod(gun_type: &GunType, mod_index: usize) -> &WeaponMod {
+    return match gun_type {
+        GunType::Rifle => {
+             &RifleMods::ALL_MODS[mod_index]
+        }
+    };
 }

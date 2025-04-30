@@ -119,5 +119,25 @@ pub fn fill_empty_mod_slots(
     compare_stats(base_gun_stats, &new_stats, &mod_list.criteria)
 }
 
-// fn find_next_top_mod_index(mod_list: &ModList) -> i8 {
-// }
+fn identify_weakest_mod_slot(mod_list: &ModList, base_gun_stats: &GunStats) -> i8 {
+    let current_mod_sum = GunStatModSums::from_mod_list(&mod_list, &base_gun_stats);
+    let current_weapon_stats = base_gun_stats.apply_stat_sums(&current_mod_sum);
+    let mut weakest_score = 1000.0;
+    let mut weak_index: i8 = -1;
+    for (slot_index, mod_index) in mod_list.index_array.iter().enumerate() {
+        let weapon_mod = lookup_mod(&base_gun_stats.gun_type, mod_index.clone() as usize);
+        let mut modified_sum = current_mod_sum.clone();
+        modified_sum.remove_mod(weapon_mod, mod_list.criteria.kills(), base_gun_stats.semi);
+        let modified_weapon_stats = base_gun_stats.apply_stat_sums(&modified_sum);
+        let mod_rating = compare_stats(&modified_weapon_stats, &current_weapon_stats, &mod_list.criteria);
+        if mod_rating < weakest_score {
+            weakest_score = mod_rating;
+            weak_index = slot_index as i8;
+        };
+    };
+    return weak_index;
+}
+
+fn test_for_better_mods(&mut mod_list: &ModList, base_gun_stats: &GunStats) -> {
+    
+}

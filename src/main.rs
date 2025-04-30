@@ -6,5 +6,13 @@ mod supporting_functions;
 use supporting_functions::weapon_select_loop;
 
 fn main() {
-    weapon_select_loop();
+    cli();
+}
+
+fn cli() {
+    let base_weapon_stats = weapon_select_loop();
+    let criteria = Criteria::determine_criteria();
+    let mut mod_list = ModList::new(criteria);
+    let initial_score = fill_empty_mod_slots(&mut mod_list, &base_weapon_stats);
+    println!("Score: {}", initial_score);
 }

@@ -68,7 +68,7 @@ pub fn filter_combinations(
 }
 
 fn keep_combo(combo: &[u8; 8], required: &Vec<usize>, disallowed: &Vec<usize>) -> bool {
-    let mut truth_table = [false; 34];
+    let mut truth_table = [false; MAX_INDEX];
     for &index in combo {
         truth_table[index as usize] = true;
     };

@@ -1,38 +1,35 @@
-Mod Name,Stat 1 Type,Stat 1 Value,Stat 2 Type,Stat 2 Value,Index,Exlude Index
-Amalgam Serration,Damage,155,None,0,0,26
-Argon Scope,CritChance,135,None,0,1,7
-Bladed Rounds,CritDamageOnKill,120,None,0,2,
-Critical Delay,CritChance,200,FireRate,-20,3,16
-Fast Hands,ReloadSpeed,30,None,0,4,19
-Galvanized Aptitude,StatusChance,80,ConditionOverload,80,5,22
-Galvanized Chamber,Multishot,80,MultishotOnKill,150,6,29
-Galvanized Scope,CritChance,120,CritChanceOnKill,200,7,1
-Hammer Shot,CritDamage,60,StatusChance,80,8,
-Heavy Caliber,Damage,165,None,0,9,
-Hellfire,Heat,90,None,0,10,
-High Voltage,Shock,60,StatusChance,60,11,
-Hunter Munitions,None,30,None,0,12,
-Infected Clip,Toxic,90,None,0,13,
-Magnetic Capacity,Magnetic,60,MagazineCapacity,40,14,
-Malignant Force,Toxic,60,StatusChance,60,15,
-Point Strike,CritChance,150,None,0,16,3
-Primary Acuity,AcuityBonus,350,None,0,17,
-Primed Cryo Rounds,Cold,165,None,0,18,
-Primed Fast Hands,ReloadSpeed,55,None,0,19,4
-Primed Shred,FireRate,55,PunchThrough,22,20,27
-Radiated Reload,Radiation,60,ReloadSpeed,40,21,
-Rifle Aptitude,StatusChance,90,None,0,22,5
-Rifle Elementalist,StatusDamage,90,PunchThrough,6,23,
-Rime Rounds,Cold,60,StatusChance,60,24,
-Semi-Rifle Cannonade,DamageForSemiAuto,240,PunchThrough,15,25,
-Serration,Damage,165,None,0,26,0
-Shred,FireRate,30,PunchThrough,12,27,20
-Speed Trigger,FireRate,60,None,0,28,
-Split Chamber,Multishot,90,None,0,29,6
-Stormbringer,Shock,90,None,0,30,
-Thermite Rounds,Heat,60,StatusChance,60,31,
-Vigilante Armaments,Multishot,60,None,5,32,
-Vigilante Fervor,FireRate,45,None,5,33,
-Vile Acceleration,FireRate,90,Damage,-15,34,
-Vital Sense,CritDamage,120,None,0,35,
-Wildfire,Heat,60,MagazineCapacity,20,36,
+Mod Name,Stat 1 Type,Stat 1 Value,Stat 2 Type,Stat 2 Value,Excludes,Index
+Amalgam Serration,Damage,155,None,0,Serration,0
+Argon Scope,CritChance,135,None,0,Scope,1
+Bladed Rounds,CritDamageOnKill,120,None,0,,2
+Critical Delay,CritChance,200,FireRate,-20,Point Strike,3
+Galvanized Aptitude,StatusChance,80,ConditionOverload,80,Aptitude,4
+Galvanized Chamber,Multishot,80,MultishotOnKill,150,Chamber,5
+Galvanized Scope,CritChance,120,CritChanceOnKill,200,Scope,6
+Hammer Shot,CritDamage,60,StatusChance,80,,7
+Heavy Caliber,Damage,165,None,0,,8
+Hellfire,Heat,90,None,0,,9
+High Voltage,Shock,60,StatusChance,60,,10
+Hunter Munitions,None,30,None,0,,11
+Infected Clip,Toxic,90,None,0,,12
+Magnetic Capacity,Magnetic,60,MagazineCapacity,40,,13
+Malignant Force,Toxic,60,StatusChance,60,,14
+Point Strike,CritChance,150,None,0,Point Strike,15
+Primary Acuity,AcuityBonus,350,None,0,,16
+Primed Cryo Rounds,Cold,165,None,0,,17
+Primed Fast Hands,ReloadSpeed,55,None,0,,18
+Primed Shred,FireRate,55,PunchThrough,22,,19
+Radiated Reload,Radiation,60,ReloadSpeed,40,,20
+Rifle Aptitude,StatusChance,90,None,0,Aptitude,21
+Rifle Elementalist,StatusDamage,90,PunchThrough,6,,22
+Rime Rounds,Cold,60,StatusChance,60,,23
+Semi-Rifle Cannonade,DamageForSemiAuto,240,PunchThrough,15,,24
+Serration,Damage,165,None,0,Serration,25
+Speed Trigger,FireRate,60,None,0,,26
+Split Chamber,Multishot,90,None,0,Chamber,27
+Stormbringer,Shock,90,None,0,,28
+Thermite Rounds,Heat,60,StatusChance,60,,29
+Vigilante Armaments,Multishot,60,None,5,,30
+Vile Acceleration,FireRate,90,Damage,-15,,31
+Vital Sense,CritDamage,120,None,0,,32
+Wildfire,Heat,60,MagazineCapacity,20,,33

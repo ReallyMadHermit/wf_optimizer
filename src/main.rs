@@ -9,13 +9,21 @@ use crate::brute_force_solution::generate_combinations;
 use crate::mod_structs::ModLoader;
 
 fn main() {
-    // let combinations = generate_combinations(32);
-    // let count = combinations.len();
-    // println!("{}", count);
-    // print_combo(&combinations[0]);
-    // print_combo(&combinations[count - 1]);
-    let mut buffer = String::new();
-    let parsed_mods = ModLoader::load_gun_mods(&GunType::Rifle, &mut buffer);
+    debug_prompts();
+}
+
+fn debug_prompts() {
+    let parsed_mod_list = {
+        let mut buffer = String::new();
+        ModLoader::load_gun_mods(&GunType::Rifle, &mut buffer)
+    };
+    let mut combinations = generate_combinations(parsed_mod_list.len() as u8);
+    let count = combinations.len();
+    println!("Combinations: {}", count);
+    println!("First combo:");
+    print_combo(&combinations[0]);
+    println!("Last combo:");
+    print_combo(&combinations[count - 1]);
 }
 
 fn print_combo(combo: &[u8; 8]) {

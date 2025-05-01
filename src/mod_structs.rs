@@ -33,7 +33,8 @@ pub enum StatType {
     AcuityBonus,  // crit chance + weak point damage
     StatusDamage,
     PunchThrough,
-    AmmoEfficiency
+    AmmoEfficiency,
+    GalvanizedAptitude
 }
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]

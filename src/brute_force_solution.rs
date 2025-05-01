@@ -59,7 +59,7 @@ const ILLEGAL_PAIRS: [(usize, usize); 11] = [
     (24, 26), // Cannonade exclude Speed Trigger
     (24, 31), // Cannonade exclude Vile Acceleration
 ];
-const MAX_INDEX: usize = 34;
+const MAX_INDEX: usize = 35;
 
 pub fn filter_combinations(
     combinations: &mut Vec<[u8; 8]>, required: &Vec<usize>, disallowed: &Vec<usize>

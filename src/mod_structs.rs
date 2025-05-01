@@ -35,7 +35,8 @@ pub enum GunStatType {
     AcuityBonus,  // crit chance + weak point damage
     StatusDamage,
     PunchThrough,
-    AmmoEfficiency
+    AmmoEfficiency,
+    Riven
 } impl GunStatType {
     fn from_str(string_slice: &str) -> Self {
         return match string_slice {

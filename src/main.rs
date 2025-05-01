@@ -8,9 +8,18 @@ mod brute_force_solution;
 use supporting_functions::{weapon_select_loop};
 use crate::supporting_functions::fill_empty_mod_slots;
 use crate::weapon_structs::{ModList, Criteria};
+use crate::brute_force_solution::generate_combinations;
 
 fn main() {
-    cli();
+    let combinations = generate_combinations(32);
+    print_combo(&combinations[0]);
+}
+
+fn print_combo(combo: &[u8; 8]) {
+    println!(
+        "{}, {}, {}, {}, {}, {}, {}, {}",
+        combo[0], combo[1], combo[2], combo[3], combo[4], combo[5], combo[6], combo[7],
+    );
 }
 
 fn cli() {

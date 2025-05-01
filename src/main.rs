@@ -24,11 +24,13 @@ fn debug_prompts() {
     print_combo(&combinations[0]);
     println!("Last combo:");
     print_combo(&combinations[count - 1]);
+    
     let required_mods: Vec<usize> = Vec::new();
     let disallowed_mods: Vec<usize> = Vec::new();
     println!("Filtering illegal pairs...");
     filter_combinations(&mut combinations, &required_mods, &disallowed_mods);
     combinations.shrink_to_fit();
+    
     let count = combinations.len();
     println!("Combinations: {}", count);
     println!("First combo:");

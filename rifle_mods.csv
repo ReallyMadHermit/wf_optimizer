@@ -1,0 +1,40 @@
+Mod Name,Stat 1 Type,Stat 1 Value,Stat 2 Type,Stat 2 Value,MutuallyExclusive
+Hunter Munitions,None,30,None,0,
+Vigilante Armaments,Multishot,60,None,5,
+Vigilante Fervor,FireRate,45,None,5,
+Vigilante Offense,PunchThrough,15,None,5,
+Amalgam Serration,Damage,155,None,0,Serration
+Argon Scope,CritChance,135,None,0,Scope
+Bladed Rounds,CritDamageOnKill,120,None,0,
+Critical Delay,CritChance,200,FireRate,-20,Point Strike
+Cryo rounds,Cold,90,None,0,Cryo rounds
+Fast Hands,ReloadSpeed,30,None,0,Fast Hands
+Galvanized Aptitude,StatusChance,80,GalvanizedAptitude,80,Aptitude
+Galvanized Chamber,Multishot,80,MultishotOnKill,150,Chamber
+Galvanized Scope,CritChance,120,CritChanceOnKill,200,Scope
+Hammer Shot,CritDamage,60,StatusChance,80,
+Heavy Caliber,Damage,165,None,0,
+Hellfire,Heat,90,None,0,
+High Voltage,Shock,60,StatusChance,60,
+Infected Clip,Toxic,90,,,
+Magnetic Capacity,Magnetic,60,MagazineCapacity,40,
+Malignant Force,Toxic,60,StatusChance,60,
+Point Strike,CritChance,150,,,Point Strike
+Primary Acuity,AcuityBonus,350,,,
+Primed Cryo Rounds,Cold,165,,,Cryo rounds
+Primed Fast Hands,ReloadSpeed,55,,,Fast Hands
+Primed Shred,FireRate,55,PunchThrough,22,Shred
+Radiated Reload,Radiation,60,ReloadSpeed,40,
+Rifle Aptitude,StatusChance,90,,,Aptitude
+Rifle Elementalist,StatusDamage,90,PunchThrough,6,
+Rime Rounds,Cold,60,StatusChance,60,
+Semi-Rifle Cannonade,DamageForSemiAuto,240,PunchThrough,15,
+Serration,Damage,165,,,Serration
+Shred,FireRate,30,PunchThrough,12,
+Speed Trigger,FireRate,60,,,
+Split Chamber,Multishot,90,,,Chamber
+Stormbringer,Shock,90,,,
+Thermite Rounds,Heat,60,StatusChance,60,
+Vile Acceleration,FireRate,90,Damage,-15,
+Vital Sense,CritDamage,120,,,
+Wildfire,Heat,60,MagazineCapacity,20,

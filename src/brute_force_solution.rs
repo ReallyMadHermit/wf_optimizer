@@ -45,3 +45,47 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
     };
     result
 }
+
+const ILLEGAL_PAIRS: [(usize, usize); 11] = [
+    (4, 21),  // Aptitude
+    (5, 27),  // Chamber
+    (3, 15),  // Point Strike
+    (1, 6),   // Scope
+    (0, 25),  // Serration
+    (16, 5),  // Acuity exclude Galvanized Chamber
+    (16, 27), // Acuity exclude Split Chamber
+    (16, 5),  // Acuity exclude Vigilante Armaments
+    (24, 19), // Cannonade exclude Primed Shred
+    (24, 26), // Cannonade exclude Speed Trigger
+    (24, 31), // Cannonade exclude Vile Acceleration
+];
+const MAX_INDEX: usize = 34;
+
+pub fn filter_combinations(
+    combinations: &mut Vec<[u8; 8]>, required: &Vec<usize>, disallowed: &Vec<usize>
+) {
+    combinations.retain(|combo: &[u8; 8]| keep_combo(combo, required, disallowed));
+}
+
+fn keep_combo(combo: &[u8; 8], required: &Vec<usize>, disallowed: &Vec<usize>) -> bool {
+    let mut truth_table = [false; 34];
+    for &index in combo {
+        truth_table[index as usize] = true;
+    };
+    for (a, b) in ILLEGAL_PAIRS {
+        if truth_table[a] && truth_table[b] {
+            return false;
+        };
+    };
+    for &i in required {
+        if !truth_table[i] {
+            return false;
+        };
+    };
+    for &i in disallowed {
+        if truth_table[i] {
+            return false;
+        };
+    };
+    return true;
+}

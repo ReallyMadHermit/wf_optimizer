@@ -1,9 +1,9 @@
-// Vec<[u8;8]> 
+// Vec<[u8;8]>
 pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {
     let combination_count = get_combination_count(index_count as usize, 8);
     let mut combinations: Vec<[u8; 8]> = Vec::with_capacity(combination_count);
     let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
-    for i in 0..combination_count {
+    for _ in 0..combination_count {
         live_array[7] = live_array[7] + 1;
         if live_array[7] == index_count {
             array_flipper(&mut live_array);

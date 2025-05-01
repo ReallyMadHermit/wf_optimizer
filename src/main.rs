@@ -1,5 +1,3 @@
-use std::io::stdin;
-
 mod mod_structs;
 mod weapon_structs;
 mod supporting_functions;
@@ -12,6 +10,7 @@ use crate::brute_force_solution::generate_combinations;
 
 fn main() {
     let combinations = generate_combinations(32);
+    println!("{}", combinations.len());
     print_combo(&combinations[0]);
 }
 

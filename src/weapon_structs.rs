@@ -1,4 +1,4 @@
-use crate::mod_structs::{RifleMods, WeaponMod, GunStatType};
+use crate::mod_structs::{WeaponMod, GunStatType};
 use crate::supporting_functions::take_input;
 
 #[derive(Clone)]
@@ -205,22 +205,22 @@ pub struct GunStatModSums {
         }
     }
 
-    pub fn from_mod_list(mod_list: &ModList, gun_stats: &GunStats) -> Self {
-        let mut mod_sums = GunStatModSums::new(
-            mod_list.criteria.kills(), gun_stats.semi
-        );
-        let global_mod_list = match gun_stats.gun_type {
-            GunType::Rifle => &RifleMods::ALL_MODS
-        };
-        for mod_id in mod_list.index_array {
-            if mod_id < 0 {
-                continue
-            };
-            let weapon_mod: &WeaponMod = &global_mod_list[mod_id as usize];
-            mod_sums.add_mod(&weapon_mod, mod_list.criteria.kills(), gun_stats.semi);
-        };
-        return mod_sums;
-    }
+    // pub fn from_mod_list(mod_list: &ModList, gun_stats: &GunStats) -> Self {
+    //     let mut mod_sums = GunStatModSums::new(
+    //         mod_list.criteria.kills(), gun_stats.semi
+    //     );
+    //     let global_mod_list = match gun_stats.gun_type {
+    //         GunType::Rifle => &RifleMods::ALL_MODS
+    //     };
+    //     for mod_id in mod_list.index_array {
+    //         if mod_id < 0 {
+    //             continue
+    //         };
+    //         let weapon_mod: &WeaponMod = &global_mod_list[mod_id as usize];
+    //         mod_sums.add_mod(&weapon_mod, mod_list.criteria.kills(), gun_stats.semi);
+    //     };
+    //     return mod_sums;
+    // }
 
     pub fn add_mod(
         &mut self, weapon_mod: &WeaponMod, kills: bool, semi: bool

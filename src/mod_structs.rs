@@ -8,6 +8,10 @@ pub struct WeaponMod {
     pub mod_stats: [ModStat; 2]
 }
 
+pub struct RivenMod {
+    mod_stat_array: [ModStat; 4]
+}
+
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Debug)]
 pub enum GunStatType {
     None,
@@ -66,6 +70,7 @@ pub enum GunStatType {
             "StatusDamage" => GunStatType::StatusDamage,
             "PunchThrough" => GunStatType::PunchThrough,
             "AmmoEfficiency" => GunStatType::AmmoEfficiency,
+            "Riven" => GunStatType::Riven,
             _ => {
                 println!("{} not found! Using 'None'", string_slice);
                 GunStatType::None

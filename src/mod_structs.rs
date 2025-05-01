@@ -114,6 +114,9 @@ impl ModLoader {
         csv_lines.pop_front();
         let mut mod_list: Vec<WeaponMod> = Vec::with_capacity(csv_lines.len());
         for line in csv_lines {
+            if &line[0..1] == "," {
+                continue;
+            };
             mod_list.push(
                 ModLoader::parse_gun_mod(line)
             );
@@ -124,22 +127,23 @@ impl ModLoader {
     fn parse_gun_mod(csv_line: &str) -> WeaponMod {
         let attributes: Vec<&str> = csv_line.split(",").collect();
         let mod_name = attributes[0];
+        
         let stat_type_1 = GunStatType::from_str(attributes[1]);
-        // let stat_value_1: i16 = attributes[2].parse();
-        let stat_type_2 = GunStatType::from_str(attributes[3]);
-        // let stat_value_2: i16 = attributes[4].parse();
         let stat_value_1: i16 = if let Ok(parsed_value) = attributes[2].parse() {
             parsed_value
         } else {
             println!("Failed to load mod value 1 for {}", mod_name);
             0
         };
+        
+        let stat_type_2 = GunStatType::from_str(attributes[3]);
         let stat_value_2: i16 = if let Ok(parsed_value) = attributes[4].parse() {
             parsed_value
         } else {
             println!("Failed to load mod value 2 for {}", mod_name);
             0
         };
+        
         println!("Loading {}, {}|{}", mod_name, stat_value_1, stat_value_2);
         WeaponMod {
             name: String::from(mod_name),

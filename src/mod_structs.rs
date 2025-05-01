@@ -1,3 +1,6 @@
+use std::error::Error;
+use std::fs::File;
+
 use crate::weapon_structs::GunType;
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
@@ -7,7 +10,7 @@ pub struct WeaponMod {
 }
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub enum StatType {
+pub enum GunStatType {
     None,
     Damage,
     DamageForSemiAuto,
@@ -39,11 +42,11 @@ pub enum StatType {
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct ModStat {
-    pub stat_type: StatType,
+    pub stat_type: GunStatType,
     pub stat_value: i16
 } impl ModStat {
     
-    const fn new(stat_type: StatType, stat_value: i16) -> Self {
+    const fn new(stat_type: GunStatType, stat_value: i16) -> Self {
         ModStat {
             stat_type,
             stat_value
@@ -52,9 +55,32 @@ pub struct ModStat {
     
     const fn empty() -> Self {
         ModStat {
-            stat_type: StatType::None,
+            stat_type: GunStatType::None,
             stat_value: 0
         }
+    }
+    
+}
+
+pub struct ModLoader;
+impl ModLoader {
+    
+    pub fn load_mods(gun_type: &GunType) -> Vec<WeaponMod> {
+        let mut buffer = String::new();
+        match gun_type {
+            GunType::Rifle => {
+                Self::load_rifle_mod_data(&mut buffer);
+            }
+        };
+    }
+    
+    fn load_rifle_mod_data(buffer: &mut String) {
+        if let Ok(csv_text) = std::fs::read_to_string("rifle_mods.csv") {
+            buffer.push_str(&csv_text);
+        } else {
+            println!("oopsie, the rifle mods data could not be loaded, vewy sowwy, time to panic!");
+            panic!();
+        };
     }
     
 }
@@ -67,29 +93,29 @@ impl WeaponArcanes {
         WeaponMod {
             name: "Steel Path Arcane",
             mod_stats: [
-                ModStat{stat_type: StatType::DamageOnKill, stat_value: 360},
+                ModStat{stat_type: GunStatType::DamageOnKill, stat_value: 360},
                 ModStat::empty()
             ]
         },
         WeaponMod {
             name: "Primary Frostbite",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 120},
-                ModStat{stat_type: StatType::Multishot, stat_value: 90}
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 120},
+                ModStat{stat_type: GunStatType::Multishot, stat_value: 90}
             ]
         },
         WeaponMod {
             name: "Primary Blight",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 144},
-                ModStat{stat_type: StatType::Multishot, stat_value: 72}
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 144},
+                ModStat{stat_type: GunStatType::Multishot, stat_value: 72}
             ]
         },
         WeaponMod {
             name: "Primary Crux",
             mod_stats: [
-                ModStat{stat_type: StatType::StatusChance, stat_value: 300},
-                ModStat{stat_type: StatType::AmmoEfficiency, stat_value: 60}
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 300},
+                ModStat{stat_type: GunStatType::AmmoEfficiency, stat_value: 60}
             ]
         }
     ];
@@ -99,36 +125,36 @@ impl WeaponArcanes {
         WeaponMod {
             name: "Steel Path Arcane",
             mod_stats: [
-                ModStat{stat_type: StatType::DamageOnKill, stat_value: 360},
-                ModStat{stat_type: StatType::ReloadSpeed, stat_value: 30}
+                ModStat{stat_type: GunStatType::DamageOnKill, stat_value: 360},
+                ModStat{stat_type: GunStatType::ReloadSpeed, stat_value: 30}
             ]
         },
         WeaponMod {
             name: "Primary Frostbite",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 120},
-                ModStat{stat_type: StatType::Multishot, stat_value: 90}
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 120},
+                ModStat{stat_type: GunStatType::Multishot, stat_value: 90}
             ]
         },
         WeaponMod {
             name: "Primary Blight",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 144},
-                ModStat{stat_type: StatType::Multishot, stat_value: 72}
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 144},
+                ModStat{stat_type: GunStatType::Multishot, stat_value: 72}
             ]
         },
         WeaponMod {
             name: "Primary Crux",
             mod_stats: [
-                ModStat{stat_type: StatType::StatusChance, stat_value: 300},
-                ModStat{stat_type: StatType::AmmoEfficiency, stat_value: 60}
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 300},
+                ModStat{stat_type: GunStatType::AmmoEfficiency, stat_value: 60}
             ]
         },
         WeaponMod {
             name: "Shotgun Vendetta",
             mod_stats: [
-                ModStat{stat_type: StatType::MultishotOnKill, stat_value: 180},
-                ModStat{stat_type: StatType::ReloadSpeedOnKill, stat_value: 75}
+                ModStat{stat_type: GunStatType::MultishotOnKill, stat_value: 180},
+                ModStat{stat_type: GunStatType::ReloadSpeedOnKill, stat_value: 75}
             ]
         }
     ];
@@ -144,209 +170,209 @@ impl RifleMods {
         WeaponMod {  // 0
             name: "Amalgam Serration",
             mod_stats: [
-                ModStat{stat_type: StatType::Damage, stat_value: 155},
+                ModStat{stat_type: GunStatType::Damage, stat_value: 155},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 1
             name: "Argon Scope",
             mod_stats: [
-                ModStat{stat_type: StatType::CritChance, stat_value: 135},
+                ModStat{stat_type: GunStatType::CritChance, stat_value: 135},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 2
             name: "Bladed Rounds",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 0},
-                ModStat{stat_type: StatType::CritDamageOnKill, stat_value: 120}
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 0},
+                ModStat{stat_type: GunStatType::CritDamageOnKill, stat_value: 120}
             ]
         },
         WeaponMod {  // 3
             name: "Critical Delay",
             mod_stats: [
-                ModStat{stat_type: StatType::CritChance, stat_value: 200},
-                ModStat{stat_type: StatType::FireRate, stat_value: -20}
+                ModStat{stat_type: GunStatType::CritChance, stat_value: 200},
+                ModStat{stat_type: GunStatType::FireRate, stat_value: -20}
             ]
         },
         WeaponMod {  // 4
             name: "Galvanized Aptitude",
             mod_stats: [
-                ModStat{stat_type: StatType::StatusChance, stat_value: 80},
-                ModStat{stat_type: StatType::ConditionOverload, stat_value: 80}
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 80},
+                ModStat{stat_type: GunStatType::ConditionOverload, stat_value: 80}
             ]
         },
         WeaponMod {  // 5
             name: "Galvanized Chamber",
             mod_stats: [
-                ModStat{stat_type: StatType::Multishot, stat_value: 80},
-                ModStat{stat_type: StatType::MultishotOnKill, stat_value: 150}
+                ModStat{stat_type: GunStatType::Multishot, stat_value: 80},
+                ModStat{stat_type: GunStatType::MultishotOnKill, stat_value: 150}
             ]
         },
         WeaponMod {  // 6
             name: "Galvanized Scope",
             mod_stats: [
-                ModStat{stat_type: StatType::CritChance, stat_value: 120},
-                ModStat{stat_type: StatType::CritChanceOnKill, stat_value: 200}
+                ModStat{stat_type: GunStatType::CritChance, stat_value: 120},
+                ModStat{stat_type: GunStatType::CritChanceOnKill, stat_value: 200}
             ]
         },
         WeaponMod {  // 7
             name: "Hammer Shot",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 60},
-                ModStat{stat_type: StatType::StatusChance, stat_value: 80}
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 60},
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 80}
             ]
         },
         WeaponMod {  // 8
             name: "Heavy Caliber",
             mod_stats: [
-                ModStat{stat_type: StatType::Damage, stat_value: 165},
+                ModStat{stat_type: GunStatType::Damage, stat_value: 165},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 9
             name: "Hellfire",
             mod_stats: [
-                ModStat{stat_type: StatType::Heat, stat_value: 110},
+                ModStat{stat_type: GunStatType::Heat, stat_value: 110},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 10
             name: "High Voltage",
             mod_stats: [
-                ModStat{stat_type: StatType::Shock, stat_value: 60},
-                ModStat{stat_type: StatType::StatusChance, stat_value: 60}
+                ModStat{stat_type: GunStatType::Shock, stat_value: 60},
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 11
             name: "Infected Clip",
             mod_stats: [
-                ModStat{stat_type: StatType::Toxic, stat_value: 110},
+                ModStat{stat_type: GunStatType::Toxic, stat_value: 110},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 12
             name: "Magnetic Capacity",
             mod_stats: [
-                ModStat{stat_type: StatType::Magnetic, stat_value: 60},
-                ModStat{stat_type: StatType::MagazineCapacity, stat_value: 40}
+                ModStat{stat_type: GunStatType::Magnetic, stat_value: 60},
+                ModStat{stat_type: GunStatType::MagazineCapacity, stat_value: 40}
             ]
         },
         WeaponMod {  // 13
             name: "Malignant Force",
             mod_stats: [
-                ModStat{stat_type: StatType::Toxic, stat_value: 60},
-                ModStat{stat_type: StatType::StatusChance, stat_value: 60}
+                ModStat{stat_type: GunStatType::Toxic, stat_value: 60},
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 14
             name: "Point Strike",
             mod_stats: [
-                ModStat{stat_type: StatType::CritChance, stat_value: 150},
+                ModStat{stat_type: GunStatType::CritChance, stat_value: 150},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 15
             name: "Primary Acuity",
-            mod_stats: [ModStat{stat_type: StatType::AcuityBonus, stat_value: 350},
+            mod_stats: [ModStat{stat_type: GunStatType::AcuityBonus, stat_value: 350},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 16
             name: "Primed Cryo Rounds",
             mod_stats: [
-                ModStat {stat_type: StatType::Cold, stat_value: 165},
+                ModStat {stat_type: GunStatType::Cold, stat_value: 165},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 17
             name: "Primed Shred",
             mod_stats: [
-                ModStat{stat_type: StatType::FireRate, stat_value: 55},
-                ModStat{stat_type: StatType::PunchThrough, stat_value: 12}
+                ModStat{stat_type: GunStatType::FireRate, stat_value: 55},
+                ModStat{stat_type: GunStatType::PunchThrough, stat_value: 12}
             ]
         },
         WeaponMod {  // 18
             name: "Radiated Reload",
             mod_stats: [
-                ModStat{stat_type: StatType::Radiation, stat_value: 60},
-                ModStat{stat_type: StatType::ReloadSpeed, stat_value: 60}
+                ModStat{stat_type: GunStatType::Radiation, stat_value: 60},
+                ModStat{stat_type: GunStatType::ReloadSpeed, stat_value: 60}
             ]
         },
         WeaponMod {  // 19
             name: "Rifle Elementalist",
             mod_stats: [
-                ModStat {stat_type: StatType::StatusDamage, stat_value: 90},
+                ModStat {stat_type: GunStatType::StatusDamage, stat_value: 90},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 20
             name: "Rime Rounds",
             mod_stats: [
-                ModStat{stat_type: StatType::Cold, stat_value: 60},
-                ModStat{stat_type: StatType::StatusChance, stat_value: 60}
+                ModStat{stat_type: GunStatType::Cold, stat_value: 60},
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 21
             name: "Semi-Rifle Cannonade",
             mod_stats: [
-                ModStat{stat_type: StatType::Damage, stat_value: 0},
-                ModStat{stat_type: StatType::DamageForSemiAuto, stat_value: 240}
+                ModStat{stat_type: GunStatType::Damage, stat_value: 0},
+                ModStat{stat_type: GunStatType::DamageForSemiAuto, stat_value: 240}
             ]
         },
         WeaponMod {  // 22
             name: "Speed Trigger",
             mod_stats: [
-                ModStat {stat_type: StatType::FireRate, stat_value: 60},
+                ModStat {stat_type: GunStatType::FireRate, stat_value: 60},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 23
             name: "Stormbringer",
             mod_stats: [
-                ModStat{stat_type: StatType::Shock, stat_value: 110},
+                ModStat{stat_type: GunStatType::Shock, stat_value: 110},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 24
             name: "Thermite Rounds",
             mod_stats: [
-                ModStat{stat_type: StatType::Heat, stat_value: 60},
-                ModStat{stat_type: StatType::StatusChance, stat_value: 60}
+                ModStat{stat_type: GunStatType::Heat, stat_value: 60},
+                ModStat{stat_type: GunStatType::StatusChance, stat_value: 60}
             ]
         },
         WeaponMod {  // 25
             name: "Vile Acceleration",
             mod_stats: [
-                ModStat{stat_type: StatType::FireRate, stat_value: 90},
-                ModStat{stat_type: StatType::Damage, stat_value: -15}
+                ModStat{stat_type: GunStatType::FireRate, stat_value: 90},
+                ModStat{stat_type: GunStatType::Damage, stat_value: -15}
             ]
         },
         WeaponMod {  // 26
             name: "Vital Sense",
             mod_stats: [
-                ModStat{stat_type: StatType::CritDamage, stat_value: 120},
+                ModStat{stat_type: GunStatType::CritDamage, stat_value: 120},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 27
             name: "Wildfire",
             mod_stats: [
-                ModStat{stat_type: StatType::Heat, stat_value: 60},
-                ModStat{stat_type: StatType::MagazineCapacity, stat_value: 20}
+                ModStat{stat_type: GunStatType::Heat, stat_value: 60},
+                ModStat{stat_type: GunStatType::MagazineCapacity, stat_value: 20}
             ]
         },
         WeaponMod {  // 28
             name: "Vigilante Armaments",
             mod_stats: [
-                ModStat{stat_type: StatType::Multishot, stat_value: 60},
+                ModStat{stat_type: GunStatType::Multishot, stat_value: 60},
                 ModStat::empty()
             ]
         },
         WeaponMod {  // 29
             name: "Vigilante Fervor",
             mod_stats: [
-                ModStat{stat_type: StatType::FireRate, stat_value: 45},
+                ModStat{stat_type: GunStatType::FireRate, stat_value: 45},
                 ModStat::empty()
             ]
         }

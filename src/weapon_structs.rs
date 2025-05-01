@@ -1,4 +1,4 @@
-use crate::mod_structs::{RifleMods, WeaponMod, StatType};
+use crate::mod_structs::{RifleMods, WeaponMod, GunStatType};
 use crate::supporting_functions::take_input;
 
 #[derive(Clone)]
@@ -227,59 +227,59 @@ pub struct GunStatModSums {
     ) {
         for mod_stat in &weapon_mod.mod_stats {
             match mod_stat.stat_type {
-                StatType::None => {continue},
-                StatType::Damage => {
+                GunStatType::None => {continue},
+                GunStatType::Damage => {
                     self.damage += mod_stat.stat_value;
                 },
-                StatType::DamageForSemiAuto => {
+                GunStatType::DamageForSemiAuto => {
                     if semi {
                         self.damage += mod_stat.stat_value;
                     };
                 },
-                StatType::DamageOnKill => {
+                GunStatType::DamageOnKill => {
                     if kills {
                         self.damage += mod_stat.stat_value;
                     };
                 },
-                StatType::Cold | StatType::Toxic |
-                StatType::Heat | StatType::Shock |
-                StatType::Radiation | StatType::Magnetic => {
+                GunStatType::Cold | GunStatType::Toxic |
+                GunStatType::Heat | GunStatType::Shock |
+                GunStatType::Radiation | GunStatType::Magnetic => {
                     self.ele_damage += mod_stat.stat_value;
                 },
-                StatType::StatusChance => {
+                GunStatType::StatusChance => {
                     self.status += mod_stat.stat_value;
                 }
-                StatType::Multishot => {
+                GunStatType::Multishot => {
                     self.multishot += mod_stat.stat_value;
                 },
-                StatType::MultishotOnKill => {
+                GunStatType::MultishotOnKill => {
                     if kills {
                         self.multishot += mod_stat.stat_value;
                     };
                 },
-                StatType::CritChance => {
+                GunStatType::CritChance => {
                     self.crit_chance += mod_stat.stat_value;
                 },
-                StatType::CritChanceOnKill => {
+                GunStatType::CritChanceOnKill => {
                     if kills {
                         self.crit_chance += mod_stat.stat_value;
                     };
                 },
-                StatType::CritDamage => {
+                GunStatType::CritDamage => {
                     self.crit_damage += mod_stat.stat_value;
                 },
-                StatType::CritDamageOnKill => {
+                GunStatType::CritDamageOnKill => {
                     if kills {
                         self.crit_damage += mod_stat.stat_value;
                     };
                 },
-                StatType::FireRate => {
+                GunStatType::FireRate => {
                     self.fire_rate += mod_stat.stat_value;
                 },
-                StatType::MagazineCapacity => {
+                GunStatType::MagazineCapacity => {
                     self.magazine += mod_stat.stat_value;
                 },
-                StatType::ReloadSpeed => {
+                GunStatType::ReloadSpeed => {
                     self.reload += mod_stat.stat_value;
                 },
                 _ => {}
@@ -292,59 +292,59 @@ pub struct GunStatModSums {
     ) {
         for mod_stat in &weapon_mod.mod_stats {
             match mod_stat.stat_type {
-                StatType::None => {continue},
-                StatType::Damage => {
+                GunStatType::None => {continue},
+                GunStatType::Damage => {
                     self.damage -= mod_stat.stat_value;
                 },
-                StatType::DamageForSemiAuto => {
+                GunStatType::DamageForSemiAuto => {
                     if semi {
                         self.damage -= mod_stat.stat_value;
                     };
                 },
-                StatType::DamageOnKill => {
+                GunStatType::DamageOnKill => {
                     if kills {
                         self.damage -= mod_stat.stat_value;
                     };
                 },
-                StatType::Cold | StatType::Toxic |
-                StatType::Heat | StatType::Shock |
-                StatType::Radiation | StatType::Magnetic => {
+                GunStatType::Cold | GunStatType::Toxic |
+                GunStatType::Heat | GunStatType::Shock |
+                GunStatType::Radiation | GunStatType::Magnetic => {
                     self.ele_damage -= mod_stat.stat_value;
                 },
-                StatType::StatusChance => {
+                GunStatType::StatusChance => {
                     self.status -= mod_stat.stat_value;
                 }
-                StatType::Multishot => {
+                GunStatType::Multishot => {
                     self.multishot -= mod_stat.stat_value;
                 },
-                StatType::MultishotOnKill => {
+                GunStatType::MultishotOnKill => {
                     if kills {
                         self.multishot -= mod_stat.stat_value;
                     };
                 },
-                StatType::CritChance => {
+                GunStatType::CritChance => {
                     self.crit_chance -= mod_stat.stat_value;
                 },
-                StatType::CritChanceOnKill => {
+                GunStatType::CritChanceOnKill => {
                     if kills {
                         self.crit_chance -= mod_stat.stat_value;
                     };
                 },
-                StatType::CritDamage => {
+                GunStatType::CritDamage => {
                     self.crit_damage -= mod_stat.stat_value;
                 },
-                StatType::CritDamageOnKill => {
+                GunStatType::CritDamageOnKill => {
                     if kills {
                         self.crit_damage -= mod_stat.stat_value;
                     };
                 },
-                StatType::FireRate => {
+                GunStatType::FireRate => {
                     self.fire_rate -= mod_stat.stat_value;
                 },
-                StatType::MagazineCapacity => {
+                GunStatType::MagazineCapacity => {
                     self.magazine -= mod_stat.stat_value;
                 },
-                StatType::ReloadSpeed => {
+                GunStatType::ReloadSpeed => {
                     self.reload -= mod_stat.stat_value;
                 },
                 _ => {}

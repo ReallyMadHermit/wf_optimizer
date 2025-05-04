@@ -401,19 +401,19 @@ pub enum Criteria {
 
 }
 
-#[derive(Clone)]
-pub struct ModList {
-    pub index_array: [i8; 8],
-    pub arcane_index: i8,
-    pub criteria: Criteria
-} impl ModList {
-
-    pub fn new(criteria: Criteria) -> Self {
-        ModList {
-            index_array: [-1; 8],
-            arcane_index: -1,
-            criteria
-        }
-    }
-
-}
+// #[derive(Clone)]
+// pub struct ModList {
+//     pub index_array: [i8; 8],
+//     pub arcane_index: i8,
+//     pub criteria: Criteria
+// } impl ModList {
+// 
+//     pub fn new(criteria: Criteria) -> Self {
+//         ModList {
+//             index_array: [-1; 8],
+//             arcane_index: -1,
+//             criteria
+//         }
+//     }
+// 
+// }

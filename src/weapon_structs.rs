@@ -221,7 +221,7 @@ pub struct GunStatModSums {
     ) {
         for mod_stat in &weapon_mod.mod_stats {
             match mod_stat.stat_type {
-                GunStatType::None => {continue},
+                GunStatType::None => {continue;},
                 GunStatType::Damage => {
                     self.damage += mod_stat.stat_value;
                 },

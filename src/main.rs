@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 mod mod_structs;
 mod weapon_structs;
 mod supporting_functions;
@@ -13,6 +15,7 @@ fn main() {
 }
 
 fn debug_prompts() {
+    let start = Instant::now();
     let parsed_mod_list = {
         let mut buffer = String::new();
         ModLoader::load_gun_mods(&GunType::Rifle, &mut buffer)
@@ -28,7 +31,7 @@ fn debug_prompts() {
     let required_mods: Vec<usize> = Vec::new();
     let disallowed_mods: Vec<usize> = Vec::new();
     println!("Filtering illegal pairs...");
-    filter_combinations(&mut combinations, &required_mods, &disallowed_mods);
+    filter_combinations(&mut combinations, required_mods.as_slice(), disallowed_mods.as_slice());
     combinations.shrink_to_fit();
     
     let count = combinations.len();
@@ -37,6 +40,8 @@ fn debug_prompts() {
     print_combo(&combinations[0]);
     println!("Last combo:");
     print_combo(&combinations[count - 1]);
+    let duration = start.elapsed();
+    println!("Elapsed: {:?}", duration);
 }
 
 fn print_combo(combo: &[u8; 8]) {

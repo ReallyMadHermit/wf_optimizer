@@ -1,3 +1,5 @@
+use crate::supporting_functions::build_mask;
+
 // Vec<[u8;8]>
 pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {
     let combination_count = get_combination_count(index_count as usize, 8);
@@ -62,12 +64,16 @@ const ILLEGAL_PAIRS: [(usize, usize); 11] = [
 const MAX_INDEX: usize = 35;
 
 pub fn filter_combinations(
-    combinations: &mut Vec<[u8; 8]>, required: &Vec<usize>, disallowed: &Vec<usize>
+    combinations: &mut Vec<[u8; 8]>, required: &[usize], disallowed: &[usize]
 ) {
     combinations.retain(|combo: &[u8; 8]| keep_combo(combo, required, disallowed));
 }
 
-fn keep_combo(combo: &[u8; 8], required: &Vec<usize>, disallowed: &Vec<usize>) -> bool {
+// fn keep_combo_bitmask(combo: &[u8; 8]) -> bool {
+//     
+// }
+
+fn keep_combo(combo: &[u8; 8], required: &[usize], disallowed: &[usize]) -> bool {
     let mut truth_table = [false; MAX_INDEX];
     for &index in combo {
         truth_table[index as usize] = true;

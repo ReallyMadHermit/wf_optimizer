@@ -2,6 +2,16 @@ use std::io::stdin;
 use crate::mod_structs::*;
 use crate::weapon_structs::*;
 
+pub const fn build_mask(indices: &[u8]) -> u64 {
+    let mut mask: u64 = 0;
+    let mut i = 0;
+    while i < indices.len() {
+        mask |= 1 << indices[i];
+        i += 1;
+    };
+    mask
+}
+
 pub fn weapon_select_loop() -> GunStats {
     let mut selected = false;
     let mut gun_stats = GunStats::EMPTY_GUN;

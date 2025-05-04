@@ -205,16 +205,13 @@ pub struct GunStatModSums {
         }
     }
 
-    pub fn from_mod_list(mod_list: &ModList, gun_stats: &GunStats, loaded_mods: &Vec<WeaponMod>) -> Self {
+    pub fn from_mod_list(weapon_mods: [u8; 8], loaded_mods: &Vec<WeaponMod>, gun_stats: &GunStats, criteria: &Criteria) -> Self {
         let mut mod_sums = GunStatModSums::new(
-            mod_list.criteria.kills(), gun_stats.semi
+            criteria.kills(), gun_stats.semi
         );
-        for mod_id in mod_list.index_array {
-            if mod_id < 0 {
-                continue
-            };
+        for mod_id in weapon_mods {
             let weapon_mod: &WeaponMod = &loaded_mods[mod_id as usize];
-            mod_sums.add_mod(&weapon_mod, mod_list.criteria.kills(), gun_stats.semi);
+            mod_sums.add_mod(&weapon_mod, criteria.kills(), gun_stats.semi);
         };
         return mod_sums;
     }
@@ -400,20 +397,3 @@ pub enum Criteria {
     }
 
 }
-
-// #[derive(Clone)]
-// pub struct ModList {
-//     pub index_array: [i8; 8],
-//     pub arcane_index: i8,
-//     pub criteria: Criteria
-// } impl ModList {
-// 
-//     pub fn new(criteria: Criteria) -> Self {
-//         ModList {
-//             index_array: [-1; 8],
-//             arcane_index: -1,
-//             criteria
-//         }
-//     }
-// 
-// }

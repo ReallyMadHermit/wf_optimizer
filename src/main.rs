@@ -6,7 +6,7 @@ mod supporting_functions;
 mod brute_force_solution;
 
 use supporting_functions::{weapon_select_loop};
-use crate::weapon_structs::{Criteria, GunStats, GunType};
+use crate::weapon_structs::{Criteria};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds, sort_by_criteria
 };

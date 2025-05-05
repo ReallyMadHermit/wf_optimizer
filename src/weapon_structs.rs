@@ -1,7 +1,6 @@
 use crate::mod_structs::{WeaponMod, GunStatType};
 use crate::supporting_functions::take_input;
 use std::fmt::Write;
-use crate::weapon_structs::Criteria::PerShotNoKills;
 
 #[derive(Clone)]
 struct HitStats {

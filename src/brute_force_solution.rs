@@ -1,5 +1,4 @@
 use crate::mod_structs::WeaponMod;
-use crate::supporting_functions::build_mask;
 use crate::weapon_structs::{Criteria, GunStats, WeaponReport, GunStatModSums};
 use std::cmp::Reverse;
 

@@ -397,3 +397,13 @@ pub enum Criteria {
     }
 
 }
+
+pub struct WeaponReport {
+    weapon_name: &'static str,
+    criteria: Criteria,
+    hit_damage: f32,
+    burst_dps: f32,
+    sustained_dps: f32,
+    mods: [u8; 8],
+    arcane: u8
+}

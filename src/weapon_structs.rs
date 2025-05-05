@@ -422,14 +422,14 @@ pub enum Criteria {
 }
 
 pub struct WeaponReport {
-    weapon_name: &'static str,
-    gun_type: GunType,
-    criteria: Criteria,
-    hit_damage: f32,
-    burst_dps: f32,
-    sustained_dps: f32,
-    mods: [u8; 8],
-    arcane: u8
+    pub weapon_name: &'static str,
+    pub gun_type: GunType,
+    pub criteria: Criteria,
+    pub hit_damage: f32,
+    pub burst_dps: f32,
+    pub sustained_dps: f32,
+    pub mods: [u8; 8],
+    pub arcane: u8
 } impl WeaponReport {
     
     fn get_report_string(&self, loaded_mods: &Vec<WeaponMod>, loaded_arcanes: &Vec<WeaponMod>) {

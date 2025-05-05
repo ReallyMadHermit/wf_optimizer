@@ -31,6 +31,7 @@ fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
 
 #[derive(Clone)]
 pub struct GunStats {
+    pub name: &'static str,
     pub fire_rate: f32,
     pub multishot: f32,
     pub magazine: f32,
@@ -93,6 +94,7 @@ pub struct GunStats {
     }
 
     pub const EMPTY_GUN: GunStats = GunStats {
+        name: "ERROR YOU SHOULD NOT SEE THIS DISBARK AND DISBAND",
         fire_rate: 0.0,
         multishot: 0.0,
         magazine: 0.0,
@@ -106,6 +108,7 @@ pub struct GunStats {
     };
 
     const PRISMA_GORGON: GunStats = GunStats {
+        name: "Prisma Gorgon",
         fire_rate: 14.7,
         multishot: 1.0,
         magazine: 120.0,
@@ -123,6 +126,7 @@ pub struct GunStats {
         ]
     };
     const TRUMNA_PRIME: GunStats = GunStats {
+        name: "Trumna Prime",
         fire_rate: 4.67,
         multishot: 1.0,
         magazine: 250.0,
@@ -145,6 +149,7 @@ pub struct GunStats {
         ]
     };
     const ACCELTRA_PRIME: GunStats = GunStats {
+        name: "Acceltra Prime",
         fire_rate: 10.0,
         multishot: 1.0,
         magazine: 48.0,

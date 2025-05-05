@@ -434,7 +434,7 @@ pub struct WeaponReport {
 } impl WeaponReport {
     
     pub fn get_report_string(&self, loaded_mods: &Vec<WeaponMod>, loaded_arcanes: &Vec<WeaponMod>) -> String {
-        let mut buffer = String::with_capacity(300);
+        let mut buffer = String::with_capacity(250);
         _ = writeln!(buffer, "{}", self.weapon_name).unwrap();
         _ = writeln!(buffer, "Hit|Burst|Sustained").unwrap();
         _ = writeln!(
@@ -456,6 +456,7 @@ pub struct WeaponReport {
                 loaded_mods[self.mods[off + 3] as usize].name
             ).unwrap();
         };
+        buffer.shrink_to_fit();
         buffer
     }
     

@@ -59,7 +59,25 @@ pub struct GunStats {
         let firing_ratio = (mag_time + self.reload) / mag_time;
         firing_ratio * burst_dps
     }
-
+    
+    pub fn generate_report(
+        &self, criteria: Criteria, mod_list: &[u8; 8], arcane: u8
+    ) -> WeaponReport {
+        let hit = self.calculate_shot_damage();
+        let burst = self.calculate_burst_dps(hit);
+        let sustained = self.calculate_sustained_dps(burst);
+        WeaponReport {
+            weapon_name: self.name,
+            gun_type: self.gun_type,
+            criteria,
+            hit_damage: hit,
+            burst_dps: burst,
+            sustained_dps: sustained,
+            mods: mod_list.clone(),
+            arcane
+        }
+    }
+    
     pub fn apply_stat_sums(&self, stat_sums: &GunStatModSums) -> Self {
         let mut modded_self = self.clone();
         modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sums.fire_rate);

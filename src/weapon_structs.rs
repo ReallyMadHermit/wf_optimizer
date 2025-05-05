@@ -205,11 +205,11 @@ pub struct GunStatModSums {
         }
     }
 
-    pub fn from_mod_list(weapon_mods: [u8; 8], loaded_mods: &Vec<WeaponMod>, gun_stats: &GunStats, criteria: &Criteria) -> Self {
+    pub fn from_mod_list(weapon_mods: &[u8; 8], loaded_mods: &Vec<WeaponMod>, gun_stats: &GunStats, criteria: &Criteria) -> Self {
         let mut mod_sums = GunStatModSums::new(
             criteria.kills(), gun_stats.semi
         );
-        for mod_id in weapon_mods {
+        for &mod_id in weapon_mods {
             let weapon_mod: &WeaponMod = &loaded_mods[mod_id as usize];
             mod_sums.add_mod(&weapon_mod, criteria.kills(), gun_stats.semi);
         };

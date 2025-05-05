@@ -400,10 +400,39 @@ pub enum Criteria {
 
 pub struct WeaponReport {
     weapon_name: &'static str,
+    gun_type: GunType,
     criteria: Criteria,
     hit_damage: f32,
     burst_dps: f32,
     sustained_dps: f32,
     mods: [u8; 8],
     arcane: u8
+} impl WeaponReport {
+    
+    fn get_report_string(&self, mod_list: &Vec<WeaponMod>, arcane_list: &Vec<WeaponMod>) {
+        let mut buffer = String::with_capacity(300);
+        _ = writeln!(&mut buffer, "{}", self.weapon_name);
+        _ = writeln!(&mut buffer, "Hit|Burst|Sustained");
+        _ = writeln!(
+            &mut buffer, 
+            "{}|{}|{}", 
+            self.hit_damage.round() as usize, 
+            self.burst_dps.round() as usize, 
+            self.sustained_dps.round() as usize
+        );
+        _ = writeln!(&mut buffer, "Arcane: {}, Mods:", arcane_list[self.arcane as usize].name);
+        for i in 0usize..2usize {
+            let off = i * 4;
+            _ = writeln!(
+                &mut buffer, 
+                "{}, {}, {}, {}, ",
+                mod_list[self.mods[off] as usize].name,
+                mod_list[self.mods[off + 1] as usize].name,
+                mod_list[self.mods[off + 2] as usize].name,
+                mod_list[self.mods[off + 3] as usize].name
+            );
+        };
+        
+    }
+    
 }

@@ -104,10 +104,14 @@ pub struct ModStat {
 pub struct ModLoader;
 impl ModLoader {
 
-    pub fn load_gun_mods(gun_type: &GunType, buffer: &mut String) -> Vec<WeaponMod> {
+    pub fn load_mods(gun_type: &GunType, buffer: &mut String, arcanes: bool) -> Vec<WeaponMod> {
         match gun_type {
             GunType::Rifle => {
-                Self::load_rifle_mod_data(buffer);
+                if arcanes {
+                    Self::read_csv(buffer, "rifle_arcanes.csv")
+                } else {
+                    Self::read_csv(buffer, "rifle_mods.csv");
+                };
             }
         };
         let mut csv_lines: VecDeque<&str> = buffer.lines().collect();
@@ -121,7 +125,7 @@ impl ModLoader {
                 ModLoader::parse_gun_mod(line)
             );
         };
-        mod_list
+        return mod_list;
     }
     
     fn parse_gun_mod(csv_line: &str) -> WeaponMod {
@@ -159,12 +163,12 @@ impl ModLoader {
             ]
         }
     }
-
-    fn load_rifle_mod_data(buffer: &mut String) {
-        if let Ok(csv_text) = std::fs::read_to_string("rifle_mods.csv") {
+    
+    fn read_csv(buffer: &mut String, file_name: &str) {
+        if let Ok(csv_text) = std::fs::read_to_string(file_name) {
             buffer.push_str(&csv_text);
         } else {
-            println!("oopsie, the rifle mods data could not be loaded, vewy sowwy, time to panic!");
+            println!("oopsie, {} could not be loaded, vewy sowwy, time to panic!", file_name);
             panic!();
         };
     }

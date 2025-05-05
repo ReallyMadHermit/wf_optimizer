@@ -1,5 +1,7 @@
 use crate::mod_structs::{WeaponMod, GunStatType};
 use crate::supporting_functions::take_input;
+use std::fmt::Write;
+use crate::weapon_structs::Criteria::PerShotNoKills;
 
 #[derive(Clone)]
 struct HitStats {
@@ -68,11 +70,11 @@ pub struct GunStats {
         let sustained = self.calculate_sustained_dps(burst);
         WeaponReport {
             weapon_name: self.name,
-            gun_type: self.gun_type,
+            gun_type: self.gun_type.clone(),
             criteria,
-            hit_damage: hit,
-            burst_dps: burst,
-            sustained_dps: sustained,
+            hit_damage: hit.round() as u32,
+            burst_dps: burst.round() as u32,
+            sustained_dps: sustained.round() as u32,
             mods: mod_list.clone(),
             arcane
         }
@@ -85,7 +87,7 @@ pub struct GunStats {
         modded_self.magazine = apply_stat_sum(self.magazine, stat_sums.magazine);
         modded_self.reload = apply_inverse_stat_sum(self.reload, stat_sums.reload);
         for i in 0..self.hit_stats.len() {
-            let mut modded_hit = &mut modded_self.hit_stats[i];
+            let modded_hit = &mut modded_self.hit_stats[i];
             let self_hit = &self.hit_stats[i];
             modded_hit.damage = apply_stat_sum(self_hit.damage, stat_sums.damage);
             modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
@@ -425,37 +427,37 @@ pub struct WeaponReport {
     pub weapon_name: &'static str,
     pub gun_type: GunType,
     pub criteria: Criteria,
-    pub hit_damage: f32,
-    pub burst_dps: f32,
-    pub sustained_dps: f32,
+    pub hit_damage: u32,
+    pub burst_dps: u32,
+    pub sustained_dps: u32,
     pub mods: [u8; 8],
     pub arcane: u8
 } impl WeaponReport {
     
-    fn get_report_string(&self, loaded_mods: &Vec<WeaponMod>, loaded_arcanes: &Vec<WeaponMod>) {
+    pub fn get_report_string(&self, loaded_mods: &Vec<WeaponMod>, loaded_arcanes: &Vec<WeaponMod>) -> String {
         let mut buffer = String::with_capacity(300);
-        _ = writeln!(&mut buffer, "{}", self.weapon_name);
-        _ = writeln!(&mut buffer, "Hit|Burst|Sustained");
+        _ = writeln!(buffer, "{}", self.weapon_name).unwrap();
+        _ = writeln!(buffer, "Hit|Burst|Sustained").unwrap();
         _ = writeln!(
-            &mut buffer, 
+            buffer,
             "{}|{}|{}", 
-            self.hit_damage.round() as usize, 
-            self.burst_dps.round() as usize, 
-            self.sustained_dps.round() as usize
-        );
-        _ = writeln!(&mut buffer, "Arcane: {}, Mods:", loaded_arcanes[self.arcane as usize].name);
+            self.hit_damage, 
+            self.burst_dps, 
+            self.sustained_dps
+        ).unwrap();
+        _ = writeln!(buffer, "Arcane: {}, Mods:", loaded_arcanes[self.arcane as usize].name).unwrap();
         for i in 0usize..2usize {
             let off = i * 4;
             _ = writeln!(
-                &mut buffer, 
+                buffer, 
                 "{}, {}, {}, {}, ",
                 loaded_mods[self.mods[off] as usize].name,
                 loaded_mods[self.mods[off + 1] as usize].name,
                 loaded_mods[self.mods[off + 2] as usize].name,
                 loaded_mods[self.mods[off + 3] as usize].name
-            );
+            ).unwrap();
         };
-        
+        buffer
     }
     
 }

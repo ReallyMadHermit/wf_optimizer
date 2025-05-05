@@ -1,4 +1,6 @@
+use crate::mod_structs::WeaponMod;
 use crate::supporting_functions::build_mask;
+use crate::weapon_structs::{Criteria, GunStats, WeaponReport, GunStatModSums};
 
 // Vec<[u8;8]>
 pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {

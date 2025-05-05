@@ -57,7 +57,7 @@ pub struct GunStats {
 
     pub fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
         let mag_time = self.magazine / self.fire_rate;
-        let firing_ratio = (mag_time + self.reload) / mag_time;
+        let firing_ratio = mag_time / (mag_time + self.reload);
         firing_ratio * burst_dps
     }
     

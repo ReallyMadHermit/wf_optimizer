@@ -51,17 +51,17 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
 }
 
 const ILLEGAL_PAIRS: [(usize, usize); 11] = [
-    (4, 21),  // Aptitude
-    (5, 27),  // Chamber
-    (3, 15),  // Point Strike
-    (1, 6),   // Scope
-    (0, 25),  // Serration
-    (16, 5),  // Acuity exclude Galvanized Chamber
-    (16, 27), // Acuity exclude Split Chamber
-    (16, 5),  // Acuity exclude Vigilante Armaments
-    (24, 19), // Cannonade exclude Primed Shred
-    (24, 26), // Cannonade exclude Speed Trigger
-    (24, 31), // Cannonade exclude Vile Acceleration
+    (5, 22),  // Aptitude
+    (6, 28),  // Chamber
+    (4, 16),  // Point Strike
+    (2, 7),   // Scope
+    (1, 26),  // Serration
+    (17, 6),  // Acuity exclude Galvanized Chamber
+    (17, 28), // Acuity exclude Split Chamber
+    (17, 6),  // Acuity exclude Vigilante Armaments
+    (25, 20), // Cannonade exclude Primed Shred
+    (25, 27), // Cannonade exclude Speed Trigger
+    (25, 32), // Cannonade exclude Vile Acceleration
 ];
 const MAX_INDEX: usize = 35;
 

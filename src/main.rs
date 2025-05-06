@@ -1,3 +1,5 @@
+use rayon;
+
 use std::time::Instant;
 
 mod mod_structs;

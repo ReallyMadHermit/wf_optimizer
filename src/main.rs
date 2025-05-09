@@ -12,7 +12,7 @@ use crate::weapon_structs::{Criteria};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds, sort_by_criteria
 };
-use crate::mod_structs::ModLoader;
+use crate::mod_structs::DataLoader;
 
 const TOP_BUILD_COUNT: usize = 20;
 
@@ -28,11 +28,11 @@ fn debug_prompts() {
 
     let parsed_mod_list = {
         let mut buffer = String::new();
-        ModLoader::load_mods(&base_weapon_stats.gun_type, &mut buffer, false)
+        DataLoader::load_mods(&base_weapon_stats.gun_type, &mut buffer, false)
     };
     let parsed_arcane_list = {
         let mut buffer = String::new();
-        ModLoader::load_mods(&base_weapon_stats.gun_type, &mut buffer, true)
+        DataLoader::load_mods(&base_weapon_stats.gun_type, &mut buffer, true)
     };
 
     let mut combinations = generate_combinations(parsed_mod_list.len() as u8);

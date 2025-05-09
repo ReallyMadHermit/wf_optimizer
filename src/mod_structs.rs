@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::path::Path;
 
 use crate::weapon_structs::GunType;
 
@@ -101,8 +102,8 @@ pub struct ModStat {
     
 }
 
-pub struct ModLoader;
-impl ModLoader {
+pub struct DataLoader;
+impl DataLoader {
 
     pub fn load_mods(gun_type: &GunType, buffer: &mut String, arcanes: bool) -> Vec<WeaponMod> {
         match gun_type {
@@ -122,7 +123,7 @@ impl ModLoader {
                 continue;
             };
             mod_list.push(
-                ModLoader::parse_gun_mod(line)
+                DataLoader::parse_gun_mod(line)
             );
         };
         return mod_list;
@@ -165,7 +166,8 @@ impl ModLoader {
     }
     
     fn read_csv(buffer: &mut String, file_name: &str) {
-        if let Ok(csv_text) = std::fs::read_to_string(file_name) {
+        let full_path = Path::new("data").join(file_name);
+        if let Ok(csv_text) = std::fs::read_to_string(full_path) {
             buffer.push_str(&csv_text);
         } else {
             println!("oopsie, {} could not be loaded, vewy sowwy, time to panic!", file_name);

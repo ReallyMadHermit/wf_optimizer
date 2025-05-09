@@ -181,7 +181,7 @@ pub struct GunStats {
                 crit_chance: 0.34,
                 crit_damage: 3.0,
                 status: 0.18
-            }, 
+            },
             HitStats {
                 damage: 53.0,
                 crit_chance: 0.34,

@@ -7,12 +7,11 @@ mod weapon_structs;
 mod supporting_functions;
 mod brute_force_solution;
 
-use supporting_functions::{weapon_select_loop};
+use supporting_functions::{weapon_select_loop, DataLoader};
 use crate::weapon_structs::{Criteria};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds, sort_by_criteria
 };
-use crate::mod_structs::DataLoader;
 
 const TOP_BUILD_COUNT: usize = 20;
 

@@ -60,17 +60,12 @@ pub fn new_weapon_list_select(imported_guns: &Vec<ImportedGun>, last_input: &str
     } else {
         _ = writeln!(buffer, "Right... Couldn't find that, but I narrowed the results a bit.");
     };
-    let mut last_name = "";
     let input_first = last_input.to_uppercase().chars().next();
     for (index, weapon) in imported_guns.iter().enumerate() {
         let name = weapon.get_name();
-        if name == last_name {  // prevents listing weapons with 2 modes twice
-            continue;
-        } else {
-            last_name = name;
-        };
+        let attack = weapon.get_attack();
         if empty || input_first == name.chars().next() {  // checks if input is empty
-            _ = writeln!(buffer, "{}. {}", index, name);
+            _ = writeln!(buffer, "{}. {} - {}", index, name, attack);
         };
     };
     _ = writeln!(buffer, "Please enter the number corresponding with the weapon you want to customize...");

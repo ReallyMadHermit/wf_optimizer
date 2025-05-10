@@ -77,7 +77,8 @@ fn debug_prompts() {
     println!("All done! displaying reports");
     
     println!("Elapsed: {:?}", duration);
-
+    
+    println!("{}", imported_gun.get_name());
     for i in 0..TOP_BUILD_COUNT {
         println!("{}", build_reports[i].get_report_string(&parsed_mod_list, &parsed_arcane_list))
     };

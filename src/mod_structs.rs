@@ -1,8 +1,3 @@
-use std::collections::VecDeque;
-use std::path::Path;
-
-use crate::weapon_structs::GunType;
-
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct WeaponMod {
     pub name: String,

@@ -34,12 +34,14 @@ pub fn new_weapon_select(imported_guns: &Vec<ImportedGun>) -> usize {
 }
 
 pub fn sub_weapon_select(imported_guns: &Vec<ImportedGun>, results: &Vec<usize>) -> usize {
-    let mut buffer = String::from("There are multiple weapons with that name:");
+    let mut buffer = String::with_capacity(300);
+    _ = writeln!(buffer, "There are multiple weapons with that name:");
     for (index, &result) in results.iter().enumerate() {
         let var = imported_guns[result].get_attack();
         _ = writeln!(buffer, "{}. {}", index, var);
     };
     _ = writeln!(buffer, "Please choose the variant number you wish to optimize.");
+    buffer.shrink_to_fit();
     let input = take_input(&buffer);
     return if let Ok(choice) = input.parse() {
         let choice: usize = choice;
@@ -72,6 +74,7 @@ pub fn new_weapon_list_select(imported_guns: &Vec<ImportedGun>, last_input: &str
         };
     };
     _ = writeln!(buffer, "Please enter the number corresponding with the weapon you want to customize...");
+    buffer.shrink_to_fit();
     let input = take_input(&buffer);
     let ii: usize = if let Ok(choice) = input.parse() {
         choice

@@ -7,8 +7,8 @@ mod weapon_structs;
 mod supporting_functions;
 mod brute_force_solution;
 
-use supporting_functions::{weapon_select_loop, DataLoader};
-use crate::weapon_structs::{Criteria};
+use supporting_functions::{new_weapon_select, DataLoader};
+use crate::weapon_structs::{Criteria, GunType};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds, sort_by_criteria
 };
@@ -20,9 +20,15 @@ fn main() {
 }
 
 fn debug_prompts() {
-    let base_weapon_stats = weapon_select_loop();
+    
+    let mut gun_buffer =String::new();
+    let gun_type = GunType::Rifle;
+    let parsed_gun_list = DataLoader::load_guns(&gun_type, &mut gun_buffer);
+    let weapon_choice_index = new_weapon_select(&parsed_gun_list);
+    let imported_gun = &parsed_gun_list[weapon_choice_index];
+    let base_weapon_stats = imported_gun.get_gunstats(gun_type);
+    
     let criteria = Criteria::determine_criteria();
-
     let start = Instant::now();
 
     let parsed_mod_list = {

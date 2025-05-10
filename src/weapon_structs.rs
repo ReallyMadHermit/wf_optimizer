@@ -32,7 +32,6 @@ fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
 
 #[derive(Clone)]
 pub struct GunStats {
-    pub name: &'static str,
     pub fire_rate: f32,
     pub multishot: f32,
     pub magazine: f32,
@@ -68,7 +67,6 @@ pub struct GunStats {
         let burst = self.calculate_burst_dps(hit);
         let sustained = self.calculate_sustained_dps(burst);
         WeaponReport {
-            weapon_name: self.name,
             gun_type: self.gun_type.clone(),
             criteria,
             hit_damage: hit.round() as u32,
@@ -97,99 +95,99 @@ pub struct GunStats {
         return modded_self;
     }
     
-    pub const RIFLE_LIST: [&'static str; 3] = [
-        "Prisma Gorgon",
-        "Trumna Prime",
-        "Acceltra Prime"
-    ];
-
-    pub fn gun_lookup(weapon_name: &str) -> Self {
-        match weapon_name {
-            "Prisma Gorgon" => GunStats::PRISMA_GORGON,
-            "Trumna Prime" => GunStats::TRUMNA_PRIME,
-            "Acceltra Prime" => GunStats::ACCELTRA_PRIME,
-            _ => GunStats::EMPTY_GUN
-        }
-    }
-
-    pub const EMPTY_GUN: GunStats = GunStats {
-        name: "ERROR YOU SHOULD NOT SEE THIS DISBARK AND DISBAND",
-        fire_rate: 0.0,
-        multishot: 0.0,
-        magazine: 0.0,
-        reload: 0.0,
-        semi: false,
-        gun_type: GunType::Rifle,
-        hit_stats: [
-            HitStats::empty(),
-            HitStats::empty()
-        ]
-    };
-
-    const PRISMA_GORGON: GunStats = GunStats {
-        name: "Prisma Gorgon",
-        fire_rate: 14.7,
-        multishot: 1.0,
-        magazine: 120.0,
-        reload: 3.0,
-        semi: false,
-        gun_type: GunType::Rifle,
-        hit_stats: [
-            HitStats {
-                damage: 23.0,
-                crit_chance: 0.3,
-                crit_damage: 2.3,
-                status: 0.15
-            },
-            HitStats::empty()
-        ]
-    };
-    const TRUMNA_PRIME: GunStats = GunStats {
-        name: "Trumna Prime",
-        fire_rate: 4.67,
-        multishot: 1.0,
-        magazine: 250.0,
-        reload: 4.0,
-        semi: false,
-        gun_type: GunType::Rifle,
-        hit_stats: [
-            HitStats {
-                damage: 85.0,
-                crit_chance: 0.24,
-                crit_damage: 2.4,
-                status: 0.34
-            },
-            HitStats {
-                damage: 50.0,
-                crit_chance: 0.24,
-                crit_damage: 2.4,
-                status: 0.34
-            }
-        ]
-    };
-    const ACCELTRA_PRIME: GunStats = GunStats {
-        name: "Acceltra Prime",
-        fire_rate: 10.0,
-        multishot: 1.0,
-        magazine: 48.0,
-        reload: 1.6,
-        semi: false,
-        gun_type: GunType::Rifle,
-        hit_stats: [
-            HitStats {
-                damage: 44.0,
-                crit_chance: 0.34,
-                crit_damage: 3.0,
-                status: 0.18
-            },
-            HitStats {
-                damage: 53.0,
-                crit_chance: 0.34,
-                crit_damage: 3.0,
-                status: 0.18
-            }
-        ]
-    };
+    // pub const RIFLE_LIST: [&'static str; 3] = [
+    //     "Prisma Gorgon",
+    //     "Trumna Prime",
+    //     "Acceltra Prime"
+    // ];
+    // 
+    // pub fn gun_lookup(weapon_name: &str) -> Self {
+    //     match weapon_name {
+    //         "Prisma Gorgon" => GunStats::PRISMA_GORGON,
+    //         "Trumna Prime" => GunStats::TRUMNA_PRIME,
+    //         "Acceltra Prime" => GunStats::ACCELTRA_PRIME,
+    //         _ => GunStats::EMPTY_GUN
+    //     }
+    // }
+    // 
+    // pub const EMPTY_GUN: GunStats = GunStats {
+    //     name: "ERROR YOU SHOULD NOT SEE THIS DISBARK AND DISBAND",
+    //     fire_rate: 0.0,
+    //     multishot: 0.0,
+    //     magazine: 0.0,
+    //     reload: 0.0,
+    //     semi: false,
+    //     gun_type: GunType::Rifle,
+    //     hit_stats: [
+    //         HitStats::empty(),
+    //         HitStats::empty()
+    //     ]
+    // };
+    // 
+    // const PRISMA_GORGON: GunStats = GunStats {
+    //     name: "Prisma Gorgon",
+    //     fire_rate: 14.7,
+    //     multishot: 1.0,
+    //     magazine: 120.0,
+    //     reload: 3.0,
+    //     semi: false,
+    //     gun_type: GunType::Rifle,
+    //     hit_stats: [
+    //         HitStats {
+    //             damage: 23.0,
+    //             crit_chance: 0.3,
+    //             crit_damage: 2.3,
+    //             status: 0.15
+    //         },
+    //         HitStats::empty()
+    //     ]
+    // };
+    // const TRUMNA_PRIME: GunStats = GunStats {
+    //     name: "Trumna Prime",
+    //     fire_rate: 4.67,
+    //     multishot: 1.0,
+    //     magazine: 250.0,
+    //     reload: 4.0,
+    //     semi: false,
+    //     gun_type: GunType::Rifle,
+    //     hit_stats: [
+    //         HitStats {
+    //             damage: 85.0,
+    //             crit_chance: 0.24,
+    //             crit_damage: 2.4,
+    //             status: 0.34
+    //         },
+    //         HitStats {
+    //             damage: 50.0,
+    //             crit_chance: 0.24,
+    //             crit_damage: 2.4,
+    //             status: 0.34
+    //         }
+    //     ]
+    // };
+    // const ACCELTRA_PRIME: GunStats = GunStats {
+    //     name: "Acceltra Prime",
+    //     fire_rate: 10.0,
+    //     multishot: 1.0,
+    //     magazine: 48.0,
+    //     reload: 1.6,
+    //     semi: false,
+    //     gun_type: GunType::Rifle,
+    //     hit_stats: [
+    //         HitStats {
+    //             damage: 44.0,
+    //             crit_chance: 0.34,
+    //             crit_damage: 3.0,
+    //             status: 0.18
+    //         },
+    //         HitStats {
+    //             damage: 53.0,
+    //             crit_chance: 0.34,
+    //             crit_damage: 3.0,
+    //             status: 0.18
+    //         }
+    //     ]
+    // };
 
 }
 
@@ -423,7 +421,6 @@ pub enum Criteria {
 }
 
 pub struct WeaponReport {
-    pub weapon_name: &'static str,
     pub gun_type: GunType,
     pub criteria: Criteria,
     pub hit_damage: u32,
@@ -435,7 +432,6 @@ pub struct WeaponReport {
     
     pub fn get_report_string(&self, loaded_mods: &Vec<WeaponMod>, loaded_arcanes: &Vec<WeaponMod>) -> String {
         let mut buffer = String::with_capacity(250);
-        _ = writeln!(buffer, "{}", self.weapon_name).unwrap();
         _ = writeln!(buffer, "Hit|Burst|Sustained").unwrap();
         _ = writeln!(
             buffer,
@@ -458,6 +454,108 @@ pub struct WeaponReport {
         };
         buffer.shrink_to_fit();
         buffer
+    }
+    
+}
+
+pub struct ImportedGun<'a> {
+    csv_line: &'a str,
+    split: Option<Vec<&'a str>>
+}impl<'a> ImportedGun<'a> {
+    
+    pub fn new(csv_line: &'a str) -> Self {
+        ImportedGun {
+            csv_line,
+            split: Some(csv_line.split(",").collect())
+        }
+    }
+    
+    pub fn get_gunstats(&self, gun_type: GunType) -> GunStats {
+        GunStats {
+            fire_rate: self.get_fire_rate(),
+            multishot: self.get_multishot(),
+            magazine: self.get_mag_size(),
+            reload: self.get_reload(),
+            semi: self.get_semi(),
+            gun_type,
+            hit_stats: self.get_hit_stats()
+        }
+    }
+    
+    fn get_field_index_str(&self, index: usize) -> &str {
+        self.split.as_ref().unwrap()[index]
+    }
+
+    fn get_field_index_f32(&self, index: usize) -> f32 {
+        return if let Ok(parsed_value) = self.split.as_ref().unwrap()[index].parse() {
+            parsed_value
+        } else {
+            println!("Failed to load value index {} for {}", index, self.get_name());
+            0.0
+        };
+    }
+    
+    pub fn get_name(&self) -> &str {
+        self.get_field_index_str(0)
+    }
+    pub fn get_attack(&self) -> &str {
+        self.get_field_index_str(1)
+    }
+    pub fn get_mag_size(&self) -> f32 {
+        self.get_field_index_f32(2)
+    }
+    pub fn get_reload(&self) -> f32 {
+        self.get_field_index_f32(3)
+    }
+    pub fn get_fire_rate(&self) -> f32 {
+        self.get_field_index_f32(4)
+    }
+    pub fn get_multishot(&self) -> f32 {
+        self.get_field_index_f32(5)
+    }
+    pub fn get_semi(&self) -> bool {
+        let s = self.get_field_index_str(6);
+        if s == "TRUE" {
+            true
+        } else {
+            false
+        }
+    }
+    pub fn get_punch_through(&self) -> f32 {
+        self.get_field_index_f32(7)
+    }
+    pub fn get_hit_stats(&self) -> [HitStats; 2] {
+        let damage = self.get_field_index_f32(8);
+        let crit_chance = self.get_field_index_f32(9);
+        let crit_damage = self.get_field_index_f32(10);
+        let status = self.get_field_index_f32(11);
+        let hit_stats_1 = HitStats {
+            damage,
+            crit_chance,
+            crit_damage,
+            status
+        };
+        let damage = self.get_field_index_f32(12);
+        return if damage < 1.0 {
+            [
+                hit_stats_1,
+                HitStats::empty()
+            ]
+        } else {
+            let crit_chance = self.get_field_index_f32(13);
+            let crit_damage = self.get_field_index_f32(14);
+            let status = self.get_field_index_f32(15);
+            let hit_stats_2 = HitStats {
+                damage,
+                crit_chance,
+                crit_damage,
+                status
+            };
+            [
+                hit_stats_1,
+                hit_stats_2
+            ]
+        };
     }
     
 }

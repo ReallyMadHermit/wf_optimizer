@@ -102,9 +102,6 @@ impl DataLoader {
         csv_lines.pop_front();
         let mut mod_list: Vec<WeaponMod> = Vec::with_capacity(csv_lines.len());
         for line in csv_lines {
-            if &line[0..1] == "," {
-                continue;
-            };
             mod_list.push(
                 DataLoader::parse_gun_mod(line)
             );

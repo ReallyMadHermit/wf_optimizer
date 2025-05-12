@@ -105,10 +105,26 @@ fn compare_stats(
     return new_sustained_damage / old_sustained_damage;
 }
 
-pub struct DataLoader;
-impl DataLoader {
+pub struct DataLoader<'a> {
+    pub gun_type: GunType,
+    pub weapon_list: Vec<ImportedGun<'a>>,
+    pub mod_list: Vec<WeaponMod>,
+    pub arcane_list: Vec<WeaponMod>
+}impl<'a> DataLoader<'a> {
 
-    pub fn load_guns<'a>(gun_type: &GunType, buffer:  &'a mut String) -> Vec<ImportedGun<'a>> {
+    pub fn new(gun_type: GunType, weapon_buffer: &'a mut String) -> Self {
+        let weapon_list = DataLoader::load_guns(&gun_type, weapon_buffer);
+        let mod_list = DataLoader::load_mods(&gun_type, &mut String::new(), false);
+        let arcane_list = DataLoader::load_mods(&gun_type, &mut String::new(), true);
+        DataLoader {
+            gun_type: gun_type.clone(),
+            weapon_list,
+            mod_list,
+            arcane_list
+        }
+    }
+    
+    pub fn load_guns(gun_type: &GunType, buffer:  &'a mut String) -> Vec<ImportedGun<'a>> {
         match gun_type {
             GunType::Rifle => {
                 Self::read_csv(buffer, "rifle_stats.csv");

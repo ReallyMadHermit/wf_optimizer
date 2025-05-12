@@ -376,14 +376,14 @@ pub struct ImportedGun<'a> {
         }
     }
     
-    pub fn get_gunstats(&self, gun_type: GunType) -> GunStats {
+    pub fn get_gunstats(&self, gun_type: &GunType) -> GunStats {
         GunStats {
             fire_rate: self.get_fire_rate(),
             multishot: self.get_multishot(),
             magazine: self.get_mag_size(),
             reload: self.get_reload(),
             semi: self.get_semi(),
-            gun_type,
+            gun_type: gun_type.clone(),
             hit_stats: self.get_hit_stats()
         }
     }

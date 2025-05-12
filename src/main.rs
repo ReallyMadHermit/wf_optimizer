@@ -22,12 +22,11 @@ fn main() {
 
 fn debug_prompts() {
     
-    let mut gun_buffer =String::new();
-    let gun_type = GunType::Rifle;
-    let parsed_gun_list = DataLoader::load_guns(&gun_type, &mut gun_buffer);
-    let weapon_choice_index = new_weapon_select(&parsed_gun_list);
-    let imported_gun = &parsed_gun_list[weapon_choice_index];
-    let base_weapon_stats = imported_gun.get_gunstats(gun_type);
+    let mut weapon_buffer = String::new();
+    let data = DataLoader::new(GunType::Rifle, &mut weapon_buffer);
+    let weapon_choice_index = new_weapon_select(&data.weapon_list);
+    let imported_gun = &data.weapon_list[weapon_choice_index];
+    let base_weapon_stats = imported_gun.get_gunstats(&data.gun_type);
     
     let criteria = Criteria::determine_criteria();
     let start = Instant::now();

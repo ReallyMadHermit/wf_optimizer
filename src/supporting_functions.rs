@@ -5,16 +5,6 @@ use crate::mod_structs::*;
 use crate::weapon_structs::*;
 use std::fmt::Write;
 
-pub const fn build_mask(indices: &[u8]) -> u64 {
-    let mut mask: u64 = 0;
-    let mut i = 0;
-    while i < indices.len() {
-        mask |= 1 << indices[i];
-        i += 1;
-    };
-    mask
-}
-
 pub fn new_weapon_select(imported_guns: &Vec<ImportedGun>) -> usize {
     let mut results:Vec<usize> = Vec::with_capacity(4);
     println!("Enter the weapon's name (it's case sensitive (out of spite, of course))");

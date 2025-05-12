@@ -199,7 +199,7 @@ pub struct DataLoader<'a> {
     }
 
     fn read_csv(buffer: &mut String, file_name: &str) {
-        let full_path = Path::new("data").join(file_name);
+        let full_path = Path::new("game_data").join(file_name);
         if let Ok(csv_text) = std::fs::read_to_string(full_path) {
             buffer.push_str(&csv_text);
         } else {

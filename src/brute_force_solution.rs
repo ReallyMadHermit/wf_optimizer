@@ -1,3 +1,5 @@
+use rayon;
+
 use crate::mod_structs::WeaponMod;
 use crate::weapon_structs::{Criteria, GunStats, WeaponReport, GunStatModSums};
 use std::cmp::Reverse;

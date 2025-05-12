@@ -43,13 +43,7 @@ pub fn sub_weapon_select(imported_guns: &Vec<ImportedGun>, results: &Vec<usize>)
     _ = writeln!(buffer, "Please choose the variant number you wish to optimize.");
     buffer.shrink_to_fit();
     let input = take_input(&buffer);
-    return if let Ok(choice) = input.parse() {
-        let choice: usize = choice;
-        return results[choice]
-    } else {
-        println!("Something went wrong! have the first one ig");
-        results[0]
-    };
+    results[parse_input(&input)]
 }
 
 pub fn new_weapon_list_select(imported_guns: &Vec<ImportedGun>, last_input: &str) -> usize {
@@ -71,13 +65,7 @@ pub fn new_weapon_list_select(imported_guns: &Vec<ImportedGun>, last_input: &str
     _ = writeln!(buffer, "Please enter the number corresponding with the weapon you want to customize...");
     buffer.shrink_to_fit();
     let input = take_input(&buffer);
-    let ii: usize = if let Ok(choice) = input.parse() {
-        choice
-    } else {
-        println!("You've bungled it somehow... I'm just gonna give you the first one off the top.");
-        0
-    };
-    return ii;
+    parse_input(&input)
 }
 
 pub fn take_input(prompt: &str) -> String {
@@ -86,6 +74,17 @@ pub fn take_input(prompt: &str) -> String {
     let _ = stdin().read_line(&mut buffer);
     buffer.pop();
     return buffer;
+}
+
+pub fn parse_input(input: &str) -> usize {
+    if let Ok(parsed) = input.parse() {
+        parsed
+    } else {
+        println!(
+            "Error! The input'{}' could not be parsed as a number, and will now return 0.", input
+        );
+        0
+    }
 }
 
 fn try_mod(

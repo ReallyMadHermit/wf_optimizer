@@ -12,6 +12,7 @@ use crate::weapon_structs::{Criteria, GunType};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds, sort_by_criteria
 };
+use crate::supporting_functions::take_input;
 
 const TOP_BUILD_COUNT: usize = 20;
 

@@ -108,29 +108,6 @@ fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64, disallowed_mask: u64)
     return true;
 }
 
-// fn keep_combo(combo: &[u8; 8], required: &[usize], disallowed: &[usize]) -> bool {
-//     let mut truth_table = [false; MAX_INDEX];
-//     for &index in combo {
-//         truth_table[index as usize] = true;
-//     };
-//     for (a, b) in ILLEGAL_PAIRS {
-//         if truth_table[a] && truth_table[b] {
-//             return false;
-//         };
-//     };
-//     for &i in required {
-//         if !truth_table[i] {
-//             return false;
-//         };
-//     };
-//     for &i in disallowed {
-//         if truth_table[i] {
-//             return false;
-//         };
-//     };
-//     return true;
-// }
-
 pub fn test_all_builds(
     combinations: &Vec<[u8; 8]>, 
     base_gun_stats: &GunStats, 

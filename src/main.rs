@@ -49,8 +49,8 @@ fn debug_prompts() {
     println!("Last combo:");
     print_combo(&combinations[count - 1]);
     
-    let required_mods: Vec<usize> = Vec::new();
-    let disallowed_mods: Vec<usize> = Vec::new();
+    let required_mods: Vec<u8> = Vec::new();
+    let disallowed_mods: Vec<u8> = Vec::new();
 
     println!("Filtering illegal pairs...");
     filter_combinations(&mut combinations, required_mods.as_slice(), disallowed_mods.as_slice());

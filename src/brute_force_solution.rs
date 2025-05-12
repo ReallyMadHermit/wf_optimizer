@@ -50,7 +50,7 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
     result
 }
 
-const ILLEGAL_PAIRS: [(usize, usize); 11] = [
+const ILLEGAL_PAIRS: [(u8, u8); 11] = [
     (5, 22),  // Aptitude
     (6, 28),  // Chamber
     (4, 16),  // Point Strike
@@ -66,37 +66,70 @@ const ILLEGAL_PAIRS: [(usize, usize); 11] = [
 const MAX_INDEX: usize = 35;
 
 pub fn filter_combinations(
-    combinations: &mut Vec<[u8; 8]>, required: &[usize], disallowed: &[usize]
+    combinations: &mut Vec<[u8; 8]>, required: &[u8], disallowed: &[u8]
 ) {
-    combinations.retain(|combo: &[u8; 8]| keep_combo(combo, required, disallowed));
+    let required_mask = build_mask(required);
+    let disallowed_mask = build_mask(disallowed);
+    combinations.retain(|combo: &[u8; 8]| keep_combo_bitmask(combo, required_mask, disallowed_mask));
 }
 
-// fn keep_combo_bitmask(combo: &[u8; 8]) -> bool {
-//     
-// }
+#[inline(always)]
+pub fn build_mask(indices: &[u8]) -> u64 {
+    let mut mask: u64 = 0;
+    for &i in indices {
+        mask |= 1 << i;
+    };
+    mask
+}
 
-fn keep_combo(combo: &[u8; 8], required: &[usize], disallowed: &[usize]) -> bool {
-    let mut truth_table = [false; MAX_INDEX];
-    for &index in combo {
-        truth_table[index as usize] = true;
+#[inline(always)]
+fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64, disallowed_mask: u64) -> bool {
+    // create bitmask
+    let mut bits: u64 = 0;
+    for &i in combo.iter() {
+        bits |= 1 << i;
     };
+    
+    // filter illegal mod pairs
     for (a, b) in ILLEGAL_PAIRS {
-        if truth_table[a] && truth_table[b] {
+        if (bits & (1 << a)) != 0 && (bits & (1 << b)) != 0 {
             return false;
         };
     };
-    for &i in required {
-        if !truth_table[i] {
-            return false;
-        };
+    
+    if (bits & required_mask) != required_mask {
+        return false;
     };
-    for &i in disallowed {
-        if truth_table[i] {
-            return false;
-        };
+    
+    if (bits & disallowed_mask) != 0 {
+        return false;
     };
+    
     return true;
 }
+
+// fn keep_combo(combo: &[u8; 8], required: &[usize], disallowed: &[usize]) -> bool {
+//     let mut truth_table = [false; MAX_INDEX];
+//     for &index in combo {
+//         truth_table[index as usize] = true;
+//     };
+//     for (a, b) in ILLEGAL_PAIRS {
+//         if truth_table[a] && truth_table[b] {
+//             return false;
+//         };
+//     };
+//     for &i in required {
+//         if !truth_table[i] {
+//             return false;
+//         };
+//     };
+//     for &i in disallowed {
+//         if truth_table[i] {
+//             return false;
+//         };
+//     };
+//     return true;
+// }
 
 pub fn test_all_builds(
     combinations: &Vec<[u8; 8]>, 

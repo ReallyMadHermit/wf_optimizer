@@ -1,4 +1,4 @@
-use rayon;
+use rayon::prelude::*;
 
 use crate::mod_structs::WeaponMod;
 use crate::weapon_structs::{Criteria, GunStats, WeaponReport, GunStatModSums};
@@ -118,22 +118,34 @@ pub fn test_all_builds(
     loaded_arcanes: &Vec<WeaponMod>
 ) -> Vec<WeaponReport> {
     let mut builds: Vec<WeaponReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.iter().len());
-    for combo in combinations {
-        let modded_sums = GunStatModSums::from_mod_list(
-            combo,
-            loaded_mods,
-            base_gun_stats,
-            criteria
-        );
-        for (i, arcane) in loaded_arcanes.iter().enumerate() {
-            let mut arcane_sums = modded_sums.clone();
-            arcane_sums.add_mod(arcane, criteria.kills(), base_gun_stats.semi);
-            let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
-            let arcane_report = arcane_stats.generate_report(criteria.clone(), combo, i as u8);
-            builds.push(arcane_report);
-        };
+    builds = combinations.par_iter().flat_map(|combo| {
+        test_arcanes(combo, &base_gun_stats, &criteria, &loaded_mods, &loaded_arcanes)
+    }).collect();
+    builds
+}
+
+fn test_arcanes(
+    combo: &[u8; 8],
+    base_gun_stats: &GunStats,
+    criteria: &Criteria,
+    loaded_mods: &Vec<WeaponMod>,
+    loaded_arcanes: &Vec<WeaponMod>
+) -> Vec<WeaponReport> {
+    let modded_sums = GunStatModSums::from_mod_list(
+        combo,
+        loaded_mods,
+        base_gun_stats,
+        criteria
+    );
+    let mut results: Vec<WeaponReport> = Vec::with_capacity(loaded_arcanes.len());
+    for (i, arcane) in loaded_arcanes.iter().enumerate() {
+        let mut arcane_sums = modded_sums.clone();
+        arcane_sums.add_mod(arcane, criteria.kills(), base_gun_stats.semi);
+        let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
+        let arcane_report = arcane_stats.generate_report(criteria.clone(), combo, i as u8);
+        results.push(arcane_report);
     };
-    return builds;
+    results
 }
 
 pub fn sort_by_criteria(reports: &mut Vec<WeaponReport>, criteria: Criteria) {

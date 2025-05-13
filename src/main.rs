@@ -28,16 +28,7 @@ fn debug_prompts() {
     let criteria = Criteria::determine_criteria();
     let start = Instant::now();
 
-    let parsed_mod_list = {
-        let mut buffer = String::new();
-        DataLoader::load_mods(&base_weapon_stats.gun_type, &mut buffer, false)
-    };
-    let parsed_arcane_list = {
-        let mut buffer = String::new();
-        DataLoader::load_mods(&base_weapon_stats.gun_type, &mut buffer, true)
-    };
-
-    let mut combinations = generate_combinations(parsed_mod_list.len() as u8);
+    let mut combinations = generate_combinations(data.mod_list.len() as u8);
     let count = combinations.len();
     println!("Combinations: {}", count);
     println!("First combo:");
@@ -63,8 +54,8 @@ fn debug_prompts() {
         &combinations,
         &base_weapon_stats,
         &criteria,
-        &parsed_mod_list,
-        &parsed_arcane_list
+        &data.mod_list,
+        &data.arcane_list
     );
     println!("Sorting reports...");
     
@@ -77,7 +68,7 @@ fn debug_prompts() {
     
     println!("{}", imported_gun.get_name());
     for i in 0..TOP_BUILD_COUNT {
-        println!("{}", build_reports[i].get_report_string(&parsed_mod_list, &parsed_arcane_list))
+        println!("{}", build_reports[i].get_report_string(&data.mod_list, &data.arcane_list))
     };
 }
 

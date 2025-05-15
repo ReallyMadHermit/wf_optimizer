@@ -99,34 +99,6 @@ pub fn loop_integer_prompt(prompt: &str, min: usize, max: usize) -> usize {
     parsed_int
 }
 
-fn try_mod(
-    mod_sum: &GunStatModSums, base_stats: &GunStats, weapon_mod: &WeaponMod, criteria: &Criteria
-) -> f32 {  // this should return a number representing the effective multiplier the mod applies
-    let old_stats = base_stats.apply_stat_sums(&mod_sum);
-    let mut new_mod_sum = mod_sum.clone();
-    new_mod_sum.add_mod(weapon_mod, criteria.kills(), base_stats.semi);
-    let new_stats = base_stats.apply_stat_sums(&new_mod_sum);
-    return compare_stats(&old_stats, &new_stats, criteria);
-}
-
-fn compare_stats(
-    old_stats: &GunStats, new_stats: &GunStats, criteria: &Criteria
-) -> f32 {
-    let old_shot_damage = old_stats.calculate_shot_damage();
-    let new_shot_damage = new_stats.calculate_shot_damage();
-    if criteria == &Criteria::PerShot || criteria == &Criteria::PerShotNoKills {
-        return new_shot_damage / old_shot_damage;
-    };
-    let old_burst_damage = old_stats.calculate_burst_dps(old_shot_damage);
-    let new_burst_damage = new_stats.calculate_burst_dps(new_shot_damage);
-    if criteria == &Criteria::BurstDPS || criteria == &Criteria::BurstDPSNoKills {
-        return new_burst_damage / old_burst_damage;
-    };
-    let old_sustained_damage = old_stats.calculate_sustained_dps(old_burst_damage);
-    let new_sustained_damage = new_stats.calculate_sustained_dps(new_burst_damage);
-    return new_sustained_damage / old_sustained_damage;
-}
-
 pub struct DataLoader<'a> {
     pub gun_type: GunType,
     pub weapon_list: Vec<ImportedGun<'a>>,

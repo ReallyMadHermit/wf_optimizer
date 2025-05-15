@@ -77,7 +77,7 @@ pub fn parse_input(input: &str) -> usize {
     }
 }
 
-pub fn loop_integer_prompt(prompt: &str, max: usize) -> usize {
+pub fn loop_integer_prompt(prompt: &str, min: usize, max: usize) -> usize {
     let mut curious = true;
     let mut parsed_int = 0usize;
     while curious {
@@ -90,7 +90,7 @@ pub fn loop_integer_prompt(prompt: &str, max: usize) -> usize {
         };
         if parsed_int > max {
             println!("That number exceeds the index boundary! Try again...")
-        } else if parsed_int >= 0 {
+        } else if parsed_int >= min {
             curious = false;
         } else {
             println!("I had to write an extra condition for people like you! Try again...")

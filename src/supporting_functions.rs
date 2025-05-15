@@ -77,6 +77,28 @@ pub fn parse_input(input: &str) -> usize {
     }
 }
 
+pub fn loop_integer_prompt(prompt: &str, max: usize) -> usize {
+    let mut curious = true;
+    let mut parsed_int = 0usize;
+    while curious {
+        let input = take_input(prompt);
+        if let Ok(parsed_input) = input.parse() {
+            parsed_int = parsed_input;
+        } else {
+            println!("That's not a number! Try again...");
+            continue;
+        };
+        if parsed_int > max {
+            println!("That number exceeds the index boundary! Try again...")
+        } else if parsed_int >= 0 {
+            curious = false;
+        } else {
+            println!("I had to write an extra condition for people like you! Try again...")
+        };
+    };
+    parsed_int
+}
+
 fn try_mod(
     mod_sum: &GunStatModSums, base_stats: &GunStats, weapon_mod: &WeaponMod, criteria: &Criteria
 ) -> f32 {  // this should return a number representing the effective multiplier the mod applies

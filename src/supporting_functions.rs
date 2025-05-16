@@ -5,6 +5,15 @@ use crate::mod_structs::*;
 use crate::weapon_structs::*;
 use std::fmt::Write;
 
+pub fn establish_the_facts(weapon_buffer: &mut String) -> (DataLoader, usize, ModdingCriteria) {
+    let data = DataLoader::new(GunType::Rifle, weapon_buffer);
+    let weapon_choice_index = new_weapon_select(&data.weapon_list);
+    let modding_criteria = ModdingCriteria::interview_user(
+        GunType::Rifle, data.weapon_list[weapon_choice_index].get_semi()
+    );
+    return (data, weapon_choice_index, modding_criteria);
+}
+
 pub fn new_weapon_select(imported_guns: &Vec<ImportedGun>) -> usize {
     let mut results:Vec<usize> = Vec::with_capacity(4);
     println!("Enter the weapon's name (it's case sensitive (out of spite, of course))");
@@ -97,6 +106,24 @@ pub fn loop_integer_prompt(prompt: &str, min: usize, max: usize) -> usize {
         };
     };
     parsed_int
+}
+
+pub fn yes_no_prompt(prompt: &str, prefer_yes: bool) -> bool {
+    let ending = if prefer_yes {
+        "(Y/n)?"
+    } else {
+        "(y/N)?"
+    };
+    let full_prompt = format!("{} {}", prompt, ending);
+    let input = take_input(&full_prompt);
+    let lower = input.to_lowercase();
+    return if lower == "y" {
+        true
+    } else if lower == "n" {
+        false
+    } else {
+        prefer_yes
+    };
 }
 
 pub struct DataLoader<'a> {

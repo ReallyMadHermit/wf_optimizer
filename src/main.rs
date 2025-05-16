@@ -1,15 +1,16 @@
 use std::time::Instant;
+use std::cmp::Reverse;
 
 mod mod_structs;
 mod weapon_structs;
 mod supporting_functions;
 mod brute_force_solution;
 
-use supporting_functions::{new_weapon_select, DataLoader};
-use crate::weapon_structs::{Criteria, GunType};
+use supporting_functions::establish_the_facts;
 use crate::brute_force_solution::{
-    generate_combinations, filter_combinations, test_all_builds, sort_by_criteria
+    generate_combinations, filter_combinations, test_all_builds
 };
+use crate::supporting_functions::{parse_input, take_input};
 
 const TOP_BUILD_COUNT: usize = 20;
 
@@ -20,12 +21,13 @@ fn main() {
 fn debug_prompts() {
     
     let mut weapon_buffer = String::new();
-    let data = DataLoader::new(GunType::Rifle, &mut weapon_buffer);
-    let weapon_choice_index = new_weapon_select(&data.weapon_list);
-    let imported_gun = &data.weapon_list[weapon_choice_index];
-    let base_weapon_stats = imported_gun.get_gunstats(&data.gun_type);
+    let (
+        data, weapon_choice_index, modding_criteria
+    ) = establish_the_facts(&mut weapon_buffer);
     
-    let criteria = Criteria::determine_criteria();
+    let imported_gun = &data.weapon_list[weapon_choice_index];
+    let base_weapon_stats = imported_gun.get_gunstats();
+    
     let start = Instant::now();
 
     let mut combinations = generate_combinations(data.mod_list.len() as u8);
@@ -49,26 +51,33 @@ fn debug_prompts() {
     println!("Last combo:");
     print_combo(&combinations[count - 1]);
     
-    println!("Calculating build reports...");
+    println!("Calculating builds...");
     let mut build_reports = test_all_builds(
         &combinations,
         &base_weapon_stats,
-        &criteria,
+        modding_criteria.damage.clone(),
         &data.mod_list,
-        &data.arcane_list
+        &data.arcane_list,
     );
     println!("Sorting reports...");
-    
-    sort_by_criteria(&mut build_reports, criteria.clone());
+    build_reports.sort_by_key(|r|r.criteria_result);
 
     let duration = start.elapsed();
-    println!("All done! displaying reports");
+    println!("All done! Elapsed: {:?}", duration);
+    let display_input = take_input("How many reports should we show?");
+    let report_display_count = parse_input(&display_input);
     
-    println!("Elapsed: {:?}", duration);
-    
-    println!("{}", imported_gun.get_name());
-    for i in 0..TOP_BUILD_COUNT {
-        println!("{}", build_reports[i].get_report_string(&data.mod_list, &data.arcane_list))
+    println!("{}\nHit|Burst|Sustain", imported_gun.get_name());
+    for i in 0..report_display_count {
+        println!(
+            "{}",
+            build_reports[i].get_report_string(
+                &base_weapon_stats,
+                &combinations,
+                &data.mod_list,
+                &data.arcane_list
+            )
+        );
     };
 }
 

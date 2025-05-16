@@ -1,6 +1,6 @@
 use crate::mod_structs::{WeaponMod, GunStatType};
-use crate::supporting_functions::take_input;
-use std::fmt::Write;
+use crate::supporting_functions::{loop_integer_prompt, yes_no_prompt};
+use std::fmt::{format, Write};
 
 #[derive(Clone)]
 struct HitStats {
@@ -23,11 +23,17 @@ struct HitStats {
 }
 
 fn apply_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
-    base_stat * ((mod_sum + 100) as f32 / 100.0)
+    if mod_sum == 100 {
+        return base_stat;
+    };
+    base_stat * (mod_sum as f32 / 100.0)
 }
 
 fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
-    base_stat / ((mod_sum + 100) as f32 / 100.0)
+    if mod_sum == 100 {
+        return base_stat;
+    };
+    base_stat / (mod_sum as f32 / 100.0)
 }
 
 #[derive(Clone)]
@@ -36,10 +42,12 @@ pub struct GunStats {
     pub multishot: f32,
     pub magazine: f32,
     pub reload: f32,
-    pub semi: bool,
-    pub gun_type: GunType,
     pub hit_stats: [HitStats; 2]
 } impl GunStats {
+    
+    pub fn from_imported_gun(imported_gun: &ImportedGun) -> Self {
+        imported_gun.get_gunstats()
+    }
 
     pub fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;
@@ -51,37 +59,45 @@ pub struct GunStats {
     }
 
     pub fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
-        self.fire_rate * shot_damage
+        if self.magazine > 1.1 {
+            self.fire_rate * shot_damage
+        } else {
+            shot_damage
+        }
     }
 
     pub fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
-        let mag_time = self.magazine / self.fire_rate;
-        let firing_ratio = mag_time / (mag_time + self.reload);
-        firing_ratio * burst_dps
-    }
-    
-    pub fn generate_report(
-        &self, criteria: Criteria, mod_list: &[u8; 8], arcane: u8
-    ) -> WeaponReport {
-        let hit = self.calculate_shot_damage();
-        let burst = self.calculate_burst_dps(hit);
-        let sustained = self.calculate_sustained_dps(burst);
-        WeaponReport {
-            gun_type: self.gun_type.clone(),
-            criteria,
-            hit_damage: hit.round() as u32,
-            burst_dps: burst.round() as u32,
-            sustained_dps: sustained.round() as u32,
-            mods: mod_list.clone(),
-            arcane
+        if self.magazine > 1.1 {
+            let mag_time = self.magazine / self.fire_rate;
+            let firing_ratio = mag_time / (mag_time + self.reload);
+            firing_ratio * burst_dps
+        } else {
+            burst_dps / self.reload
         }
     }
+    
+    // pub fn generate_report(
+    //     &self, criteria: DamageCriteria, mod_list: &[u8; 8], arcane: u8
+    // ) -> WeaponReport {
+    //     let hit = self.calculate_shot_damage();
+    //     let burst = self.calculate_burst_dps(hit);
+    //     let sustained = self.calculate_sustained_dps(burst);
+    //     WeaponReport {
+    //         gun_type: self.gun_type.clone(),
+    //         criteria,
+    //         hit_damage: hit.round() as u32,
+    //         burst_dps: burst.round() as u32,
+    //         sustained_dps: sustained.round() as u32,
+    //         mods: mod_list.clone(),
+    //         arcane
+    //     }
+    // }
     
     pub fn apply_stat_sums(&self, stat_sums: &GunStatModSums) -> Self {
         let mut modded_self = self.clone();
         modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sums.fire_rate);
         modded_self.multishot = apply_stat_sum(self.multishot, stat_sums.multishot);
-        modded_self.magazine = apply_stat_sum(self.magazine, stat_sums.magazine);
+        modded_self.magazine = apply_stat_sum(self.magazine, stat_sums.magazine).round();
         modded_self.reload = apply_inverse_stat_sum(self.reload, stat_sums.reload);
         for i in 0..self.hit_stats.len() {
             let modded_hit = &mut modded_self.hit_stats[i];
@@ -97,7 +113,7 @@ pub struct GunStats {
 
 }
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq)]
 pub enum GunType {
     Rifle
 }
@@ -112,223 +128,235 @@ pub struct GunStatModSums {
     status: i16,
     fire_rate: i16,
     magazine: i16,
-    reload: i16,
-    kills: bool,
-    semi: bool
+    reload: i16
 } impl GunStatModSums {
 
-    pub fn new(kills: bool, semi: bool) -> Self {
+    pub fn new() -> Self {
         GunStatModSums {
-            damage: 0,
-            ele_damage: 0,
-            multishot: 0,
-            crit_chance: 0,
-            crit_damage: 0,
-            status: 0,
-            fire_rate: 0,
-            magazine: 0,
-            reload: 0,
-            kills,
-            semi
+            damage: 100,
+            ele_damage: 100,
+            multishot: 100,
+            crit_chance: 100,
+            crit_damage: 100,
+            status: 100,
+            fire_rate: 100,
+            magazine: 100,
+            reload: 100
         }
     }
 
-    pub fn from_mod_list(weapon_mods: &[u8; 8], loaded_mods: &Vec<WeaponMod>, gun_stats: &GunStats, criteria: &Criteria) -> Self {
-        let mut mod_sums = GunStatModSums::new(
-            criteria.kills(), gun_stats.semi
-        );
+    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) -> Self {
+        let mut new_sums = GunStatModSums::new();
+        new_sums.add_many_mods(weapon_mods, loaded_mods);
+        return new_sums;
+    }
+    
+    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) {
         for &mod_id in weapon_mods {
             let weapon_mod: &WeaponMod = &loaded_mods[mod_id as usize];
-            mod_sums.add_mod(&weapon_mod, criteria.kills(), gun_stats.semi);
-        };
-        return mod_sums;
-    }
-
-    pub fn add_mod(
-        &mut self, weapon_mod: &WeaponMod, kills: bool, semi: bool
-    ) {
-        for mod_stat in &weapon_mod.mod_stats {
-            match mod_stat.stat_type {
-                GunStatType::None => {continue;},
-                GunStatType::Damage => {
-                    self.damage += mod_stat.stat_value;
-                },
-                GunStatType::DamageForSemiAuto => {
-                    if semi {
-                        self.damage += mod_stat.stat_value;
-                    };
-                },
-                GunStatType::DamageOnKill => {
-                    if kills {
-                        self.damage += mod_stat.stat_value;
-                    };
-                },
-                GunStatType::Cold | GunStatType::Toxic |
-                GunStatType::Heat | GunStatType::Shock |
-                GunStatType::Radiation | GunStatType::Magnetic => {
-                    self.ele_damage += mod_stat.stat_value;
-                },
-                GunStatType::StatusChance => {
-                    self.status += mod_stat.stat_value;
-                }
-                GunStatType::Multishot => {
-                    self.multishot += mod_stat.stat_value;
-                },
-                GunStatType::MultishotOnKill => {
-                    if kills {
-                        self.multishot += mod_stat.stat_value;
-                    };
-                },
-                GunStatType::CritChance => {
-                    self.crit_chance += mod_stat.stat_value;
-                },
-                GunStatType::CritChanceOnKill => {
-                    if kills {
-                        self.crit_chance += mod_stat.stat_value;
-                    };
-                },
-                GunStatType::CritDamage => {
-                    self.crit_damage += mod_stat.stat_value;
-                },
-                GunStatType::CritDamageOnKill => {
-                    if kills {
-                        self.crit_damage += mod_stat.stat_value;
-                    };
-                },
-                GunStatType::FireRate => {
-                    self.fire_rate += mod_stat.stat_value;
-                },
-                GunStatType::MagazineCapacity => {
-                    self.magazine += mod_stat.stat_value;
-                },
-                GunStatType::ReloadSpeed => {
-                    self.reload += mod_stat.stat_value;
-                },
-                _ => {}
-            };
+            self.add_mod(&weapon_mod);
         };
     }
-
-    pub fn remove_mod(
-        &mut self, weapon_mod: &WeaponMod, kills: bool, semi: bool
-    ) {
+    
+    pub fn add_mod(&mut self, weapon_mod: &WeaponMod) {
         for mod_stat in &weapon_mod.mod_stats {
-            match mod_stat.stat_type {
-                GunStatType::None => {continue},
-                GunStatType::Damage => {
-                    self.damage -= mod_stat.stat_value;
-                },
-                GunStatType::DamageForSemiAuto => {
-                    if semi {
-                        self.damage -= mod_stat.stat_value;
-                    };
-                },
-                GunStatType::DamageOnKill => {
-                    if kills {
-                        self.damage -= mod_stat.stat_value;
-                    };
-                },
-                GunStatType::Cold | GunStatType::Toxic |
-                GunStatType::Heat | GunStatType::Shock |
-                GunStatType::Radiation | GunStatType::Magnetic => {
-                    self.ele_damage -= mod_stat.stat_value;
-                },
-                GunStatType::StatusChance => {
-                    self.status -= mod_stat.stat_value;
-                }
-                GunStatType::Multishot => {
-                    self.multishot -= mod_stat.stat_value;
-                },
-                GunStatType::MultishotOnKill => {
-                    if kills {
-                        self.multishot -= mod_stat.stat_value;
-                    };
-                },
-                GunStatType::CritChance => {
-                    self.crit_chance -= mod_stat.stat_value;
-                },
-                GunStatType::CritChanceOnKill => {
-                    if kills {
-                        self.crit_chance -= mod_stat.stat_value;
-                    };
-                },
-                GunStatType::CritDamage => {
-                    self.crit_damage -= mod_stat.stat_value;
-                },
-                GunStatType::CritDamageOnKill => {
-                    if kills {
-                        self.crit_damage -= mod_stat.stat_value;
-                    };
-                },
-                GunStatType::FireRate => {
-                    self.fire_rate -= mod_stat.stat_value;
-                },
-                GunStatType::MagazineCapacity => {
-                    self.magazine -= mod_stat.stat_value;
-                },
-                GunStatType::ReloadSpeed => {
-                    self.reload -= mod_stat.stat_value;
-                },
-                _ => {}
-            };
+            self.apply_mod(mod_stat.stat_type.clone(), mod_stat.stat_value.clone())
+        };
+    }
+    
+    pub fn remove_mod(&mut self, weapon_mod: &WeaponMod) {
+        for mod_stat in &weapon_mod.mod_stats {
+            self.apply_mod(mod_stat.stat_type.clone(), -mod_stat.stat_value.clone())
+        };
+    }
+    
+    pub fn apply_mod(&mut self, stat_type: GunStatType, stat_value: i16) {
+        match stat_type {
+            GunStatType::None => {},
+            GunStatType::Damage => {
+                self.damage += stat_value;
+            },
+            GunStatType::Cold | GunStatType::Toxic |
+            GunStatType::Heat | GunStatType::Shock |
+            GunStatType::Radiation | GunStatType::Magnetic => {
+                self.ele_damage += stat_value;
+            },
+            GunStatType::StatusChance => {
+                self.status += stat_value;
+            }
+            GunStatType::Multishot => {
+                self.multishot += stat_value;
+            },
+            GunStatType::CritChance => {
+                self.crit_chance += stat_value;
+            },
+            GunStatType::CritDamage => {
+                self.crit_damage += stat_value;
+            },
+            GunStatType::FireRate => {
+                self.fire_rate += stat_value;
+            },
+            GunStatType::MagazineCapacity => {
+                self.magazine += stat_value;
+            },
+            GunStatType::ReloadSpeed => {
+                self.reload += stat_value;
+            },
+            _ => {}
         };
     }
 
 }
 
 #[derive(Clone, Eq, PartialEq)]
-pub enum Criteria {
-    PerShot,
-    BurstDPS,
-    SustainedDPS,
-    PerShotNoKills,
-    BurstDPSNoKills,
-    SustainedDPSNoKills
-} impl Criteria {
-
-    pub fn kills(&self) -> bool {
-        match self {
-            Criteria::PerShot | Criteria::BurstDPS | Criteria::SustainedDPS => {
-                true
-            },
-            _ => {
-                false
-            }
+pub struct ModdingCriteria {
+    pub gun_type: GunType,
+    pub damage: DamageCriteria,
+    pub kills: bool,
+    pub semi: bool,
+    pub aiming: bool,
+    pub acuity: bool,
+    pub riven: bool,
+    pub prefer_amalgam: bool,
+    
+} impl ModdingCriteria {
+    
+    pub fn interview_user(gun_type: GunType, semi: bool) -> Self {
+        let damage = DamageCriteria::determine_criteria();
+        let kills = yes_no_prompt("Use kill-reliant benefits", true);
+        let aiming = yes_no_prompt("Use aiming-reliant benefits", true);
+        let acuity = yes_no_prompt("Use acuity mods", false);
+        let riven = yes_no_prompt("Use Riven mod", false);
+        let prefer_amalgam = yes_no_prompt("Prefer Amalgam Serration & Diffusion", true);
+        ModdingCriteria {
+            gun_type,
+            damage,
+            kills,
+            semi,
+            aiming,
+            acuity,
+            riven,
+            prefer_amalgam
         }
     }
+    
+}
 
-    pub fn determine_criteria() -> Criteria {
+#[derive(Clone, Eq, PartialEq)]
+pub enum DamageCriteria {
+    PerShot,
+    BurstDPS,
+    SustainedDPS
+} impl DamageCriteria {
+
+    pub fn determine_criteria() -> DamageCriteria {
         println!();
         println!("Okay, what are we optimizing this for?");
         println!("1: Per-Shot Damage");
         println!("2: Burst DPS");
         println!("3: Sustained DPS");
-        println!("4: Per-Shot Damage, without kills");
-        println!("5: Burst DPS, without kills");
-        println!("6: Sustained DPS, without kills");
-        let input = take_input(
-            "If you fuck this up, we assume you want 'Per-Shot Damage'"
+        let input = loop_integer_prompt(
+            "Please enter the numer corresponding with your preferred criteria.", 1, 3
         );
-        return if let Ok(index) = input.parse::<u8>() {
-            match index {
-                1 => Criteria::PerShot,
-                2 => Criteria::BurstDPS,
-                3 => Criteria::SustainedDPS,
-                4 => Criteria::PerShotNoKills,
-                5 => Criteria::BurstDPSNoKills,
-                6 => Criteria::SustainedDPSNoKills,
-                _ => Criteria::PerShot
-            }
-        } else {
-            Criteria::PerShot
+        return match input {
+            1 => DamageCriteria::PerShot,
+            2 => DamageCriteria::BurstDPS,
+            3 => DamageCriteria::SustainedDPS,
+            _ => DamageCriteria::PerShot
         };
     }
 
 }
 
+pub struct LiteReport {
+    pub criteria_result: u32,
+    pub combo_index: u32,
+    pub arcane_index: u32
+} impl LiteReport {
+    
+    pub fn new(
+        modded_stats: GunStats, 
+        damage_criteria: DamageCriteria, 
+        combo_index: usize, arcane_index: usize
+    ) -> Self {
+        let shot_damage = modded_stats.calculate_shot_damage();
+        if damage_criteria == DamageCriteria::PerShot {
+            return LiteReport {
+                criteria_result: u32::MAX - shot_damage as u32,
+                combo_index: combo_index as u32,
+                arcane_index: arcane_index as u32
+            };
+        };
+        let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
+        if damage_criteria == DamageCriteria::BurstDPS {
+            return LiteReport {
+                criteria_result: u32::MAX - burst_damage as u32,
+                combo_index: combo_index as u32,
+                arcane_index: arcane_index as u32
+            };
+        };
+        LiteReport {
+            criteria_result: u32::MAX - modded_stats.calculate_sustained_dps(burst_damage) as u32,
+            combo_index: combo_index as u32,
+            arcane_index: arcane_index as u32
+        }
+    }
+    
+    pub fn get_report_string(
+        &self,
+        base_gun_stats: &GunStats,
+        combinations: &Vec<[u8; 8]>,
+        loaded_mods: &Vec<WeaponMod>,
+        loaded_arcanes: &Vec<WeaponMod>
+    ) -> String {
+        let mut stat_sums = GunStatModSums::from_mod_list(
+            &combinations[self.combo_index as usize],
+            loaded_mods
+        );
+        stat_sums.add_mod(&loaded_arcanes[self.arcane_index as usize]);
+        let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
+        format!(
+            "{}\n{}",
+            LiteReport::get_damage_string(&modded_stats),
+            self.get_mod_string(
+                combinations,
+                loaded_mods,
+                loaded_arcanes
+            )
+        )
+    }
+    
+    fn get_damage_string(modded_gun_stats: &GunStats) -> String {
+        let hit = modded_gun_stats.calculate_shot_damage();
+        let burst = modded_gun_stats.calculate_burst_dps(hit);
+        let sustained = modded_gun_stats.calculate_sustained_dps(burst);
+        format!("{}|{}|{}", hit, burst, sustained)
+    }
+    
+    fn get_mod_string(
+        &self, 
+        combinations: &Vec<[u8; 8]>, 
+        loaded_mods: &Vec<WeaponMod>, 
+        loaded_arcanes: &Vec<WeaponMod>
+    ) -> String {
+        let mut names = [""; 8];
+        let arcane = &loaded_arcanes[self.arcane_index as usize].name;
+        for (index, &id) in combinations[self.combo_index as usize].iter().enumerate() {
+            names[index] = &loaded_mods[id as usize].name;
+        };
+        format!(
+            "{}\n{}, {}, {}, {}, {}, {}, {}, {}",
+            arcane, 
+            names[0], names[1], names[2], names[3],
+            names[4], names[5], names[6], names[7]
+        )
+    }
+    
+}
+
 pub struct WeaponReport {
     pub gun_type: GunType,
-    pub criteria: Criteria,
+    pub criteria: DamageCriteria,
     pub hit_damage: u32,
     pub burst_dps: u32,
     pub sustained_dps: u32,
@@ -376,14 +404,12 @@ pub struct ImportedGun<'a> {
         }
     }
     
-    pub fn get_gunstats(&self, gun_type: &GunType) -> GunStats {
+    pub fn get_gunstats(&self) -> GunStats {
         GunStats {
             fire_rate: self.get_fire_rate(),
             multishot: self.get_multishot(),
             magazine: self.get_mag_size(),
             reload: self.get_reload(),
-            semi: self.get_semi(),
-            gun_type: gun_type.clone(),
             hit_stats: self.get_hit_stats()
         }
     }

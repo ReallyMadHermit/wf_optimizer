@@ -1,7 +1,7 @@
-use rayon::prelude::*;
+// use rayon::prelude::*;
 
 use crate::mod_structs::WeaponMod;
-use crate::weapon_structs::{Criteria, GunStats, WeaponReport, GunStatModSums};
+use crate::weapon_structs::{DamageCriteria, GunStats, WeaponReport, GunStatModSums, LiteReport, ModdingCriteria};
 use std::cmp::Reverse;
 
 // Vec<[u8;8]>
@@ -111,53 +111,62 @@ fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64, disallowed_mask: u64)
 }
 
 pub fn test_all_builds(
-    combinations: &Vec<[u8; 8]>, 
-    base_gun_stats: &GunStats, 
-    criteria: &Criteria, 
-    loaded_mods: &Vec<WeaponMod>, 
-    loaded_arcanes: &Vec<WeaponMod>
-) -> Vec<WeaponReport> {
-    let mut builds: Vec<WeaponReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.iter().len());
-    builds = combinations.par_iter().flat_map(|combo| {
-        test_arcanes(combo, &base_gun_stats, &criteria, &loaded_mods, &loaded_arcanes)
-    }).collect();
+    combinations: &Vec<[u8; 8]>,
+    base_gun_stats: &GunStats,
+    damage_criteria: DamageCriteria,
+    loaded_mods: &Vec<WeaponMod>,
+    loaded_arcanes: &Vec<WeaponMod>,
+) -> Vec<LiteReport> {
+    let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.iter().len());
+    for (combo_index, combo) in combinations.iter().enumerate() {
+        let modded_sums = GunStatModSums::from_mod_list(combo, loaded_mods);
+        for (arcane_index, arcane) in loaded_arcanes.iter().enumerate() {
+            let mut arcane_sums = modded_sums.clone();
+            arcane_sums.add_mod(arcane);
+            let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
+            let report = LiteReport::new(
+                arcane_stats, damage_criteria.clone(), combo_index, arcane_index
+            );
+            builds.push(report);
+        };
+    };
     builds
 }
 
-fn test_arcanes(
-    combo: &[u8; 8],
-    base_gun_stats: &GunStats,
-    criteria: &Criteria,
-    loaded_mods: &Vec<WeaponMod>,
-    loaded_arcanes: &Vec<WeaponMod>
-) -> Vec<WeaponReport> {
-    let modded_sums = GunStatModSums::from_mod_list(
-        combo,
-        loaded_mods,
-        base_gun_stats,
-        criteria
-    );
-    let mut results: Vec<WeaponReport> = Vec::with_capacity(loaded_arcanes.len());
-    for (i, arcane) in loaded_arcanes.iter().enumerate() {
-        let mut arcane_sums = modded_sums.clone();
-        arcane_sums.add_mod(arcane, criteria.kills(), base_gun_stats.semi);
-        let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
-        let arcane_report = arcane_stats.generate_report(criteria.clone(), combo, i as u8);
-        results.push(arcane_report);
-    };
-    results
-}
+// fn test_arcanes(
+//     combo: &[u8; 8],
+//     base_gun_stats: &GunStats,
+//     criteria: DamageCriteria,
+//     loaded_mods: &Vec<WeaponMod>,
+//     loaded_arcanes: &Vec<WeaponMod>
+// ) -> Vec<WeaponReport> {
+//     let modded_sums = GunStatModSums::from_mod_list(
+//         combo,
+//         loaded_mods,
+//         base_gun_stats,
+//         criteria
+//     );
+//     let mut results: Vec<WeaponReport> = Vec::with_capacity(loaded_arcanes.len());
+//     for (i, arcane) in loaded_arcanes.iter().enumerate() {
+//         let mut arcane_sums = modded_sums.clone();
+//         arcane_sums.add_mod(arcane, criteria.kills(), base_gun_stats.semi);
+//         let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
+//         let arcane_report = arcane_stats.generate_report(criteria.clone(), combo, i as u8);
+//         results.push(arcane_report);
+//     };
+//     results
+// }
 
-pub fn sort_by_criteria(reports: &mut Vec<WeaponReport>, criteria: Criteria) {
-    match criteria {
-        Criteria::PerShot | Criteria::PerShotNoKills => {
-            reports.sort_by_key(|r| Reverse(r.hit_damage));
-        },
-        Criteria::BurstDPS | Criteria::BurstDPSNoKills => {
-            reports.sort_by_key(|r| Reverse(r.burst_dps));
-        },
-        Criteria::SustainedDPS | Criteria::SustainedDPSNoKills => {
-            reports.sort_by_key(|r| Reverse(r.sustained_dps));
-        }
-    };
-}
+// pub fn sort_by_criteria(reports: &mut Vec<WeaponReport>, criteria: DamageCriteria) {
+//     match criteria {
+//         DamageCriteria::PerShot | DamageCriteria::PerShotNoKills => {
+//             reports.sort_by_key(|r| Reverse(r.hit_damage));
+//         },
+//         DamageCriteria::BurstDPS | DamageCriteria::BurstDPSNoKills => {
+//             reports.sort_by_key(|r| Reverse(r.burst_dps));
+//         },
+//         DamageCriteria::SustainedDPS | DamageCriteria::SustainedDPSNoKills => {
+//             reports.sort_by_key(|r| Reverse(r.sustained_dps));
+//         }
+//     };
+// }

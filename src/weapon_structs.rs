@@ -248,6 +248,7 @@ pub struct ModdingCriteria {
     fn generate_rifle_filters(&self) -> (Vec<u8>, Vec<u8>) {
         let mut required_set: HashSet<u8> = HashSet::with_capacity(10);
         let mut disallowed_set: HashSet<u8> = HashSet::with_capacity(10);
+        required_set.insert(18);
         if !self.kills {
             disallowed_set.extend([3, 5, 6, 7]);
         };

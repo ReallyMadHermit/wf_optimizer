@@ -52,20 +52,15 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
     result
 }
 
-const ILLEGAL_PAIRS: [(u8, u8); 11] = [
+const ILLEGAL_PAIRS: [(u8, u8); 7] = [
     (5, 22),  // Aptitude
     (6, 28),  // Chamber
     (4, 16),  // Point Strike
     (2, 7),   // Scope
-    (1, 26),  // Serration
-    (17, 6),  // Acuity exclude Galvanized Chamber
-    (17, 28), // Acuity exclude Split Chamber
-    (17, 6),  // Acuity exclude Vigilante Armaments
     (25, 20), // Cannonade exclude Primed Shred
     (25, 27), // Cannonade exclude Speed Trigger
     (25, 32), // Cannonade exclude Vile Acceleration
 ];
-const MAX_INDEX: usize = 35;
 
 pub fn filter_combinations(
     combinations: &mut Vec<[u8; 8]>, required: &[u8], disallowed: &[u8]
@@ -76,7 +71,7 @@ pub fn filter_combinations(
 }
 
 #[inline(always)]
-pub fn build_mask(indices: &[u8]) -> u64 {
+fn build_mask(indices: &[u8]) -> u64 {
     let mut mask: u64 = 0;
     for &i in indices {
         mask |= 1 << i;

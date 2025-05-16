@@ -8,9 +8,10 @@ use std::fmt::Write;
 pub fn establish_the_facts(weapon_buffer: &mut String) -> (DataLoader, usize, ModdingCriteria) {
     let data = DataLoader::new(GunType::Rifle, weapon_buffer);
     let weapon_choice_index = new_weapon_select(&data.weapon_list);
-    let modding_criteria = ModdingCriteria::interview_user(
+    let mut modding_criteria = ModdingCriteria::interview_user(
         GunType::Rifle, data.weapon_list[weapon_choice_index].get_semi()
     );
+    modding_criteria.semi = data.weapon_list[weapon_choice_index].get_semi();
     return (data, weapon_choice_index, modding_criteria);
 }
 

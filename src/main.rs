@@ -19,15 +19,15 @@ fn main() {
 }
 
 fn debug_prompts() {
-    
+
     let mut weapon_buffer = String::new();
     let (
         data, weapon_choice_index, modding_criteria
     ) = establish_the_facts(&mut weapon_buffer);
-    
+
     let imported_gun = &data.weapon_list[weapon_choice_index];
     let base_weapon_stats = imported_gun.get_gunstats();
-    
+
     let start = Instant::now();
 
     let mut combinations = generate_combinations(data.mod_list.len() as u8);
@@ -38,8 +38,9 @@ fn debug_prompts() {
     println!("Last combo:");
     print_combo(&combinations[count - 1]);
     
-    let required_mods: Vec<u8> = Vec::new();
-    let disallowed_mods: Vec<u8> = Vec::new();
+    let (required_mods, disallowed_mods) = modding_criteria.generate_filters();
+    // let required_mods = Vec::new();
+    // let disallowed_mods = Vec::new();
 
     println!("Filtering illegal pairs...");
     filter_combinations(&mut combinations, required_mods.as_slice(), disallowed_mods.as_slice());

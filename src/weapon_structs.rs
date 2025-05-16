@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use crate::mod_structs::{WeaponMod, GunStatType};
 use crate::supporting_functions::{loop_integer_prompt, yes_no_prompt};
 use std::fmt::{format, Write};
@@ -44,7 +45,7 @@ pub struct GunStats {
     pub reload: f32,
     pub hit_stats: [HitStats; 2]
 } impl GunStats {
-    
+
     pub fn from_imported_gun(imported_gun: &ImportedGun) -> Self {
         imported_gun.get_gunstats()
     }
@@ -150,26 +151,26 @@ pub struct GunStatModSums {
         new_sums.add_many_mods(weapon_mods, loaded_mods);
         return new_sums;
     }
-    
+
     pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) {
         for &mod_id in weapon_mods {
             let weapon_mod: &WeaponMod = &loaded_mods[mod_id as usize];
             self.add_mod(&weapon_mod);
         };
     }
-    
+
     pub fn add_mod(&mut self, weapon_mod: &WeaponMod) {
         for mod_stat in &weapon_mod.mod_stats {
             self.apply_mod(mod_stat.stat_type.clone(), mod_stat.stat_value.clone())
         };
     }
-    
+
     pub fn remove_mod(&mut self, weapon_mod: &WeaponMod) {
         for mod_stat in &weapon_mod.mod_stats {
             self.apply_mod(mod_stat.stat_type.clone(), -mod_stat.stat_value.clone())
         };
     }
-    
+
     pub fn apply_mod(&mut self, stat_type: GunStatType, stat_value: i16) {
         match stat_type {
             GunStatType::None => {},
@@ -218,9 +219,9 @@ pub struct ModdingCriteria {
     pub acuity: bool,
     pub riven: bool,
     pub prefer_amalgam: bool,
-    
+
 } impl ModdingCriteria {
-    
+
     pub fn interview_user(gun_type: GunType, semi: bool) -> Self {
         let damage = DamageCriteria::determine_criteria();
         let kills = yes_no_prompt("Use kill-reliant benefits", true);
@@ -239,7 +240,45 @@ pub struct ModdingCriteria {
             prefer_amalgam
         }
     }
-    
+
+    pub fn generate_filters(&self) -> (Vec<u8>, Vec<u8>) {
+        self.generate_rifle_filters()
+    }
+
+    fn generate_rifle_filters(&self) -> (Vec<u8>, Vec<u8>) {
+        let mut required_set: HashSet<u8> = HashSet::with_capacity(10);
+        let mut disallowed_set: HashSet<u8> = HashSet::with_capacity(10);
+        if !self.kills {
+            disallowed_set.extend([3, 5, 6, 7]);
+        };
+        if !self.semi {
+            disallowed_set.insert(25);
+        };
+        if !self.aiming {
+            disallowed_set.extend(&[2, 3, 7]);
+        };
+        if self.acuity {
+            required_set.insert(17);
+            disallowed_set.extend(&[6, 28, 31]);
+        } else {
+            disallowed_set.insert(17);
+        };
+        if self.riven {
+            required_set.insert(0);
+        } else {
+            disallowed_set.insert(0);
+        };
+        if self.prefer_amalgam {
+            required_set.insert(1);
+            disallowed_set.insert(26);
+        } else {
+            disallowed_set.insert(1);
+        };
+        required_set.shrink_to_fit();
+        disallowed_set.shrink_to_fit();
+        return (required_set.into_iter().collect(), disallowed_set.into_iter().collect());
+    }
+
 }
 
 #[derive(Clone, Eq, PartialEq)]
@@ -273,10 +312,10 @@ pub struct LiteReport {
     pub combo_index: u32,
     pub arcane_index: u32
 } impl LiteReport {
-    
+
     pub fn new(
-        modded_stats: GunStats, 
-        damage_criteria: DamageCriteria, 
+        modded_stats: GunStats,
+        damage_criteria: DamageCriteria,
         combo_index: usize, arcane_index: usize
     ) -> Self {
         let shot_damage = modded_stats.calculate_shot_damage();
@@ -301,7 +340,7 @@ pub struct LiteReport {
             arcane_index: arcane_index as u32
         }
     }
-    
+
     pub fn get_report_string(
         &self,
         base_gun_stats: &GunStats,
@@ -325,18 +364,18 @@ pub struct LiteReport {
             )
         )
     }
-    
+
     fn get_damage_string(modded_gun_stats: &GunStats) -> String {
         let hit = modded_gun_stats.calculate_shot_damage();
         let burst = modded_gun_stats.calculate_burst_dps(hit);
         let sustained = modded_gun_stats.calculate_sustained_dps(burst);
         format!("{}|{}|{}", hit, burst, sustained)
     }
-    
+
     fn get_mod_string(
-        &self, 
-        combinations: &Vec<[u8; 8]>, 
-        loaded_mods: &Vec<WeaponMod>, 
+        &self,
+        combinations: &Vec<[u8; 8]>,
+        loaded_mods: &Vec<WeaponMod>,
         loaded_arcanes: &Vec<WeaponMod>
     ) -> String {
         let mut names = [""; 8];
@@ -346,12 +385,12 @@ pub struct LiteReport {
         };
         format!(
             "{}\n{}, {}, {}, {}, {}, {}, {}, {}",
-            arcane, 
+            arcane,
             names[0], names[1], names[2], names[3],
             names[4], names[5], names[6], names[7]
         )
     }
-    
+
 }
 
 pub struct WeaponReport {

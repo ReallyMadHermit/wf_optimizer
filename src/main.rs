@@ -1,5 +1,4 @@
 use std::time::Instant;
-use std::cmp::Reverse;
 
 mod mod_structs;
 mod weapon_structs;

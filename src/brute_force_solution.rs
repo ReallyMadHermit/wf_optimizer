@@ -1,8 +1,7 @@
 // use rayon::prelude::*;
 
 use crate::mod_structs::WeaponMod;
-use crate::weapon_structs::{DamageCriteria, GunStats, WeaponReport, GunStatModSums, LiteReport, ModdingCriteria};
-use std::cmp::Reverse;
+use crate::weapon_structs::{DamageCriteria, GunStats, GunStatModSums, LiteReport};
 
 // Vec<[u8;8]>
 pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {

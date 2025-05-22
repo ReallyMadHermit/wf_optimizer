@@ -5,6 +5,7 @@ mod weapon_structs;
 mod brute_force_solution;
 mod parsing;
 mod cli_inputs;
+mod core;
 
 use cli_inputs::{establish_the_facts, take_input, parse_input};
 use crate::brute_force_solution::{

@@ -5,7 +5,7 @@ mod weapon_structs;
 mod brute_force_solution;
 mod parsing;
 mod cli_inputs;
-mod core;
+mod gun_core;
 
 use cli_inputs::{establish_the_facts, take_input, parse_input};
 use crate::brute_force_solution::{
@@ -13,7 +13,7 @@ use crate::brute_force_solution::{
 };
 use crate::parsing::{DataLoader};
 use crate::weapon_structs::{GunType};
-use crate::core::GunModdingContext;
+use crate::gun_core::GunModdingContext;
 
 const TOP_BUILD_COUNT: usize = 20;
 

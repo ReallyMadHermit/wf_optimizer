@@ -1,5 +1,5 @@
 use crate::mod_structs::{WeaponMod, GunStatType};
-use crate::core::GunModdingCriteria;
+use crate::gun_core::GunModdingCriteria;
 use crate::parsing::ImportedGun;
 
 #[derive(Clone)]

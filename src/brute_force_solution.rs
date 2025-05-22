@@ -2,7 +2,7 @@
 
 use crate::mod_structs::WeaponMod;
 use crate::weapon_structs::{GunStats, GunModSums, LiteReport};
-use crate::core::GunModdingCriteria;
+use crate::gun_core::GunModdingCriteria;
 
 // Vec<[u8;8]>
 pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {

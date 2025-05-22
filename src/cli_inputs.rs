@@ -3,7 +3,7 @@ use std::fmt::Write;
 
 use crate::parsing::{DataLoader, ImportedGun};
 use crate::weapon_structs::GunType;
-use crate::core::GunModdingContext;
+use crate::gun_core::GunModdingContext;
 
 pub fn establish_the_facts(weapon_buffer: &mut String) -> (DataLoader, usize, GunModdingContext) {
     let data = DataLoader::new(GunType::Rifle, weapon_buffer);

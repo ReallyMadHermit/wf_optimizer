@@ -218,8 +218,7 @@ pub struct ModdingCriteria {
     pub aiming: bool,
     pub acuity: bool,
     pub riven: bool,
-    pub prefer_amalgam: bool,
-
+    pub prefer_amalgam: bool
 } impl ModdingCriteria {
 
     pub fn interview_user(gun_type: GunType, semi: bool) -> Self {

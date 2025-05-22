@@ -1,8 +1,9 @@
 use std::io::stdin;
 use std::fmt::Write;
 
-use crate::parsing::DataLoader;
-use crate::weapon_structs::{GunType, ImportedGun, ModdingCriteria};
+use crate::parsing::{DataLoader, ImportedGun};
+use crate::weapon_structs::GunType;
+use crate::core::ModdingCriteria;
 
 pub fn establish_the_facts(weapon_buffer: &mut String) -> (DataLoader, usize, ModdingCriteria) {
     let data = DataLoader::new(GunType::Rifle, weapon_buffer);

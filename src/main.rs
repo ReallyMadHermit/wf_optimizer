@@ -12,7 +12,8 @@ use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds
 };
 use crate::parsing::{DataLoader};
-use crate::weapon_structs::{GunType, ModdingCriteria};
+use crate::weapon_structs::{GunType};
+use crate::core::ModdingCriteria;
 
 const TOP_BUILD_COUNT: usize = 20;
 

@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::path::Path;
 use crate::mod_structs::{GunStatType, ModStat, WeaponMod};
-use crate::weapon_structs::{GunType, ImportedGun};
+use crate::weapon_structs::{GunStats, GunType};
 
 pub struct DataLoader<'a> {
     pub gun_type: GunType,
@@ -103,6 +103,106 @@ pub struct DataLoader<'a> {
         } else {
             println!("oopsie, {} could not be loaded, vewy sowwy, time to panic!", file_name);
             panic!();
+        };
+    }
+
+}
+
+pub struct ImportedGun<'a> {
+    csv_line: &'a str,
+    split: Option<Vec<&'a str>>
+}impl<'a> ImportedGun<'a> {
+
+    pub fn new(csv_line: &'a str) -> Self {
+        ImportedGun {
+            csv_line,
+            split: Some(csv_line.split(",").collect())
+        }
+    }
+
+    pub fn get_gunstats(&self) -> GunStats {
+        GunStats {
+            fire_rate: self.get_fire_rate(),
+            multishot: self.get_multishot(),
+            magazine: self.get_mag_size(),
+            reload: self.get_reload(),
+            hit_stats: self.get_hit_stats()
+        }
+    }
+
+    fn get_field_index_str(&self, index: usize) -> &str {
+        self.split.as_ref().unwrap()[index]
+    }
+
+    fn get_field_index_f32(&self, index: usize) -> f32 {
+        return if let Ok(parsed_value) = self.split.as_ref().unwrap()[index].parse() {
+            parsed_value
+        } else {
+            println!("Failed to load value index {} for {}", index, self.get_name());
+            0.0
+        };
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.get_field_index_str(0)
+    }
+    pub fn get_attack(&self) -> &str {
+        self.get_field_index_str(1)
+    }
+    pub fn get_mag_size(&self) -> f32 {
+        self.get_field_index_f32(2)
+    }
+    pub fn get_reload(&self) -> f32 {
+        self.get_field_index_f32(3)
+    }
+    pub fn get_fire_rate(&self) -> f32 {
+        self.get_field_index_f32(4)
+    }
+    pub fn get_multishot(&self) -> f32 {
+        self.get_field_index_f32(5)
+    }
+    pub fn get_semi(&self) -> bool {
+        let s = self.get_field_index_str(6);
+        if s == "TRUE" {
+            true
+        } else {
+            false
+        }
+    }
+    pub fn get_punch_through(&self) -> f32 {
+        self.get_field_index_f32(7)
+    }
+    pub fn get_hit_stats(&self) -> [crate::weapon_structs::HitStats; 2] {
+        let damage = self.get_field_index_f32(8);
+        let crit_chance = self.get_field_index_f32(9);
+        let crit_damage = self.get_field_index_f32(10);
+        let status = self.get_field_index_f32(11);
+        let hit_stats_1 = crate::weapon_structs::HitStats {
+            damage,
+            crit_chance,
+            crit_damage,
+            status
+        };
+        let damage = self.get_field_index_f32(12);
+        return if damage < 1.0 {
+            [
+                hit_stats_1,
+                crate::weapon_structs::HitStats::empty()
+            ]
+        } else {
+            let crit_chance = self.get_field_index_f32(13);
+            let crit_damage = self.get_field_index_f32(14);
+            let status = self.get_field_index_f32(15);
+            let hit_stats_2 = crate::weapon_structs::HitStats {
+                damage,
+                crit_chance,
+                crit_damage,
+                status
+            };
+            [
+                hit_stats_1,
+                hit_stats_2
+            ]
         };
     }
 

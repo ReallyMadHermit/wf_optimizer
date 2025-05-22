@@ -1,23 +1,22 @@
-use std::collections::HashSet;
 use crate::mod_structs::{WeaponMod, GunStatType};
-use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
-use std::fmt::Write;
+use crate::core::DamageCriteria;
+use crate::parsing::ImportedGun;
 
 #[derive(Clone)]
-struct HitStats {
-    damage: f32,
-    crit_chance: f32,
-    crit_damage: f32,
-    status: f32
+pub struct HitStats {
+    pub damage: f32,
+    pub crit_chance: f32,
+    pub crit_damage: f32,
+    pub status: f32
 } impl HitStats {
-    
-    const fn new(damage: f32, crit_chance: f32, crit_damage: f32, status: f32) -> Self {
+
+    pub const fn new(damage: f32, crit_chance: f32, crit_damage: f32, status: f32) -> Self {
         HitStats {
             damage, crit_chance, crit_damage, status
         }
     }
-    
-    const fn empty() -> Self {
+
+    pub const fn empty() -> Self {
         HitStats::new(0.0, 0.0, 0.0, 0.0)
     }
     
@@ -187,104 +186,6 @@ pub struct GunStatModSums {
                 self.reload += stat_value;
             },
             _ => {}
-        };
-    }
-
-}
-
-#[derive(Clone, Eq, PartialEq)]
-pub struct ModdingCriteria {
-    pub gun_type: GunType,
-    pub damage: DamageCriteria,
-    pub kills: bool,
-    pub semi: bool,
-    pub aiming: bool,
-    pub acuity: bool,
-    pub riven: bool,
-    pub prefer_amalgam: bool
-} impl ModdingCriteria {
-
-    pub fn interview_user(gun_type: GunType, semi: bool) -> Self {
-        let damage = DamageCriteria::determine_criteria();
-        let kills = yes_no_prompt("Use kill-reliant benefits", true);
-        let aiming = yes_no_prompt("Use aiming-reliant benefits", true);
-        let acuity = yes_no_prompt("Use acuity mods", false);
-        let riven = yes_no_prompt("Use Riven mod", false);
-        let prefer_amalgam = yes_no_prompt("Prefer Amalgam Serration & Diffusion", true);
-        ModdingCriteria {
-            gun_type,
-            damage,
-            kills,
-            semi,
-            aiming,
-            acuity,
-            riven,
-            prefer_amalgam
-        }
-    }
-
-    pub fn generate_filters(&self) -> (Vec<u8>, Vec<u8>) {
-        self.generate_rifle_filters()
-    }
-
-    fn generate_rifle_filters(&self) -> (Vec<u8>, Vec<u8>) {
-        let mut required_set: HashSet<u8> = HashSet::with_capacity(10);
-        let mut disallowed_set: HashSet<u8> = HashSet::with_capacity(10);
-        required_set.insert(18);
-        if !self.kills {
-            disallowed_set.extend([3, 5, 6, 7]);
-        };
-        if !self.semi {
-            disallowed_set.insert(25);
-        };
-        if !self.aiming {
-            disallowed_set.extend(&[2, 3, 7]);
-        };
-        if self.acuity {
-            required_set.insert(17);
-            disallowed_set.extend(&[6, 28, 31]);
-        } else {
-            disallowed_set.insert(17);
-        };
-        if self.riven {
-            required_set.insert(0);
-        } else {
-            disallowed_set.insert(0);
-        };
-        if self.prefer_amalgam {
-            required_set.insert(1);
-            disallowed_set.insert(26);
-        } else {
-            disallowed_set.insert(1);
-        };
-        required_set.shrink_to_fit();
-        disallowed_set.shrink_to_fit();
-        return (required_set.into_iter().collect(), disallowed_set.into_iter().collect());
-    }
-
-}
-
-#[derive(Clone, Eq, PartialEq)]
-pub enum DamageCriteria {
-    PerShot,
-    BurstDPS,
-    SustainedDPS
-} impl DamageCriteria {
-
-    pub fn determine_criteria() -> DamageCriteria {
-        println!();
-        println!("Okay, what are we optimizing this for?");
-        println!("1: Per-Shot Damage");
-        println!("2: Burst DPS");
-        println!("3: Sustained DPS");
-        let input = loop_integer_prompt(
-            "Please enter the numer corresponding with your preferred criteria.", 1, 3
-        );
-        return match input {
-            1 => DamageCriteria::PerShot,
-            2 => DamageCriteria::BurstDPS,
-            3 => DamageCriteria::SustainedDPS,
-            _ => DamageCriteria::PerShot
         };
     }
 

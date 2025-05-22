@@ -16,7 +16,8 @@ use crate::weapon_structs::{GunType, ModdingCriteria};
 const TOP_BUILD_COUNT: usize = 20;
 
 fn main() {
-    mirror_mirror_on_the_wall(GunType::Rifle);
+    // mirror_mirror_on_the_wall(GunType::Rifle);
+    debug_prompts();
 }
 
 fn debug_prompts() {

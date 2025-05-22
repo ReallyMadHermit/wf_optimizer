@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use crate::mod_structs::{WeaponMod, GunStatType};
-use crate::supporting_functions::{loop_integer_prompt, yes_no_prompt};
+use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
 use std::fmt::Write;
 
 #[derive(Clone)]

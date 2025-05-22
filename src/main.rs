@@ -2,16 +2,15 @@ use std::time::Instant;
 
 mod mod_structs;
 mod weapon_structs;
-mod supporting_functions;
 mod brute_force_solution;
 mod parsing;
 mod cli_inputs;
 
-use supporting_functions::establish_the_facts;
+use cli_inputs::{establish_the_facts, take_input, parse_input};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds
 };
-use crate::supporting_functions::{parse_input, take_input, DataLoader};
+use crate::parsing::{DataLoader};
 use crate::weapon_structs::{GunType, ModdingCriteria};
 
 const TOP_BUILD_COUNT: usize = 20;

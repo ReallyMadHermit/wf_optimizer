@@ -1,8 +1,8 @@
 // use rayon::prelude::*;
 
 use crate::mod_structs::WeaponMod;
-use crate::weapon_structs::{GunStats, GunStatModSums, LiteReport};
-use crate::core::DamageCriteria;
+use crate::weapon_structs::{GunStats, GunModSums, LiteReport};
+use crate::core::GunModdingCriteria;
 
 // Vec<[u8;8]>
 pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {
@@ -108,13 +108,13 @@ fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64, disallowed_mask: u64)
 pub fn test_all_builds(
     combinations: &Vec<[u8; 8]>,
     base_gun_stats: &GunStats,
-    damage_criteria: DamageCriteria,
+    damage_criteria: GunModdingCriteria,
     loaded_mods: &Vec<WeaponMod>,
     loaded_arcanes: &Vec<WeaponMod>,
 ) -> Vec<LiteReport> {
     let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.iter().len());
     for (combo_index, combo) in combinations.iter().enumerate() {
-        let modded_sums = GunStatModSums::from_mod_list(combo, loaded_mods);
+        let modded_sums = GunModSums::from_mod_list(combo, loaded_mods);
         for (arcane_index, arcane) in loaded_arcanes.iter().enumerate() {
             let mut arcane_sums = modded_sums.clone();
             arcane_sums.add_mod(arcane);

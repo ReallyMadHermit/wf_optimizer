@@ -13,7 +13,7 @@ use crate::brute_force_solution::{
 };
 use crate::parsing::{DataLoader};
 use crate::weapon_structs::{GunType};
-use crate::core::ModdingCriteria;
+use crate::core::GunModdingContext;
 
 const TOP_BUILD_COUNT: usize = 20;
 
@@ -97,7 +97,7 @@ fn mirror_mirror_on_the_wall(gun_type: GunType) {
     println!("Mirror mirror on the wall, which gun is the strongest of them all?");
     let mut buffer = String::new();
     let data = DataLoader::new(gun_type.clone(), &mut buffer);
-    let mut modding_criteria = ModdingCriteria::interview_user(gun_type.clone(), false);
+    let mut modding_criteria = GunModdingContext::interview_user(gun_type.clone(), false);
     let all_combinations = generate_combinations(data.mod_list.len() as u8);
     let mut top_builds: Vec<(usize, u32)> = Vec::with_capacity(data.weapon_list.len());
     let mut p = 0;

@@ -3,25 +3,25 @@ use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
 use crate::weapon_structs::GunType;
 
 #[derive(Clone, Eq, PartialEq)]
-pub struct ModdingCriteria {
+pub struct GunModdingContext {
     pub gun_type: GunType,
-    pub damage: DamageCriteria,
+    pub damage: GunModdingCriteria,
     pub kills: bool,
     pub semi: bool,
     pub aiming: bool,
     pub acuity: bool,
     pub riven: bool,
     pub prefer_amalgam: bool
-} impl ModdingCriteria {
+} impl GunModdingContext {
 
     pub fn interview_user(gun_type: GunType, semi: bool) -> Self {
-        let damage = DamageCriteria::determine_criteria();
+        let damage = GunModdingCriteria::determine_criteria();
         let kills = yes_no_prompt("Use kill-reliant benefits", true);
         let aiming = yes_no_prompt("Use aiming-reliant benefits", true);
         let acuity = yes_no_prompt("Use acuity mods", false);
         let riven = yes_no_prompt("Use Riven mod", false);
         let prefer_amalgam = yes_no_prompt("Prefer Amalgam Serration & Diffusion", true);
-        ModdingCriteria {
+        GunModdingContext {
             gun_type,
             damage,
             kills,
@@ -75,13 +75,13 @@ pub struct ModdingCriteria {
 }
 
 #[derive(Clone, Eq, PartialEq)]
-pub enum DamageCriteria {
+pub enum GunModdingCriteria {
     PerShot,
     BurstDPS,
     SustainedDPS
-} impl DamageCriteria {
+} impl GunModdingCriteria {
 
-    pub fn determine_criteria() -> DamageCriteria {
+    pub fn determine_criteria() -> GunModdingCriteria {
         println!();
         println!("Okay, what are we optimizing this for?");
         println!("1: Per-Shot Damage");
@@ -91,10 +91,10 @@ pub enum DamageCriteria {
             "Please enter the numer corresponding with your preferred criteria.", 1, 3
         );
         return match input {
-            1 => DamageCriteria::PerShot,
-            2 => DamageCriteria::BurstDPS,
-            3 => DamageCriteria::SustainedDPS,
-            _ => DamageCriteria::PerShot
+            1 => GunModdingCriteria::PerShot,
+            2 => GunModdingCriteria::BurstDPS,
+            3 => GunModdingCriteria::SustainedDPS,
+            _ => GunModdingCriteria::PerShot
         };
     }
 

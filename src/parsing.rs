@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 use std::path::Path;
-use crate::mod_structs::{GunStatType, ModStat, WeaponMod};
+use crate::mod_structs::{GunStatType, GunModStat, WeaponMod};
 use crate::weapon_structs::{GunStats, GunType};
 
 pub struct DataLoader<'a> {
@@ -84,11 +84,11 @@ pub struct DataLoader<'a> {
         WeaponMod {
             name: String::from(mod_name),
             mod_stats: [
-                ModStat {
+                GunModStat {
                     stat_type: stat_type_1,
                     stat_value: stat_value_1
                 },
-                ModStat {
+                GunModStat {
                     stat_type: stat_type_2,
                     stat_value: stat_value_2
                 }

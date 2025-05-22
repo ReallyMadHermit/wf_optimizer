@@ -1,5 +1,5 @@
 use crate::mod_structs::{WeaponMod, GunStatType};
-use crate::core::DamageCriteria;
+use crate::core::GunModdingCriteria;
 use crate::parsing::ImportedGun;
 
 #[derive(Clone)]
@@ -76,7 +76,7 @@ pub struct GunStats {
         }
     }
     
-    pub fn apply_stat_sums(&self, stat_sums: &GunStatModSums) -> Self {
+    pub fn apply_stat_sums(&self, stat_sums: &GunModSums) -> Self {
         let mut modded_self = self.clone();
         modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sums.fire_rate);
         modded_self.multishot = apply_stat_sum(self.multishot, stat_sums.multishot);
@@ -102,7 +102,7 @@ pub enum GunType {
 }
 
 #[derive(Clone)]
-pub struct GunStatModSums {
+pub struct GunModSums {
     damage: i16,
     ele_damage: i16,
     multishot: i16,
@@ -112,10 +112,10 @@ pub struct GunStatModSums {
     fire_rate: i16,
     magazine: i16,
     reload: i16
-} impl GunStatModSums {
+} impl GunModSums {
 
     pub fn new() -> Self {
-        GunStatModSums {
+        GunModSums {
             damage: 100,
             ele_damage: 100,
             multishot: 100,
@@ -129,7 +129,7 @@ pub struct GunStatModSums {
     }
 
     pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) -> Self {
-        let mut new_sums = GunStatModSums::new();
+        let mut new_sums = GunModSums::new();
         new_sums.add_many_mods(weapon_mods, loaded_mods);
         return new_sums;
     }
@@ -199,11 +199,11 @@ pub struct LiteReport {
 
     pub fn new(
         modded_stats: GunStats,
-        damage_criteria: DamageCriteria,
+        damage_criteria: GunModdingCriteria,
         combo_index: usize, arcane_index: usize
     ) -> Self {
         let shot_damage = modded_stats.calculate_shot_damage();
-        if damage_criteria == DamageCriteria::PerShot {
+        if damage_criteria == GunModdingCriteria::PerShot {
             return LiteReport {
                 criteria_result: u32::MAX - shot_damage as u32,
                 combo_index: combo_index as u32,
@@ -211,7 +211,7 @@ pub struct LiteReport {
             };
         };
         let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
-        if damage_criteria == DamageCriteria::BurstDPS {
+        if damage_criteria == GunModdingCriteria::BurstDPS {
             return LiteReport {
                 criteria_result: u32::MAX - burst_damage as u32,
                 combo_index: combo_index as u32,
@@ -232,7 +232,7 @@ pub struct LiteReport {
         loaded_mods: &Vec<WeaponMod>,
         loaded_arcanes: &Vec<WeaponMod>
     ) -> String {
-        let mut stat_sums = GunStatModSums::from_mod_list(
+        let mut stat_sums = GunModSums::from_mod_list(
             &combinations[self.combo_index as usize],
             loaded_mods
         );

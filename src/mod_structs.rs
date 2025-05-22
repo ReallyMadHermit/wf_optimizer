@@ -1,11 +1,11 @@
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct WeaponMod {
     pub name: String,
-    pub mod_stats: [ModStat; 2]
+    pub mod_stats: [GunModStat; 2]
 }
 
 pub struct RivenMod {
-    mod_stat_array: [ModStat; 4]
+    mod_stat_array: [GunModStat; 4]
 }
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Debug)]
@@ -64,20 +64,20 @@ pub enum GunStatType {
 }
 
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub struct ModStat {
+pub struct GunModStat {
     pub stat_type: GunStatType,
     pub stat_value: i16
-} impl ModStat {
+} impl GunModStat {
     
     const fn new(stat_type: GunStatType, stat_value: i16) -> Self {
-        ModStat {
+        GunModStat {
             stat_type,
             stat_value
         }
     }
     
     const fn empty() -> Self {
-        ModStat {
+        GunModStat {
             stat_type: GunStatType::None,
             stat_value: 0
         }

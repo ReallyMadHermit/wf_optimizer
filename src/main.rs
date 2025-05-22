@@ -1,4 +1,3 @@
-use std::cmp::Reverse;
 use std::time::Instant;
 
 mod mod_structs;

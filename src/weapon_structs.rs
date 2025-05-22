@@ -1,4 +1,4 @@
-use crate::mod_structs::{WeaponMod, GunStatType};
+use crate::mod_structs::{WeaponMod, GunModSums};
 use crate::gun_core::GunModdingCriteria;
 use crate::parsing::ImportedGun;
 
@@ -99,96 +99,6 @@ pub struct GunStats {
 #[derive(Clone, Eq, PartialEq)]
 pub enum GunType {
     Rifle
-}
-
-#[derive(Clone)]
-pub struct GunModSums {
-    damage: i16,
-    ele_damage: i16,
-    multishot: i16,
-    crit_chance: i16,
-    crit_damage: i16,
-    status: i16,
-    fire_rate: i16,
-    magazine: i16,
-    reload: i16
-} impl GunModSums {
-
-    pub fn new() -> Self {
-        GunModSums {
-            damage: 100,
-            ele_damage: 100,
-            multishot: 100,
-            crit_chance: 100,
-            crit_damage: 100,
-            status: 100,
-            fire_rate: 100,
-            magazine: 100,
-            reload: 100
-        }
-    }
-
-    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) -> Self {
-        let mut new_sums = GunModSums::new();
-        new_sums.add_many_mods(weapon_mods, loaded_mods);
-        return new_sums;
-    }
-
-    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) {
-        for &mod_id in weapon_mods {
-            let weapon_mod: &WeaponMod = &loaded_mods[mod_id as usize];
-            self.add_mod(&weapon_mod);
-        };
-    }
-
-    pub fn add_mod(&mut self, weapon_mod: &WeaponMod) {
-        for mod_stat in &weapon_mod.mod_stats {
-            self.apply_mod(mod_stat.stat_type.clone(), mod_stat.stat_value.clone())
-        };
-    }
-
-    pub fn remove_mod(&mut self, weapon_mod: &WeaponMod) {
-        for mod_stat in &weapon_mod.mod_stats {
-            self.apply_mod(mod_stat.stat_type.clone(), -mod_stat.stat_value.clone())
-        };
-    }
-
-    pub fn apply_mod(&mut self, stat_type: GunStatType, stat_value: i16) {
-        match stat_type {
-            GunStatType::None => {},
-            GunStatType::Damage => {
-                self.damage += stat_value;
-            },
-            GunStatType::Cold | GunStatType::Toxic |
-            GunStatType::Heat | GunStatType::Shock |
-            GunStatType::Radiation | GunStatType::Magnetic => {
-                self.ele_damage += stat_value;
-            },
-            GunStatType::StatusChance => {
-                self.status += stat_value;
-            }
-            GunStatType::Multishot => {
-                self.multishot += stat_value;
-            },
-            GunStatType::CritChance => {
-                self.crit_chance += stat_value;
-            },
-            GunStatType::CritDamage => {
-                self.crit_damage += stat_value;
-            },
-            GunStatType::FireRate => {
-                self.fire_rate += stat_value;
-            },
-            GunStatType::MagazineCapacity => {
-                self.magazine += stat_value;
-            },
-            GunStatType::ReloadSpeed => {
-                self.reload += stat_value;
-            },
-            _ => {}
-        };
-    }
-
 }
 
 pub struct LiteReport {

@@ -1,7 +1,7 @@
 // use rayon::prelude::*;
 
-use crate::mod_structs::WeaponMod;
-use crate::weapon_structs::{GunStats, GunModSums, LiteReport};
+use crate::mod_structs::{WeaponMod, GunModSums};
+use crate::weapon_structs::{GunStats, LiteReport};
 use crate::gun_core::GunModdingCriteria;
 
 // Vec<[u8;8]>

@@ -4,6 +4,7 @@ mod mod_structs;
 mod weapon_structs;
 mod supporting_functions;
 mod brute_force_solution;
+mod parsing;
 
 use supporting_functions::establish_the_facts;
 use crate::brute_force_solution::{

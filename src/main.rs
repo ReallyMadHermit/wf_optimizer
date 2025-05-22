@@ -11,8 +11,8 @@ use cli_inputs::{establish_the_facts, take_input, parse_input};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds
 };
-use crate::parsing::{DataLoader};
-use crate::weapon_structs::{GunType};
+use crate::parsing::DataLoader;
+use crate::weapon_structs::GunType;
 use crate::gun_core::GunModdingContext;
 
 const TOP_BUILD_COUNT: usize = 20;

@@ -1,6 +1,47 @@
 use crate::mod_structs::{WeaponMod, GunModSums};
 use crate::gun_core::GunModdingCriteria;
-use crate::parsing::ImportedGun;
+
+pub struct GunData {
+    pub name: String,
+    pub gun_type: GunType,
+    pub semi: bool,
+    pub gun_stats: GunStats,
+} impl GunData {
+
+    pub fn from_csv_line(line: &str) -> Self {  // TODO: add implicit mods here lmao
+        let split: Vec<&str> = line.split(",").collect();
+        GunData {
+            name: String::from(split[1]),
+            gun_type: GunType::parse_from_str(split[0]),
+            semi: Self::parse_bool(split[3]),
+            gun_stats: GunStats {
+                fire_rate: split[7].parse().unwrap(),
+                multishot: split[9].parse().unwrap(),
+                magazine: split[6].parse().unwrap(),
+                reload: split[8].parse().unwrap(),
+                hit_stats: [
+                    HitStats {
+                        damage: split[11].parse().unwrap(),
+                        crit_chance: split[12].parse().unwrap(),
+                        crit_damage: split[13].parse().unwrap(),
+                        status: split[14].parse().unwrap()
+                    },
+                    HitStats {
+                        damage: split[15].parse().unwrap(),
+                        crit_chance: split[16].parse().unwrap(),
+                        crit_damage: split[17].parse().unwrap(),
+                        status: split[18].parse().unwrap()
+                    }
+                ]
+            }
+        }
+    }
+
+    fn parse_bool(s: &str) -> bool {
+        s == "TRUE"
+    }
+
+}
 
 #[derive(Clone)]
 pub struct HitStats {
@@ -45,9 +86,9 @@ pub struct GunStats {
     pub hit_stats: [HitStats; 2]
 } impl GunStats {
 
-    pub fn from_imported_gun(imported_gun: &ImportedGun) -> Self {
-        imported_gun.get_gunstats()
-    }
+    // pub fn from_imported_gun(imported_gun: &ImportedGun) -> Self {
+    //     imported_gun.get_gunstats()
+    // }
 
     pub fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;
@@ -98,7 +139,25 @@ pub struct GunStats {
 
 #[derive(Clone, Eq, PartialEq)]
 pub enum GunType {
-    Rifle
+    Rifle,
+    Shotgun,
+    Pistol,
+    Bow
+} impl GunType {
+
+    fn parse_from_str(s: &str) -> Self {
+        match s {
+            "Rifle" => Self::Rifle,
+            "Shotgun" => Self::Shotgun,
+            "Pistol" => Self::Pistol,
+            "Bow" => Self::Bow,
+            _ => {
+                println!("Weapon type '{}' not found! Using... Rifle!", s);
+                Self::Rifle
+            }
+        }
+    }
+
 }
 
 pub struct LiteReport {

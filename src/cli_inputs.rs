@@ -1,63 +1,63 @@
 use std::io::stdin;
 use std::fmt::Write;
 
-use crate::parsing::{DataLoader, ImportedGun};
-use crate::weapon_structs::GunType;
+use crate::weapon_structs::GunData;
 use crate::gun_core::GunModdingContext;
+use crate::file_interfacing::read_csv;
 
-pub fn establish_the_facts(weapon_buffer: &mut String) -> (DataLoader, usize, GunModdingContext) {
-    let data = DataLoader::new(GunType::Rifle, weapon_buffer);
-    let weapon_choice_index = new_weapon_select(&data.weapon_list);
+pub fn establish_the_facts() -> (GunData, GunModdingContext) {
+    // TODO: maybe we actually parse this buffer some??? lot of cursed splits...
+    let mut gun_data_buffer = String::new();
+    read_csv(&mut gun_data_buffer, "gun_data.csv");
+    let selected_gun = new_weapon_select(&gun_data_buffer);
     let mut modding_criteria = GunModdingContext::interview_user(
-        GunType::Rifle, data.weapon_list[weapon_choice_index].get_semi()
+        selected_gun.gun_type.clone(), selected_gun.semi.clone()
     );
-    // modding_criteria.semi = data.weapon_list[weapon_choice_index].get_semi();
-    return (data, weapon_choice_index, modding_criteria);
+    return (selected_gun, modding_criteria);
 }
 
-pub fn new_weapon_select(imported_guns: &Vec<ImportedGun>) -> usize {
+pub fn new_weapon_select(gun_data_buffer: &str) -> GunData {
     let mut results:Vec<usize> = Vec::with_capacity(4);
+    let csv_lines: Vec<&str> = gun_data_buffer.lines().collect();
     println!("Enter the weapon's name (it's case sensitive (out of spite, of course))");
-    let input = take_input("Leave blank, or fuck up the input to go back:");
-    for (index, gun) in imported_guns.iter().enumerate() {
-        if gun.get_name() == &input {
+    let input = take_input("Leave blank, or fuck up the input to choose from a list:");
+    for (index, &line) in csv_lines.iter().enumerate() {
+        if line.split(",").collect::<Vec<_>>()[1] == &input {
             results.push(index)
         };
     };
     let l = results.len();
     if l < 1 {
-        return new_weapon_list_select(imported_guns, &input);
+        return new_weapon_list_select(gun_data_buffer, &input);
     } else if l > 1 {
-        return sub_weapon_select(imported_guns, &results);
+        return sub_weapon_select(gun_data_buffer, &results);
     };
-    results[0]
+    GunData::from_csv_line(csv_lines[results[0]])
 }
 
-pub fn sub_weapon_select(imported_guns: &Vec<ImportedGun>, results: &Vec<usize>) -> usize {
+pub fn sub_weapon_select(gun_data_buffer: &str, results: &Vec<usize>) -> GunData {
+    let csv_lines: Vec<&str> = gun_data_buffer.lines().collect();
     let mut buffer = String::with_capacity(300);
     _ = writeln!(buffer, "There are multiple weapons with that name:");
     for (index, &result) in results.iter().enumerate() {
-        let var = imported_guns[result].get_attack();
+        let var = csv_lines[result].split(",").collect::<Vec<_>>()[2];
         _ = writeln!(buffer, "{}. {}", index, var);
     };
     _ = writeln!(buffer, "Please choose the variant number you wish to optimize.");
     buffer.shrink_to_fit();
     let input = take_input(&buffer);
-    results[parse_input(&input)]
+    GunData::from_csv_line(csv_lines[results[parse_input(&input)]])
 }
 
-pub fn new_weapon_list_select(imported_guns: &Vec<ImportedGun>, last_input: &str) -> usize {
-    let mut buffer = String::with_capacity(1200);
+pub fn new_weapon_list_select(gun_data_buffer: &str, last_input: &str) -> GunData {
+    let csv_lines: Vec<&str> = gun_data_buffer.lines().collect();
+    let mut buffer = String::with_capacity(16645);  // NOT ARBITRARY (LEN[1&2]+6)
     let empty = last_input == "";
-    if empty {
-        _ = writeln!(buffer, "You didn't input anything, or did it so badly, I couldn't tell.");
-    } else {
-        _ = writeln!(buffer, "Right... Couldn't find that, but I narrowed the results a bit.");
-    };
     let input_first = last_input.to_uppercase().chars().next();
-    for (index, weapon) in imported_guns.iter().enumerate() {
-        let name = weapon.get_name();
-        let attack = weapon.get_attack();
+    for (index, &line) in csv_lines.iter().enumerate() {
+        let split: Vec<&str> = line.split(",").collect();
+        let name = split[1];
+        let attack = split[2];
         if empty || input_first == name.chars().next() {  // checks if input is empty
             _ = writeln!(buffer, "{}. {} - {}", index, name, attack);
         };
@@ -65,7 +65,7 @@ pub fn new_weapon_list_select(imported_guns: &Vec<ImportedGun>, last_input: &str
     _ = writeln!(buffer, "Please enter the number corresponding with the weapon you want to customize...");
     buffer.shrink_to_fit();
     let input = take_input(&buffer);
-    parse_input(&input)
+    GunData::from_csv_line(csv_lines[parse_input(&input)])
 }
 
 pub fn take_input(prompt: &str) -> String {

@@ -21,18 +21,25 @@ fn main() {
 }
 
 fn debug_prompts() {
-
-    let mut weapon_buffer = String::new();
     let (
-        data, weapon_choice_index, modding_criteria
-    ) = establish_the_facts(&mut weapon_buffer);
+        selected_gun, modding_criteria
+    ) = establish_the_facts();
+    
+    let mod_list = load_mods(
+        &selected_gun.gun_type,
+        &mut String::new(),
+        false
+    );
 
-    let imported_gun = &data.weapon_list[weapon_choice_index];
-    let base_weapon_stats = imported_gun.get_gunstats();
+    let arcane_list = load_mods(
+        &selected_gun.gun_type,
+        &mut String::new(),
+        true
+    );
 
     let start = Instant::now();
 
-    let mut combinations = generate_combinations(data.mod_list.len() as u8);
+    let mut combinations = generate_combinations(mod_list.len() as u8);
     let count = combinations.len();
     println!("Combinations: {}", count);
     println!("First combo:");
@@ -57,10 +64,10 @@ fn debug_prompts() {
     println!("Calculating builds...");
     let mut build_reports = test_all_builds(
         &combinations,
-        &base_weapon_stats,
+        &selected_gun.gun_stats,
         modding_criteria.damage.clone(),
-        &data.mod_list,
-        &data.arcane_list,
+        &mod_list,
+        &arcane_list,
     );
     println!("Sorting reports...");
     build_reports.sort_by_key(|r|r.criteria_result);
@@ -70,15 +77,15 @@ fn debug_prompts() {
     let display_input = take_input("How many reports should we show?");
     let report_display_count = parse_input(&display_input);
     
-    println!("{}\nHit|Burst|Sustain", imported_gun.get_name());
+    println!("{}\nHit|Burst|Sustain", &selected_gun.name);
     for i in 0..report_display_count {
         println!(
             "{}",
             build_reports[i].get_report_string(
-                &base_weapon_stats,
+                &selected_gun.gun_stats,
                 &combinations,
-                &data.mod_list,
-                &data.arcane_list
+                &mod_list,
+                &arcane_list
             )
         );
     };
@@ -91,54 +98,54 @@ fn print_combo(combo: &[u8; 8]) {
     );
 }
 
-fn mirror_mirror_on_the_wall(gun_type: GunType) {
-    println!("Mirror mirror on the wall, which gun is the strongest of them all?");
-    let mut buffer = String::new();
-    let data = DataLoader::new(gun_type.clone(), &mut buffer);
-    let mut modding_criteria = GunModdingContext::interview_user(gun_type.clone(), false);
-    let all_combinations = generate_combinations(data.mod_list.len() as u8);
-    let mut top_builds: Vec<(usize, u32)> = Vec::with_capacity(data.weapon_list.len());
-    let mut p = 0;
-
-    let start = Instant::now();
-    
-    for (i, imported_gun) in data.weapon_list.iter().enumerate() {
-        p += 1;
-        println!("Calculating '{}' ({}/{})", imported_gun.get_name(), p, data.weapon_list.len());
-        modding_criteria.semi = imported_gun.get_semi();
-        let base_stats = imported_gun.get_gunstats();
-        let (required_mods, disallowed_mods) = modding_criteria.generate_filters();
-        let mut filtered_combinations = all_combinations.clone();
-        filter_combinations(&mut filtered_combinations, required_mods.as_slice(), disallowed_mods.as_slice());
-        filtered_combinations.shrink_to_fit();
-        let mut build_reports = test_all_builds(
-            &filtered_combinations,
-            &base_stats,
-            modding_criteria.damage.clone(),
-            &data.mod_list,
-            &data.arcane_list,
-        );
-        build_reports.sort_by_key(|r|r.criteria_result);
-        let t = (
-            i, 
-            build_reports[0].criteria_result.clone()
-        );
-        top_builds.push(t);
-        let mid = start.elapsed();
-        println!("Elapsed: {:?}", mid);
-    };
-    top_builds.sort_by_key(|(i, d)| *d);
-    let duration = start.elapsed();
-    println!("All done! Elapsed: {:?}", duration);
-    for (index, (i, d)) in top_builds.iter().enumerate() {
-        let dd = u32::MAX - d;
-        let ii = index + 1;
-        let n = data.weapon_list[*i].get_name();
-        let a = data.weapon_list[*i].get_attack();
-        let s = format!("{}. {} - {}: {}", ii, n, a, dd);
-        println!("{}", s);
-    };
-}
+// fn mirror_mirror_on_the_wall(gun_type: GunType) {
+//     println!("Mirror mirror on the wall, which gun is the strongest of them all?");
+//     let mut buffer = String::new();
+//     let data = DataLoader::new(gun_type.clone(), &mut buffer);
+//     let mut modding_criteria = GunModdingContext::interview_user(gun_type.clone(), false);
+//     let all_combinations = generate_combinations(data.mod_list.len() as u8);
+//     let mut top_builds: Vec<(usize, u32)> = Vec::with_capacity(data.weapon_list.len());
+//     let mut p = 0;
+// 
+//     let start = Instant::now();
+//     
+//     for (i, imported_gun) in data.weapon_list.iter().enumerate() {
+//         p += 1;
+//         println!("Calculating '{}' ({}/{})", imported_gun.get_name(), p, data.weapon_list.len());
+//         modding_criteria.semi = imported_gun.get_semi();
+//         let base_stats = imported_gun.get_gunstats();
+//         let (required_mods, disallowed_mods) = modding_criteria.generate_filters();
+//         let mut filtered_combinations = all_combinations.clone();
+//         filter_combinations(&mut filtered_combinations, required_mods.as_slice(), disallowed_mods.as_slice());
+//         filtered_combinations.shrink_to_fit();
+//         let mut build_reports = test_all_builds(
+//             &filtered_combinations,
+//             &base_stats,
+//             modding_criteria.damage.clone(),
+//             &data.mod_list,
+//             &data.arcane_list,
+//         );
+//         build_reports.sort_by_key(|r|r.criteria_result);
+//         let t = (
+//             i, 
+//             build_reports[0].criteria_result.clone()
+//         );
+//         top_builds.push(t);
+//         let mid = start.elapsed();
+//         println!("Elapsed: {:?}", mid);
+//     };
+//     top_builds.sort_by_key(|(i, d)| *d);
+//     let duration = start.elapsed();
+//     println!("All done! Elapsed: {:?}", duration);
+//     for (index, (i, d)) in top_builds.iter().enumerate() {
+//         let dd = u32::MAX - d;
+//         let ii = index + 1;
+//         let n = data.weapon_list[*i].get_name();
+//         let a = data.weapon_list[*i].get_attack();
+//         let s = format!("{}. {} - {}: {}", ii, n, a, dd);
+//         println!("{}", s);
+//     };
+// }
 
 // fn cli() {
 //     let base_weapon_stats = weapon_select_loop();

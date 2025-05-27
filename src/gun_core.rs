@@ -20,7 +20,18 @@ pub struct GunModdingContext {
         let aiming = yes_no_prompt("Use aiming-reliant benefits", true);
         let acuity = yes_no_prompt("Use acuity mods", false);
         let riven = yes_no_prompt("Use Riven mod", false);
-        let prefer_amalgam = yes_no_prompt("Prefer Amalgam Serration & Diffusion", true);
+        let amalgam_prompt = match gun_type {
+            GunType::Rifle | GunType::Bow => {
+                "Prefer Amalgam Serration"
+            },
+            GunType::Shotgun => {
+                "Prefer Amalgam  Shotgun Barrage"
+            },
+            GunType::Pistol => {
+                "Prefer Amalgam Diffusion"
+            }
+        };
+        let prefer_amalgam = yes_no_prompt(amalgam_prompt, true);
         GunModdingContext {
             gun_type,
             damage,

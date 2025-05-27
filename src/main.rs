@@ -3,7 +3,7 @@ use std::time::Instant;
 mod mod_structs;
 mod weapon_structs;
 mod brute_force_solution;
-mod parsing;
+mod file_interfacing;
 mod cli_inputs;
 mod gun_core;
 
@@ -11,9 +11,7 @@ use cli_inputs::{establish_the_facts, take_input, parse_input};
 use crate::brute_force_solution::{
     generate_combinations, filter_combinations, test_all_builds
 };
-use crate::parsing::DataLoader;
-use crate::weapon_structs::GunType;
-use crate::gun_core::GunModdingContext;
+use crate::file_interfacing::load_mods;
 
 const TOP_BUILD_COUNT: usize = 20;
 

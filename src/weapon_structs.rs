@@ -1,4 +1,4 @@
-use crate::mod_structs::{WeaponMod, GunModSums};
+use crate::mod_structs::{LoadedMods, GunModSums};
 use crate::gun_core::GunModdingCriteria;
 
 pub struct GunData {
@@ -43,7 +43,7 @@ pub struct GunData {
 
 }
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct HitStats {
     pub damage: f32,
     pub crit_chance: f32,
@@ -163,7 +163,7 @@ pub enum GunType {
 pub struct LiteReport {
     pub criteria_result: u32,
     pub combo_index: u32,
-    pub arcane_index: u32
+    pub arcane_index: u32  // this is 32 bits because it was free to do so, shrug
 } impl LiteReport {
 
     pub fn new(
@@ -198,14 +198,15 @@ pub struct LiteReport {
         &self,
         base_gun_stats: &GunStats,
         combinations: &Vec<[u8; 8]>,
-        loaded_mods: &Vec<WeaponMod>,
-        loaded_arcanes: &Vec<WeaponMod>
+        loaded_mods: &LoadedMods,
+        loaded_arcanes: &LoadedMods
     ) -> String {
         let mut stat_sums = GunModSums::from_mod_list(
             &combinations[self.combo_index as usize],
             loaded_mods
         );
-        stat_sums.add_mod(&loaded_arcanes[self.arcane_index as usize]);
+        // stat_sums.add_mod(&loaded_arcanes[self.arcane_index as usize]);
+        stat_sums.add_mod(self.arcane_index as u8, loaded_mods);
         let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
         format!(
             "{}\n{}",
@@ -228,13 +229,13 @@ pub struct LiteReport {
     fn get_mod_string(
         &self,
         combinations: &Vec<[u8; 8]>,
-        loaded_mods: &Vec<WeaponMod>,
-        loaded_arcanes: &Vec<WeaponMod>
+        loaded_mods: &LoadedMods,
+        loaded_arcanes: &LoadedMods
     ) -> String {
         let mut names = [""; 8];
-        let arcane = &loaded_arcanes[self.arcane_index as usize].name;
+        let arcane = &loaded_arcanes.get_mod_name_u8(self.arcane_index as u8);
         for (index, &id) in combinations[self.combo_index as usize].iter().enumerate() {
-            names[index] = &loaded_mods[id as usize].name;
+            names[index] = loaded_mods.get_mod_name_u8(id);
         };
         format!(
             "{}\n{}, {}, {}, {}, {}, {}, {}, {}",

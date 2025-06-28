@@ -1,14 +1,73 @@
-#[derive(Clone, Eq, PartialEq)]
-pub struct WeaponMod {
-    pub name: String,
-    pub mod_stats: [GunModStat; 2]
+pub struct LoadedMods{
+    mod_names: Vec<String>,
+    stat_types_1: Vec<GunStatType>,
+    stat_values_1: Vec<i16>,
+    stat_types_2: Vec<GunStatType>,
+    stat_values_2: Vec<i16>
+} impl LoadedMods {
+    
+    pub fn new(size: usize) -> Self {
+        Self {
+            mod_names: Vec::with_capacity(size),
+            stat_types_1: Vec::with_capacity(size),
+            stat_values_1: Vec::with_capacity(size),
+            stat_types_2: Vec::with_capacity(size),
+            stat_values_2: Vec::with_capacity(size)
+        }
+    }
+    
+    pub fn len(&self) -> usize {
+        self.mod_names.len()
+    }
+    
+    pub fn load_mod(
+        &mut self,
+        mod_name: &str, 
+        stat_type_1: GunStatType,
+        stat_value_1: i16,
+        stat_type_2: GunStatType,
+        stat_value_2: i16
+    ) {
+        self.mod_names.push(String::from(mod_name));
+        self.stat_types_1.push(stat_type_1);
+        self.stat_values_1.push(stat_value_1);
+        self.stat_types_2.push(stat_type_2);
+        self.stat_values_2.push(stat_value_2);
+    }
+
+    pub fn get_mod_name_usize(&self, mod_id: usize) -> &str {
+        &self.mod_names[mod_id]
+    }
+
+    pub fn get_mod_data_usize(&self, mod_id: usize) -> [(GunStatType, i16);2] {
+        let i = mod_id;
+        [
+            (self.stat_types_1[i], self.stat_values_1[i]),
+            (self.stat_types_2[i], self.stat_values_2[i])
+        ]
+    }
+    
+    pub fn get_mod_name_u8(&self, mod_id: u8) -> &str {
+        self.get_mod_name_usize(mod_id as usize)
+    }
+    
+    pub fn get_mod_data_u8(&self, mod_id: u8) -> [(GunStatType, i16);2] {
+        self.get_mod_data_usize(mod_id as usize)
+    }
+    
 }
 
-pub struct RivenMod {
-    mod_stat_array: [GunModStat; 4]
-}
+// #[derive(Clone, Eq, PartialEq)]
+// pub struct WeaponMod {
+//     pub name: String,
+//     pub mod_stats: [GunModStat; 2]
+// }
 
-#[derive(Clone, Eq, PartialEq, Debug)]
+// pub struct RivenMod {
+//     mod_stat_array: [GunModStat; 4]
+// }
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum GunStatType {
     None,
     Damage,
@@ -63,27 +122,27 @@ pub enum GunStatType {
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
-pub struct GunModStat {
-    pub stat_type: GunStatType,
-    pub stat_value: i16
-} impl GunModStat {
-    
-    const fn new(stat_type: GunStatType, stat_value: i16) -> Self {
-        GunModStat {
-            stat_type,
-            stat_value
-        }
-    }
-    
-    const fn empty() -> Self {
-        GunModStat {
-            stat_type: GunStatType::None,
-            stat_value: 0
-        }
-    }
-    
-}
+// #[derive(Clone, Eq, PartialEq)]
+// pub struct GunModStat {
+//     pub stat_type: GunStatType,
+//     pub stat_value: i16
+// } impl GunModStat {
+//     
+//     const fn new(stat_type: GunStatType, stat_value: i16) -> Self {
+//         GunModStat {
+//             stat_type,
+//             stat_value
+//         }
+//     }
+//     
+//     const fn empty() -> Self {
+//         GunModStat {
+//             stat_type: GunStatType::None,
+//             stat_value: 0
+//         }
+//     }
+//     
+// }
 
 #[derive(Clone)]
 pub struct GunModSums {
@@ -112,28 +171,27 @@ pub struct GunModSums {
         }
     }
 
-    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) -> Self {
+    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &LoadedMods) -> Self {
         let mut new_sums = GunModSums::new();
         new_sums.add_many_mods(weapon_mods, loaded_mods);
         return new_sums;
     }
 
-    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &Vec<WeaponMod>) {
+    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
         for &mod_id in weapon_mods {
-            let weapon_mod: &WeaponMod = &loaded_mods[mod_id as usize];
-            self.add_mod(&weapon_mod);
+            self.add_mod(mod_id, loaded_mods);
         };
     }
 
-    pub fn add_mod(&mut self, weapon_mod: &WeaponMod) {
-        for mod_stat in &weapon_mod.mod_stats {
-            self.apply_mod(mod_stat.stat_type.clone(), mod_stat.stat_value.clone())
+    pub fn add_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
+        for (stat_type, stat_value) in loaded_mods.get_mod_data_u8(mod_id) {
+            self.apply_mod(stat_type, stat_value);
         };
     }
 
-    pub fn remove_mod(&mut self, weapon_mod: &WeaponMod) {
-        for mod_stat in &weapon_mod.mod_stats {
-            self.apply_mod(mod_stat.stat_type.clone(), -mod_stat.stat_value.clone())
+    pub fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
+        for (stat_type, stat_value) in loaded_mods.get_mod_data_u8(mod_id) {
+            self.apply_mod(stat_type, -stat_value);
         };
     }
 

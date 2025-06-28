@@ -1,6 +1,6 @@
 // use rayon::prelude::*;
 
-use crate::mod_structs::{WeaponMod, GunModSums};
+use crate::mod_structs::{GunModSums, LoadedMods};
 use crate::weapon_structs::{GunStats, LiteReport};
 use crate::gun_core::GunModdingCriteria;
 
@@ -109,21 +109,30 @@ pub fn test_all_builds(
     combinations: &Vec<[u8; 8]>,
     base_gun_stats: &GunStats,
     damage_criteria: GunModdingCriteria,
-    loaded_mods: &Vec<WeaponMod>,
-    loaded_arcanes: &Vec<WeaponMod>,
+    loaded_mods: &LoadedMods,
+    loaded_arcanes: &LoadedMods,
 ) -> Vec<LiteReport> {
-    let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.iter().len());
+    let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.len());
     for (combo_index, combo) in combinations.iter().enumerate() {
         let modded_sums = GunModSums::from_mod_list(combo, loaded_mods);
-        for (arcane_index, arcane) in loaded_arcanes.iter().enumerate() {
+        for arcane_index in 0..loaded_arcanes.len() {
             let mut arcane_sums = modded_sums.clone();
-            arcane_sums.add_mod(arcane);
+            arcane_sums.add_mod(arcane_index as u8, loaded_arcanes);
             let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
             let report = LiteReport::new(
                 arcane_stats, damage_criteria.clone(), combo_index, arcane_index
             );
             builds.push(report);
         };
+        // for (arcane_index, arcane) in bad_arcanes.iter().enumerate() {
+        //     let mut arcane_sums = modded_sums.clone();
+        //     arcane_sums.add_mod(arcane);
+        //     let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
+        //     let report = LiteReport::new(
+        //         arcane_stats, damage_criteria.clone(), combo_index, arcane_index
+        //     );
+        //     builds.push(report);
+        // };
     };
     builds
 }

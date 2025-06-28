@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::collections::VecDeque;
 
-use crate::mod_structs::{WeaponMod, GunStatType, GunModStat};
+use crate::mod_structs::{GunStatType, LoadedMods};
 use crate::weapon_structs::GunType;
 
 pub fn read_csv(buffer: &mut String, file_name: &str) {
@@ -14,28 +14,27 @@ pub fn read_csv(buffer: &mut String, file_name: &str) {
     };
 }
 
-pub fn load_mods(gun_type: &GunType, buffer: &mut String, arcanes: bool) -> Vec<WeaponMod> {
+pub fn load_mods(gun_type: &GunType, arcanes: bool) -> LoadedMods {
+    let mut buffer = String::new();
     match gun_type {
         _ => {
             if arcanes {
-                read_csv(buffer, "rifle_arcanes.csv");
+                read_csv(&mut buffer, "rifle_arcanes.csv");
             } else {
-                read_csv(buffer, "rifle_mods.csv");
+                read_csv(&mut buffer, "rifle_mods.csv");
             };
         }
     };
     let mut csv_lines: VecDeque<&str> = buffer.lines().collect();
     csv_lines.pop_front();
-    let mut mod_list: Vec<WeaponMod> = Vec::with_capacity(csv_lines.len());
+    let mut loaded_mods = LoadedMods::new(csv_lines.len());
     for line in csv_lines {
-        mod_list.push(
-            parse_gun_mod(line)
-        );
+        parse_gun_mod(line, &mut loaded_mods);
     };
-    return mod_list;
+    return loaded_mods;
 }
 
-fn parse_gun_mod(csv_line: &str) -> WeaponMod {
+fn parse_gun_mod(csv_line: &str, loaded_mods: &mut LoadedMods) {
     let attributes: Vec<&str> = csv_line.split(",").collect();
     let mod_name = attributes[0];
 
@@ -56,19 +55,7 @@ fn parse_gun_mod(csv_line: &str) -> WeaponMod {
     };
 
     println!("Loading {}, {}|{}", mod_name, stat_value_1, stat_value_2);
-    WeaponMod {
-        name: String::from(mod_name),
-        mod_stats: [
-            GunModStat {
-                stat_type: stat_type_1,
-                stat_value: stat_value_1
-            },
-            GunModStat {
-                stat_type: stat_type_2,
-                stat_value: stat_value_2
-            }
-        ]
-    }
+    loaded_mods.load_mod(mod_name, stat_type_1, stat_value_1, stat_type_2, stat_value_2);
 }
 
 // pub struct DataLoader<'a> {

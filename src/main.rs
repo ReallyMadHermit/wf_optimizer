@@ -25,21 +25,19 @@ fn debug_prompts() {
         selected_gun, modding_criteria
     ) = establish_the_facts();
     
-    let mod_list = load_mods(
+    let loaded_mods = load_mods(
         &selected_gun.gun_type,
-        &mut String::new(),
         false
     );
 
-    let arcane_list = load_mods(
+    let loaded_arcanes = load_mods(
         &selected_gun.gun_type,
-        &mut String::new(),
         true
     );
 
     let start = Instant::now();
 
-    let mut combinations = generate_combinations(mod_list.len() as u8);
+    let mut combinations = generate_combinations(loaded_mods.len() as u8);
     let count = combinations.len();
     println!("Combinations: {}", count);
     println!("First combo:");
@@ -66,8 +64,8 @@ fn debug_prompts() {
         &combinations,
         &selected_gun.gun_stats,
         modding_criteria.damage.clone(),
-        &mod_list,
-        &arcane_list,
+        &loaded_mods,
+        &loaded_arcanes,
     );
     println!("Sorting reports...");
     build_reports.sort_by_key(|r|r.criteria_result);
@@ -84,8 +82,8 @@ fn debug_prompts() {
             build_reports[i].get_report_string(
                 &selected_gun.gun_stats,
                 &combinations,
-                &mod_list,
-                &arcane_list
+                &loaded_mods,
+                &loaded_arcanes
             )
         );
     };

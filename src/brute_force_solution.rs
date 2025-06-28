@@ -124,15 +124,6 @@ pub fn test_all_builds(
             );
             builds.push(report);
         };
-        // for (arcane_index, arcane) in bad_arcanes.iter().enumerate() {
-        //     let mut arcane_sums = modded_sums.clone();
-        //     arcane_sums.add_mod(arcane);
-        //     let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
-        //     let report = LiteReport::new(
-        //         arcane_stats, damage_criteria.clone(), combo_index, arcane_index
-        //     );
-        //     builds.push(report);
-        // };
     };
     builds
 }

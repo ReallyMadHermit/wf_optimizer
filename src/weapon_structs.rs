@@ -86,10 +86,6 @@ pub struct GunStats {
     pub hit_stats: [HitStats; 2]
 } impl GunStats {
 
-    // pub fn from_imported_gun(imported_gun: &ImportedGun) -> Self {
-    //     imported_gun.get_gunstats()
-    // }
-
     pub fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;
         for hit in &self.hit_stats {
@@ -205,7 +201,6 @@ pub struct LiteReport {
             &combinations[self.combo_index as usize],
             loaded_mods
         );
-        // stat_sums.add_mod(&loaded_arcanes[self.arcane_index as usize]);
         stat_sums.add_mod(self.arcane_index as u8, loaded_mods);
         let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
         format!(

@@ -21,16 +21,16 @@ fn main() {
 
 fn debug_prompts() {
     let (
-        selected_gun, modding_criteria
+        selected_gun, gun_modding_context
     ) = establish_the_facts();
     
     let loaded_mods = load_mods(
-        &selected_gun.gun_type,
+        &gun_modding_context,
         false
     );
 
     let loaded_arcanes = load_mods(
-        &selected_gun.gun_type,
+        &gun_modding_context,
         true
     );
 
@@ -44,11 +44,11 @@ fn debug_prompts() {
     println!("Last combo:");
     print_combo(&combinations[count - 1]);
     
-    let (required_mods, disallowed_mods) = modding_criteria.generate_filters();
+    let required_mods = loaded_mods.included_mods_slice();
 
     println!("Filtering illegal pairs...");
-    filter_combinations(&mut combinations, required_mods.as_slice(), disallowed_mods.as_slice());
-    combinations.shrink_to_fit();
+    filter_combinations(&mut combinations, required_mods);
+    // combinations.shrink_to_fit();
     let count = combinations.len();
     println!("Combinations: {}", count);
     println!("First combo:");
@@ -60,7 +60,7 @@ fn debug_prompts() {
     let mut build_reports = test_all_builds(
         &combinations,
         &selected_gun.gun_stats,
-        modding_criteria.damage.clone(),
+        gun_modding_context.damage,
         &loaded_mods,
         &loaded_arcanes,
     );

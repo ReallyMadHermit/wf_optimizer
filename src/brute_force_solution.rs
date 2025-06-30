@@ -1,6 +1,6 @@
 // use rayon::prelude::*;
 
-use crate::mod_structs::{GunModSums, LoadedMods};
+use crate::mod_structs::{GunModSums, LoadedGunMods};
 use crate::weapon_structs::{GunStats, LiteReport};
 use crate::gun_core::GunModdingCriteria;
 
@@ -52,22 +52,21 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
     result
 }
 
-const ILLEGAL_PAIRS: [(u8, u8); 7] = [
-    (5, 22),  // Aptitude
-    (6, 28),  // Chamber
-    (4, 16),  // Point Strike
-    (2, 7),   // Scope
-    (25, 20), // Cannonade exclude Primed Shred
-    (25, 27), // Cannonade exclude Speed Trigger
-    (25, 32), // Cannonade exclude Vile Acceleration
-];
+// const ILLEGAL_PAIRS: [(u8, u8); 7] = [
+//     (5, 22),  // Aptitude
+//     (6, 28),  // Chamber
+//     (4, 16),  // Point Strike
+//     (2, 7),   // Scope
+//     (25, 20), // Cannonade exclude Primed Shred
+//     (25, 27), // Cannonade exclude Speed Trigger
+//     (25, 32), // Cannonade exclude Vile Acceleration
+// ];
 
 pub fn filter_combinations(
-    combinations: &mut Vec<[u8; 8]>, required: &[u8], disallowed: &[u8]
+    combinations: &mut Vec<[u8; 8]>, required: &[u8]
 ) {
     let required_mask = build_mask(required);
-    let disallowed_mask = build_mask(disallowed);
-    combinations.retain(|combo: &[u8; 8]| keep_combo_bitmask(combo, required_mask, disallowed_mask));
+    combinations.retain(|combo: &[u8; 8]| keep_combo_bitmask(combo, required_mask));
 }
 
 #[inline(always)]
@@ -80,25 +79,21 @@ fn build_mask(indices: &[u8]) -> u64 {
 }
 
 #[inline(always)]
-fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64, disallowed_mask: u64) -> bool {
+fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64) -> bool {
     // create bitmask
     let mut bits: u64 = 0;
     for &i in combo.iter() {
         bits |= 1 << i;
     };
     
-    // filter illegal mod pairs
-    for (a, b) in ILLEGAL_PAIRS {
-        if (bits & (1 << a)) != 0 && (bits & (1 << b)) != 0 {
-            return false;
-        };
-    };
+    // // filter illegal mod pairs
+    // for (a, b) in ILLEGAL_PAIRS {
+    //     if (bits & (1 << a)) != 0 && (bits & (1 << b)) != 0 {
+    //         return false;
+    //     };
+    // };
     
     if (bits & required_mask) != required_mask {
-        return false;
-    };
-    
-    if (bits & disallowed_mask) != 0 {
         return false;
     };
     
@@ -109,8 +104,8 @@ pub fn test_all_builds(
     combinations: &Vec<[u8; 8]>,
     base_gun_stats: &GunStats,
     damage_criteria: GunModdingCriteria,
-    loaded_mods: &LoadedMods,
-    loaded_arcanes: &LoadedMods,
+    loaded_mods: &LoadedGunMods,
+    loaded_arcanes: &LoadedGunMods,
 ) -> Vec<LiteReport> {
     let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.len());
     for (combo_index, combo) in combinations.iter().enumerate() {
@@ -120,7 +115,7 @@ pub fn test_all_builds(
             arcane_sums.add_mod(arcane_index as u8, loaded_arcanes);
             let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
             let report = LiteReport::new(
-                arcane_stats, damage_criteria.clone(), combo_index, arcane_index
+                arcane_stats, damage_criteria, combo_index, arcane_index
             );
             builds.push(report);
         };

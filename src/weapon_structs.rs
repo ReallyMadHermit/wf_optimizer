@@ -1,4 +1,4 @@
-use crate::mod_structs::{LoadedMods, GunModSums};
+use crate::mod_structs::{LoadedGunMods, GunModSums};
 use crate::gun_core::GunModdingCriteria;
 
 pub struct GunData {
@@ -12,7 +12,7 @@ pub struct GunData {
         let split: Vec<&str> = line.split(",").collect();
         GunData {
             name: String::from(split[1]),
-            gun_type: GunType::parse_from_str(split[0]),
+            gun_type: GunType::from_str(split[0]),
             semi: Self::parse_bool(split[3]),
             gun_stats: GunStats {
                 fire_rate: split[7].parse().unwrap(),
@@ -133,24 +133,74 @@ pub struct GunStats {
 
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub enum GunType {
     Rifle,
     Shotgun,
     Pistol,
-    Bow
+    Bow,
+    Riven,
+    Primary
 } impl GunType {
 
-    fn parse_from_str(s: &str) -> Self {
+    pub fn from_str(s: &str) -> Self {
         match s {
             "Rifle" => Self::Rifle,
             "Shotgun" => Self::Shotgun,
             "Pistol" => Self::Pistol,
             "Bow" => Self::Bow,
+            "Riven" => Self::Riven,
+            "Primary" => Self::Primary,
             _ => {
                 println!("Weapon type '{}' not found! Using... Rifle!", s);
                 Self::Rifle
             }
+        }
+    }
+    
+    pub fn is_compatible(gun_type: Self, mod_type: Self) -> bool {
+        match gun_type {
+            Self::Rifle => Self::rifle_compatibility(mod_type),
+            Self::Shotgun => Self::shotgun_compatibility(mod_type),
+            Self::Pistol => Self::pistol_compatibility(mod_type),
+            Self::Bow => Self::bow_compatibility(mod_type),
+            _ => true
+        }
+    }
+    
+    fn rifle_compatibility(mod_type: Self) -> bool {
+        match mod_type {
+            Self::Rifle => true,
+            Self::Riven => true,
+            Self::Primary => true,
+            _ => false
+        }
+    }
+    
+    fn shotgun_compatibility(mod_type: Self) -> bool {
+        match mod_type {
+            Self::Shotgun => true,
+            Self::Riven => true,
+            Self::Primary => true,
+            _ => false
+        }
+    }
+    
+    fn pistol_compatibility(mod_type: Self) -> bool {
+        match mod_type {
+            Self::Pistol => true,
+            Self::Riven => true,
+            _ => false
+        }
+    }
+    
+    fn bow_compatibility(mod_type: Self) -> bool {
+        match mod_type {
+            Self::Rifle => true,
+            Self::Bow => true,
+            Self::Riven => true,
+            Self::Primary => true,
+            _ => false
         }
     }
 
@@ -194,8 +244,8 @@ pub struct LiteReport {
         &self,
         base_gun_stats: &GunStats,
         combinations: &Vec<[u8; 8]>,
-        loaded_mods: &LoadedMods,
-        loaded_arcanes: &LoadedMods
+        loaded_mods: &LoadedGunMods,
+        loaded_arcanes: &LoadedGunMods
     ) -> String {
         let mut stat_sums = GunModSums::from_mod_list(
             &combinations[self.combo_index as usize],
@@ -205,6 +255,7 @@ pub struct LiteReport {
         let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
         format!(
             "{}\n{}",
+            // u32::MAX - self.criteria_result,
             LiteReport::get_damage_string(&modded_stats),
             self.get_mod_string(
                 combinations,
@@ -218,14 +269,14 @@ pub struct LiteReport {
         let hit = modded_gun_stats.calculate_shot_damage();
         let burst = modded_gun_stats.calculate_burst_dps(hit);
         let sustained = modded_gun_stats.calculate_sustained_dps(burst);
-        format!("{}|{}|{}", hit, burst, sustained)
+        format!("{}|{}|{}", hit.round(), burst.round(), sustained.round())
     }
 
     fn get_mod_string(
         &self,
         combinations: &Vec<[u8; 8]>,
-        loaded_mods: &LoadedMods,
-        loaded_arcanes: &LoadedMods
+        loaded_mods: &LoadedGunMods,
+        loaded_arcanes: &LoadedGunMods
     ) -> String {
         let mut names = [""; 8];
         let arcane = &loaded_arcanes.get_mod_name_u8(self.arcane_index as u8);

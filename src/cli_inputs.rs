@@ -10,10 +10,10 @@ pub fn establish_the_facts() -> (GunData, GunModdingContext) {
     let mut gun_data_buffer = String::new();
     read_csv(&mut gun_data_buffer, "gun_data.csv");
     let selected_gun = new_weapon_select(&gun_data_buffer);
-    let mut modding_criteria = GunModdingContext::interview_user(
+    let mut gun_modding_context = GunModdingContext::interview_user(
         selected_gun.gun_type.clone(), selected_gun.semi.clone()
     );
-    return (selected_gun, modding_criteria);
+    return (selected_gun, gun_modding_context);
 }
 
 pub fn new_weapon_select(gun_data_buffer: &str) -> GunData {

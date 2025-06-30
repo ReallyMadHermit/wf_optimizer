@@ -102,22 +102,10 @@ pub enum GunModdingCriteria {
             "Please enter the numer corresponding with your preferred criteria.", 1, 3
         );
         return match input {
-            1 => {
-                println!("Optimizing for per-shot damage..");
-                GunModdingCriteria::PerShot
-            },
-            2 => {
-                println!("Optimizing for burst damage..");
-                GunModdingCriteria::BurstDPS
-            },
-            3 => {
-                println!("Optimizing for sustained damage..");
-                GunModdingCriteria::SustainedDPS
-            },
-            _ => {
-                println!("Optimizing for per-shot damage...");
-                GunModdingCriteria::PerShot
-            }
+            1 => GunModdingCriteria::PerShot,
+            2 => GunModdingCriteria::BurstDPS,
+            3 => GunModdingCriteria::SustainedDPS,
+            _ => GunModdingCriteria::PerShot
         };
     }
 

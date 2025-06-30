@@ -8,7 +8,7 @@ pub struct GunData {
     pub gun_stats: GunStats,
 } impl GunData {
 
-    pub fn from_csv_line(line: &str) -> Self {  // TODO: add implicit mods here lmao
+    pub fn from_csv_line(line: &str) -> Self {
         let split: Vec<&str> = line.split(",").collect();
         GunData {
             name: String::from(split[1]),

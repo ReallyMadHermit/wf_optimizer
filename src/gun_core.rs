@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
 use crate::weapon_structs::GunType;
 

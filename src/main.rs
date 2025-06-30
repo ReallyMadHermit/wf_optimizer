@@ -48,7 +48,7 @@ fn debug_prompts() {
 
     println!("Filtering illegal pairs...");
     filter_combinations(&mut combinations, required_mods);
-    // combinations.shrink_to_fit();
+    combinations.shrink_to_fit();
     let count = combinations.len();
     println!("Combinations: {}", count);
     println!("First combo:");

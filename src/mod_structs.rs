@@ -3,7 +3,7 @@ pub struct LoadedGunMods {
     mod_data: Vec<GunModData>,
     included_mods: [u8; 8],
     arcane_start_index: u8
-} impl LoadedGunMods {  // TODO: add functionality to put "included" mods at the end
+} impl LoadedGunMods {
     
     pub fn new(size: usize) -> Self {
         Self {

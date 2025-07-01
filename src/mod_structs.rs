@@ -53,14 +53,13 @@ pub struct LoadedGunMods {
     pub fn get_mod_data_u8(&self, mod_id: u8) -> GunModData {
         self.get_mod_data_usize(mod_id as usize)
     }
-    
+
     pub fn include_mod(&mut self, mod_id: u8) {
         let i = self.included_mods[0].wrapping_add(1);
-        println!("i is {}", i);
         self.included_mods[0] = i;
         self.included_mods[i as usize] = mod_id;
     }
-    
+
     pub fn included_mods_slice(&self) -> &[u8] {
         let count = self.included_mods[0] as usize;
         &self.included_mods[1..1+count]

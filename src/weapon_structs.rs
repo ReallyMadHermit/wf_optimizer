@@ -242,7 +242,7 @@ pub struct LiteReport {
 
     pub fn get_report_string(
         &self,
-        base_gun_stats: &GunStats,
+        // base_gun_stats: &GunStats,
         combinations: &Vec<[u8; 8]>,
         loaded_mods: &LoadedGunMods,
         loaded_arcanes: &LoadedGunMods
@@ -252,11 +252,11 @@ pub struct LiteReport {
             loaded_mods
         );
         stat_sums.add_mod(self.arcane_index as u8, loaded_mods);
-        let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
+        // let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
         format!(
             "{}\n{}",
-            // u32::MAX - self.criteria_result,
-            LiteReport::get_damage_string(&modded_stats),
+            u32::MAX - self.criteria_result,
+            // LiteReport::get_damage_string(&modded_stats),
             self.get_mod_string(
                 combinations,
                 loaded_mods,

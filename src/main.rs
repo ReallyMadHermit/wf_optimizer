@@ -16,7 +16,7 @@ use crate::file_interfacing::load_mods;
 const TOP_BUILD_COUNT: usize = 20;
 
 fn main() {
-    debug_prompts();
+    compact_core();
 }
 
 fn debug_prompts() {
@@ -77,7 +77,52 @@ fn debug_prompts() {
         println!(
             "{}",
             build_reports[i].get_report_string(
-                &selected_gun.gun_stats,
+                // &selected_gun.gun_stats,
+                &combinations,
+                &loaded_mods,
+                &loaded_arcanes
+            )
+        );
+    };
+}
+
+fn compact_core() {
+    let (
+        selected_gun, gun_modding_context
+    ) = establish_the_facts();
+    let start = Instant::now();
+    let loaded_mods = load_mods(
+        &gun_modding_context,
+        false
+    );
+    let loaded_arcanes = load_mods(
+        &gun_modding_context,
+        true
+    );
+    let mut combinations = generate_combinations(loaded_mods.len() as u8);
+    let required_mods = loaded_mods.included_mods_slice();
+    filter_combinations(&mut combinations, required_mods);
+    combinations.shrink_to_fit();
+    let mut build_reports = test_all_builds(
+        &combinations,
+        &selected_gun.gun_stats,
+        gun_modding_context.damage,
+        &loaded_mods,
+        &loaded_arcanes,
+    );
+    build_reports.sort_by_key(|r|r.criteria_result);
+    let duration = start.elapsed();
+    println!("All done! Elapsed: {:?}", duration);
+    let display_input = take_input("How many reports should we show?");
+    let report_display_count = parse_input(&display_input);
+
+    // println!("{}\nHit|Burst|Sustain", &selected_gun.name);
+    println!("{}, {}", &selected_gun.name, gun_modding_context.damage.str());
+    for i in 0..report_display_count {
+        println!(
+            "{}",
+            build_reports[i].get_report_string(
+                // &selected_gun.gun_stats,
                 &combinations,
                 &loaded_mods,
                 &loaded_arcanes

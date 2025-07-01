@@ -109,6 +109,14 @@ pub enum GunModdingCriteria {
             _ => GunModdingCriteria::PerShot
         };
     }
+    
+    pub fn str(&self) -> &str {
+        match self {
+            Self::PerShot => "Per-shot damage",
+            Self::BurstDPS => "Burst DPS",
+            Self::SustainedDPS => "Sustained DPS"
+        }
+    }
 
 }
 

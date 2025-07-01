@@ -2,15 +2,15 @@ use std::io::stdin;
 use std::fmt::Write;
 
 use crate::weapon_structs::GunData;
-use crate::gun_core::GunModdingContext;
+use crate::gun_core::{DamageCriteria, ModdingContext, ReportAggregator};
 use crate::file_interfacing::read_csv;
 
-pub fn establish_the_facts() -> (GunData, GunModdingContext) {
+pub fn establish_the_facts() -> (GunData, ModdingContext) {
     // TODO: maybe we actually parse this buffer some??? lot of cursed splits...
     let mut gun_data_buffer = String::new();
     read_csv(&mut gun_data_buffer, "gun_data.csv");
     let selected_gun = new_weapon_select(&gun_data_buffer);
-    let mut gun_modding_context = GunModdingContext::interview_user(
+    let mut gun_modding_context = ModdingContext::interview_user(
         selected_gun.gun_type.clone(), selected_gun.semi.clone()
     );
     return (selected_gun, gun_modding_context);
@@ -125,4 +125,62 @@ pub fn yes_no_prompt(prompt: &str, prefer_yes: bool) -> bool {
     } else {
         prefer_yes
     };
+}
+
+pub fn results_prompt(page: usize, results: usize) {
+    println!("You are now in viewing mode and may close at any time, or view other results.");
+    println!("Sorting: (P) Per-shot Damage (B) Burst DPS (S) Sustained DPS");
+    println!("Enter a number to change how many results are shown, or press enter to go to the next page.");
+    println!("You are currently on Page {}, viewing {} results per page.", page, results);
+}
+
+pub fn cli_build_calculation_workflow() {
+    let (
+        selected_gun, gun_modding_context
+    ) = establish_the_facts();
+    let mut results = loop_integer_prompt("How many results should we display when it's done?", 0, 1000000);
+    let mut page = 0;
+    let mut criteria = gun_modding_context.damage;
+    let report_ag = ReportAggregator::new(selected_gun, gun_modding_context);
+    while true {
+        report_ag.display(criteria, results, page);
+        results_prompt(page, results);
+        let mut little_loop = true;
+        while little_loop {
+            let input = take_input("What'll it be?").to_ascii_uppercase();
+            let input_s = input.as_str();
+            match input_s {
+                "P" => {
+                    little_loop = false;
+                    criteria = DamageCriteria::PerShot;
+                    page = 0;
+                },
+                "B" => {
+                    little_loop = false;
+                    criteria = DamageCriteria::BurstDPS;
+                    page = 0;
+                },
+                "S" => {
+                    little_loop = false;
+                    criteria = DamageCriteria::SustainedDPS;
+                    page = 0;
+                },
+                "" => {
+                    page += 1;
+                    little_loop = false;
+                },
+                _ => {
+                    let mut parsed_int: usize = 0;
+                    if let Ok(parsed) = input_s.parse() {
+                        parsed_int = parsed;
+                        little_loop = false;
+                        results = parsed_int;
+                        page = 0;
+                    } else {
+                        println!("Yeah I don't know what you want...");
+                    };
+                }
+            };
+        };
+    }
 }

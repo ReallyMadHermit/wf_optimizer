@@ -2,28 +2,28 @@ pub struct LoadedGunMods {
     mod_names: Vec<String>,
     mod_data: Vec<GunModData>,
     included_mods: [u8; 8],
-    arcane_start_index: u8
+    pub mod_count: u8,
+    pub arcane_count: u8
 } impl LoadedGunMods {
     
     pub fn new(size: usize) -> Self {
         Self {
             mod_names: Vec::with_capacity(size),
             mod_data: Vec::with_capacity(size),
-            included_mods: [0; 8],  // 0 is count, 1 through 7 are mod ids,
-            arcane_start_index: 0
+            included_mods: [0; 8],  // 0 is count, 1 through 7 are mod ids
+            mod_count: 0,
+            arcane_count: 0
         }
+    }
+    
+    pub fn list_mods(&self) {
+        for name in &self.mod_names {
+            println!("{}", name);
+        };
     }
     
     pub fn len(&self) -> usize {
-        if self.arcane_start_index > 0 {
-            self.arcane_start_index as usize
-        } else {
-            self.mod_data.len()
-        }
-    }
-    
-    pub fn arcane_count(&self) -> usize {
-        self.len() - self.arcane_start_index as usize
+        self.mod_data.len()
     }
     
     pub fn load_mod(
@@ -32,10 +32,16 @@ pub struct LoadedGunMods {
         stat_type_1: GunStatType,
         stat_value_1: i16,
         stat_type_2: GunStatType,
-        stat_value_2: i16
+        stat_value_2: i16,
+        arcane: bool
     ) {
         self.mod_names.push(String::from(mod_name));
-        self.mod_data.push(GunModData::new(stat_type_1, stat_type_2, stat_value_1, stat_value_2))
+        self.mod_data.push(GunModData::new(stat_type_1, stat_type_2, stat_value_1, stat_value_2));
+        if arcane {
+            self.arcane_count += 1;
+        } else {
+            self.mod_count += 1;
+        };
     }
 
     pub fn get_mod_name_usize(&self, mod_id: usize) -> &str {
@@ -60,10 +66,30 @@ pub struct LoadedGunMods {
         self.included_mods[i as usize] = mod_id;
     }
 
+    pub fn included_mods_count(&self) -> u8 {
+        self.included_mods[0]
+    }
+
     pub fn included_mods_slice(&self) -> &[u8] {
         let count = self.included_mods[0] as usize;
         &self.included_mods[1..1+count]
     }
+
+    // pub fn order_included_mods(&mut self) {
+    //     let mut last_id = self.mod_count - 1;
+    //     for included_index in 1..=self.included_mods_count() {
+    //         self.swap(self.included_mods[included_index], last_id);
+    //         self.included_mods[included_index] = last_id;
+    //         last_id -=1;
+    //     };
+    // }
+    // 
+    // pub fn swap(&mut self, mod_id_a: u8, mod_id_b: u8) {
+    //     let a = mod_id_a as usize;
+    //     let b = mod_id_b as usize;
+    //     self.mod_names.swap(a, b);
+    //     self.mod_data.swap(a, b);
+    // }
     
 }
 
@@ -157,7 +183,8 @@ pub struct GunModSums {
     pub status: i16,
     pub fire_rate: i16,
     pub magazine: i16,
-    pub reload: i16
+    pub reload: i16,
+    pub ammo_efficiency: i16
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -170,7 +197,8 @@ pub struct GunModSums {
             status: 100,
             fire_rate: 100,
             magazine: 100,
-            reload: 100
+            reload: 100,
+            ammo_efficiency: 0
         }
     }
 

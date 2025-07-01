@@ -1,5 +1,5 @@
 use crate::mod_structs::{LoadedGunMods, GunModSums};
-use crate::gun_core::GunModdingCriteria;
+use crate::gun_core::DamageCriteria;
 
 pub struct GunData {
     pub name: String,
@@ -77,6 +77,11 @@ fn apply_inverse_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
     base_stat / (mod_sum as f32 / 100.0)
 }
 
+fn apply_ammo_efficiency(mag_size: f32, ammo_efficiency: i16) -> f32 {
+    let eff_factor = (100 - ammo_efficiency) as f32 / 100.0;
+    mag_size / eff_factor
+}
+
 #[derive(Clone)]
 pub struct GunStats {
     pub fire_rate: f32,
@@ -127,6 +132,11 @@ pub struct GunStats {
             modded_hit.crit_chance = apply_stat_sum(self_hit.crit_chance, stat_sums.crit_chance);
             modded_hit.crit_damage = apply_stat_sum(self_hit.crit_damage, stat_sums.crit_damage);
             modded_hit.status = apply_stat_sum(self_hit.status, stat_sums.status);
+        };
+        if stat_sums.ammo_efficiency >= 100 {
+            modded_self.reload = 0.0;
+        } else if stat_sums.ammo_efficiency > 0 {
+            modded_self.magazine = apply_ammo_efficiency(modded_self.magazine, stat_sums.ammo_efficiency);
         };
         return modded_self;
     }
@@ -206,89 +216,86 @@ pub enum GunType {
 
 }
 
-pub struct LiteReport {
-    pub criteria_result: u32,
-    pub combo_index: u32,
-    pub arcane_index: u32  // this is 32 bits because it was free to do so, shrug
-} impl LiteReport {
-
-    pub fn new(
-        modded_stats: GunStats,
-        damage_criteria: GunModdingCriteria,
-        combo_index: usize, arcane_index: usize
-    ) -> Self {
-        let shot_damage = modded_stats.calculate_shot_damage();
-        if damage_criteria == GunModdingCriteria::PerShot {
-            return LiteReport {
-                criteria_result: u32::MAX - shot_damage as u32,
-                combo_index: combo_index as u32,
-                arcane_index: arcane_index as u32
-            };
-        };
-        let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
-        if damage_criteria == GunModdingCriteria::BurstDPS {
-            return LiteReport {
-                criteria_result: u32::MAX - burst_damage as u32,
-                combo_index: combo_index as u32,
-                arcane_index: arcane_index as u32
-            };
-        };
-        LiteReport {
-            criteria_result: u32::MAX - modded_stats.calculate_sustained_dps(burst_damage) as u32,
-            combo_index: combo_index as u32,
-            arcane_index: arcane_index as u32
-        }
-    }
-
-    pub fn get_report_string(
-        &self,
-        // base_gun_stats: &GunStats,
-        combinations: &Vec<[u8; 8]>,
-        loaded_mods: &LoadedGunMods,
-        loaded_arcanes: &LoadedGunMods
-    ) -> String {
-        let mut stat_sums = GunModSums::from_mod_list(
-            &combinations[self.combo_index as usize],
-            loaded_mods
-        );
-        stat_sums.add_mod(self.arcane_index as u8, loaded_mods);
-        // let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
-        format!(
-            "{}\n{}",
-            u32::MAX - self.criteria_result,
-            // LiteReport::get_damage_string(&modded_stats),
-            self.get_mod_string(
-                combinations,
-                loaded_mods,
-                loaded_arcanes
-            )
-        )
-    }
-
-    fn get_damage_string(modded_gun_stats: &GunStats) -> String {
-        let hit = modded_gun_stats.calculate_shot_damage();
-        let burst = modded_gun_stats.calculate_burst_dps(hit);
-        let sustained = modded_gun_stats.calculate_sustained_dps(burst);
-        format!("{}|{}|{}", hit.round(), burst.round(), sustained.round())
-    }
-
-    fn get_mod_string(
-        &self,
-        combinations: &Vec<[u8; 8]>,
-        loaded_mods: &LoadedGunMods,
-        loaded_arcanes: &LoadedGunMods
-    ) -> String {
-        let mut names = [""; 8];
-        let arcane = &loaded_arcanes.get_mod_name_u8(self.arcane_index as u8);
-        for (index, &id) in combinations[self.combo_index as usize].iter().enumerate() {
-            names[index] = loaded_mods.get_mod_name_u8(id);
-        };
-        format!(
-            "{}\n{}, {}, {}, {}, {}, {}, {}, {}",
-            arcane,
-            names[0], names[1], names[2], names[3],
-            names[4], names[5], names[6], names[7]
-        )
-    }
-
-}
+// pub struct LiteReport {
+//     pub criteria_result: u32,
+//     pub combo_index: u32,
+//     pub arcane_index: u32  // this is 32 bits because it was free to do so, shrug
+// } impl LiteReport {
+// 
+//     pub fn new(
+//         modded_stats: GunStats,
+//         damage_criteria: DamageCriteria,
+//         combo_index: usize, arcane_index: usize
+//     ) -> Self {
+//         let shot_damage = modded_stats.calculate_shot_damage();
+//         if damage_criteria == DamageCriteria::PerShot {
+//             return LiteReport {
+//                 criteria_result: u32::MAX - shot_damage as u32,
+//                 combo_index: combo_index as u32,
+//                 arcane_index: arcane_index as u32
+//             };
+//         };
+//         let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
+//         if damage_criteria == DamageCriteria::BurstDPS {
+//             return LiteReport {
+//                 criteria_result: u32::MAX - burst_damage as u32,
+//                 combo_index: combo_index as u32,
+//                 arcane_index: arcane_index as u32
+//             };
+//         };
+//         LiteReport {
+//             criteria_result: u32::MAX - modded_stats.calculate_sustained_dps(burst_damage) as u32,
+//             combo_index: combo_index as u32,
+//             arcane_index: arcane_index as u32
+//         }
+//     }
+// 
+//     pub fn get_report_string(
+//         &self,
+//         // base_gun_stats: &GunStats,
+//         combinations: &Vec<[u8; 8]>,
+//         loaded_mods: &LoadedGunMods
+//     ) -> String {
+//         let mut stat_sums = GunModSums::from_mod_list(
+//             &combinations[self.combo_index as usize],
+//             loaded_mods
+//         );
+//         stat_sums.add_mod(self.arcane_index as u8, loaded_mods);
+//         // let modded_stats = base_gun_stats.apply_stat_sums(&stat_sums);
+//         format!(
+//             "{}\n{}",
+//             u32::MAX - self.criteria_result,
+//             // LiteReport::get_damage_string(&modded_stats),
+//             self.get_mod_string(
+//                 combinations,
+//                 loaded_mods
+//             )
+//         )
+//     }
+// 
+//     fn get_damage_string(modded_gun_stats: &GunStats) -> String {
+//         let hit = modded_gun_stats.calculate_shot_damage();
+//         let burst = modded_gun_stats.calculate_burst_dps(hit);
+//         let sustained = modded_gun_stats.calculate_sustained_dps(burst);
+//         format!("{}|{}|{}", hit.round(), burst.round(), sustained.round())
+//     }
+// 
+//     fn get_mod_string(
+//         &self,
+//         combinations: &Vec<[u8; 8]>,
+//         loaded_mods: &LoadedGunMods
+//     ) -> String {
+//         let mut names = [""; 8];
+//         let arcane = &loaded_mods.get_mod_name_u8(self.arcane_index as u8 + loaded_mods.mod_count);
+//         for (index, &id) in combinations[self.combo_index as usize].iter().enumerate() {
+//             names[index] = loaded_mods.get_mod_name_u8(id);
+//         };
+//         format!(
+//             "{}\n{}, {}, {}, {}, {}, {}, {}, {}",
+//             arcane,
+//             names[0], names[1], names[2], names[3],
+//             names[4], names[5], names[6], names[7]
+//         )
+//     }
+// 
+// }

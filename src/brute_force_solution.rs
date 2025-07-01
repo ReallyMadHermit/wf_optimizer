@@ -1,22 +1,35 @@
 // use rayon::prelude::*;
 
-use crate::mod_structs::{GunModSums, LoadedGunMods};
-use crate::weapon_structs::{GunStats, LiteReport};
-use crate::gun_core::GunModdingCriteria;
+use crate::mod_structs::LoadedGunMods;
 
-// Vec<[u8;8]>
-pub fn generate_combinations(index_count: u8) -> Vec<[u8;8]>  {
-    let combination_count = get_combination_count(index_count as usize, 8);
-    let mut combinations: Vec<[u8; 8]> = Vec::with_capacity(combination_count);
+fn print_combo(combo: &[u8; 8], arcane: u8) {
+    println!(
+        "{}, {}, {}, {}, {}, {}, {}, {}, ac {}",
+        combo[0], combo[1], combo[2], combo[3], combo[4], combo[5], combo[6], combo[7], arcane
+    );
+}
+
+pub fn generate_combinations(loaded_gun_mods: &LoadedGunMods) -> Vec<u64>  {
+    let index_count = loaded_gun_mods.mod_count;
+    let arcane_count = loaded_gun_mods.arcane_count;
+    let combination_count = get_combination_count(
+        index_count as usize,
+        8
+    );
+    let mut masks: Vec<u64> = Vec::with_capacity(combination_count * arcane_count as usize);
     let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
     for _ in 0..combination_count {
         live_array[7] = live_array[7] + 1;
         if live_array[7] == index_count {
             array_flipper(&mut live_array);
         };
-        combinations.push(live_array.clone());
+        let mut mask = build_mask(&live_array);
+        for arcane_id in index_count..index_count + arcane_count {
+            let arcane_mask = mask | 1 << arcane_id;
+            masks.push(arcane_mask);
+        };
     };
-    combinations
+    masks
 }
 
 fn array_flipper(array: &mut [u8; 8]) {
@@ -52,21 +65,11 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
     result
 }
 
-// const ILLEGAL_PAIRS: [(u8, u8); 7] = [
-//     (5, 22),  // Aptitude
-//     (6, 28),  // Chamber
-//     (4, 16),  // Point Strike
-//     (2, 7),   // Scope
-//     (25, 20), // Cannonade exclude Primed Shred
-//     (25, 27), // Cannonade exclude Speed Trigger
-//     (25, 32), // Cannonade exclude Vile Acceleration
-// ];
-
 pub fn filter_combinations(
-    combinations: &mut Vec<[u8; 8]>, required: &[u8]
+    combinations: &mut Vec<u64>, required: &[u8]
 ) {
     let required_mask = build_mask(required);
-    combinations.retain(|combo: &[u8; 8]| keep_combo_bitmask(combo, required_mask));
+    combinations.retain(|&combo| keep_combo_bitmask(combo, required_mask));
 }
 
 #[inline(always)]
@@ -79,12 +82,12 @@ fn build_mask(indices: &[u8]) -> u64 {
 }
 
 #[inline(always)]
-fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64) -> bool {
+fn keep_combo_bitmask(combo: u64, required_mask: u64) -> bool {
     // create bitmask
-    let mut bits: u64 = 0;
-    for &i in combo.iter() {
-        bits |= 1 << i;
-    };
+    // let mut bits: u64 = 0;
+    // for &i in combo.iter() {
+    //     bits |= 1 << i;
+    // };
     
     // // filter illegal mod pairs
     // for (a, b) in ILLEGAL_PAIRS {
@@ -93,32 +96,31 @@ fn keep_combo_bitmask(combo: &[u8; 8], required_mask: u64) -> bool {
     //     };
     // };
     
-    if (bits & required_mask) != required_mask {
+    if (combo & required_mask) != required_mask {
         return false;
     };
     
     return true;
 }
 
-pub fn test_all_builds(
-    combinations: &Vec<[u8; 8]>,
-    base_gun_stats: &GunStats,
-    damage_criteria: GunModdingCriteria,
-    loaded_mods: &LoadedGunMods,
-    loaded_arcanes: &LoadedGunMods,
-) -> Vec<LiteReport> {
-    let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_arcanes.len());
-    for (combo_index, combo) in combinations.iter().enumerate() {
-        let modded_sums = GunModSums::from_mod_list(combo, loaded_mods);
-        for arcane_index in 0..loaded_arcanes.len() {
-            let mut arcane_sums = modded_sums.clone();
-            arcane_sums.add_mod(arcane_index as u8, loaded_arcanes);
-            let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
-            let report = LiteReport::new(
-                arcane_stats, damage_criteria, combo_index, arcane_index
-            );
-            builds.push(report);
-        };
-    };
-    builds
-}
+// pub fn test_all_builds(
+//     combinations: &Vec<[u8; 8]>,
+//     base_gun_stats: &GunStats,
+//     damage_criteria: GunModdingCriteria,
+//     loaded_mods: &LoadedGunMods,
+// ) -> Vec<LiteReport> {
+//     let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_mods.arcane_count as usize);
+//     for (combo_index, combo) in combinations.iter().enumerate() {
+//         let modded_sums = GunModSums::from_mod_list(combo, loaded_mods);
+//         for arcane_index in 0..loaded_mods.arcane_count as usize {
+//             let mut arcane_sums = modded_sums.clone();
+//             arcane_sums.add_mod(arcane_index as u8 + loaded_mods.arcane_count, loaded_mods);
+//             let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
+//             let report = LiteReport::new(
+//                 arcane_stats, damage_criteria, combo_index, arcane_index
+//             );
+//             builds.push(report);
+//         };
+//     };
+//     builds
+// }

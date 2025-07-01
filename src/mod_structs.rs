@@ -15,7 +15,15 @@ pub struct LoadedGunMods {
     }
     
     pub fn len(&self) -> usize {
-        self.mod_data.len()
+        if self.arcane_start_index > 0 {
+            self.arcane_start_index as usize
+        } else {
+            self.mod_data.len()
+        }
+    }
+    
+    pub fn arcane_count(&self) -> usize {
+        self.len() - self.arcane_start_index as usize
     }
     
     pub fn load_mod(

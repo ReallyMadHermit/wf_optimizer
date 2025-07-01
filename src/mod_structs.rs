@@ -74,22 +74,6 @@ pub struct LoadedGunMods {
         let count = self.included_mods[0] as usize;
         &self.included_mods[1..1+count]
     }
-
-    // pub fn order_included_mods(&mut self) {
-    //     let mut last_id = self.mod_count - 1;
-    //     for included_index in 1..=self.included_mods_count() {
-    //         self.swap(self.included_mods[included_index], last_id);
-    //         self.included_mods[included_index] = last_id;
-    //         last_id -=1;
-    //     };
-    // }
-    // 
-    // pub fn swap(&mut self, mod_id_a: u8, mod_id_b: u8) {
-    //     let a = mod_id_a as usize;
-    //     let b = mod_id_b as usize;
-    //     self.mod_names.swap(a, b);
-    //     self.mod_data.swap(a, b);
-    // }
     
 }
 

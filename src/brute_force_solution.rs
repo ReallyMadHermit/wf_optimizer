@@ -102,25 +102,3 @@ fn keep_combo_bitmask(combo: u64, required_mask: u64) -> bool {
     
     return true;
 }
-
-// pub fn test_all_builds(
-//     combinations: &Vec<[u8; 8]>,
-//     base_gun_stats: &GunStats,
-//     damage_criteria: GunModdingCriteria,
-//     loaded_mods: &LoadedGunMods,
-// ) -> Vec<LiteReport> {
-//     let mut builds: Vec<LiteReport> = Vec::with_capacity(combinations.len() * loaded_mods.arcane_count as usize);
-//     for (combo_index, combo) in combinations.iter().enumerate() {
-//         let modded_sums = GunModSums::from_mod_list(combo, loaded_mods);
-//         for arcane_index in 0..loaded_mods.arcane_count as usize {
-//             let mut arcane_sums = modded_sums.clone();
-//             arcane_sums.add_mod(arcane_index as u8 + loaded_mods.arcane_count, loaded_mods);
-//             let arcane_stats = base_gun_stats.apply_stat_sums(&arcane_sums);
-//             let report = LiteReport::new(
-//                 arcane_stats, damage_criteria, combo_index, arcane_index
-//             );
-//             builds.push(report);
-//         };
-//     };
-//     builds
-// }

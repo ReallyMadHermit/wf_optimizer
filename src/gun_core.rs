@@ -1,5 +1,5 @@
 use crate::brute_force_solution::{filter_combinations, generate_combinations};
-use crate::cli_inputs::{establish_the_facts, loop_integer_prompt, yes_no_prompt};
+use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
 use crate::file_interfacing::load_mods;
 use crate::mod_structs::{GunModSums, LoadedGunMods};
 use crate::weapon_structs::{GunData, GunStats, GunType};
@@ -48,45 +48,6 @@ pub struct ModdingContext {
             prefer_amalgam
         }
     }
-
-    // pub fn generate_filters(&self) -> (Vec<u8>, Vec<u8>) {
-    //     self.generate_rifle_filters()
-    // }
-
-    // fn generate_rifle_filters(&self) -> (Vec<u8>, Vec<u8>) {
-    //     let mut required_set: HashSet<u8> = HashSet::with_capacity(10);
-    //     let mut disallowed_set: HashSet<u8> = HashSet::with_capacity(10);
-    //     required_set.insert(18);
-    //     if !self.kills {
-    //         disallowed_set.extend([3, 5, 6, 7]);
-    //     };
-    //     if !self.semi {
-    //         disallowed_set.insert(25);
-    //     };
-    //     if !self.aiming {
-    //         disallowed_set.extend(&[2, 3, 7]);
-    //     };
-    //     if self.acuity {
-    //         required_set.insert(17);
-    //         disallowed_set.extend(&[6, 28, 31]);
-    //     } else {
-    //         disallowed_set.insert(17);
-    //     };
-    //     if self.riven {
-    //         required_set.insert(0);
-    //     } else {
-    //         disallowed_set.insert(0);
-    //     };
-    //     if self.prefer_amalgam {
-    //         required_set.insert(1);
-    //         disallowed_set.insert(26);
-    //     } else {
-    //         disallowed_set.insert(1);
-    //     };
-    //     required_set.shrink_to_fit();
-    //     disallowed_set.shrink_to_fit();
-    //     return (required_set.into_iter().collect(), disallowed_set.into_iter().collect());
-    // }
 
 }
 

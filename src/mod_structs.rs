@@ -126,6 +126,7 @@ pub enum GunStatType {
     AmmoEfficiency,
     Riven
 } impl GunStatType {
+    
     pub fn from_str(string_slice: &str) -> Self {
         return match string_slice {
             "None" => GunStatType::None,
@@ -155,6 +156,51 @@ pub enum GunStatType {
             }
         };
     }
+    
+    pub fn from_riven_str(s: &str) -> Self {
+        match s {
+            "C" => Self::Cold,
+            "CC" => Self::CritChance,
+            "CD" => Self::CritDamage,
+            "D" => Self::Damage,
+            "E" => Self::Shock,
+            "H" => Self::Heat,
+            "F" => Self::FireRate,
+            "MG" => Self::MagazineCapacity,
+            "MS" => Self::Multishot,
+            "T" => Self::Toxic,
+            "R" => Self::ReloadSpeed,
+            "S" => Self::StatusChance,
+            _ => Self::None
+        }
+    }
+    
+    pub fn to_str(&self) -> &str {
+        match self {
+            Self::None => "None",
+            Self::Damage => "Damage",
+            Self::Heat => "Heat",
+            Self::Cold => "Cold",
+            Self::Toxic => "Toxic",
+            Self::Shock => "Shock",
+            Self::Magnetic => "Magnetic",
+            Self::Radiation => "Radiation",
+            Self::Multishot => "Multishot",
+            Self::CritChance => "Crit Chance",
+            Self::CritDamage => "Crit Damage",
+            Self::FireRate => "Firerate",
+            Self::StatusChance => "Status Chance",
+            Self::ConditionOverload => "Condition Overload",
+            Self::MagazineCapacity => "Magazine Capacity",
+            Self::ReloadSpeed => "Reload Speed",
+            Self::AcuityBonus => "Acuity Bonus",
+            Self::StatusDamage => "Status Damage",
+            Self::PunchThrough => "Punch Through",
+            Self::AmmoEfficiency => "Ammo Efficiency",
+            Self::Riven => "Riven"
+        }
+    }
+    
 }
 
 #[derive(Clone)]

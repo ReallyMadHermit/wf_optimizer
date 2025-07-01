@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::io::stdin;
 use std::fmt::Write;
 
@@ -18,7 +19,8 @@ pub fn establish_the_facts() -> (GunData, ModdingContext) {
 
 pub fn new_weapon_select(gun_data_buffer: &str) -> GunData {
     let mut results:Vec<usize> = Vec::with_capacity(4);
-    let csv_lines: Vec<&str> = gun_data_buffer.lines().collect();
+    let mut csv_lines: VecDeque<&str> = gun_data_buffer.lines().collect();
+    csv_lines.pop_front();
     println!("Enter the weapon's name (it's case sensitive (out of spite, of course))");
     let input = take_input("Leave blank, or fuck up the input to choose from a list:");
     for (index, &line) in csv_lines.iter().enumerate() {
@@ -36,7 +38,8 @@ pub fn new_weapon_select(gun_data_buffer: &str) -> GunData {
 }
 
 pub fn sub_weapon_select(gun_data_buffer: &str, results: &Vec<usize>) -> GunData {
-    let csv_lines: Vec<&str> = gun_data_buffer.lines().collect();
+    let mut csv_lines: VecDeque<&str> = gun_data_buffer.lines().collect();
+    csv_lines.pop_front();
     let mut buffer = String::with_capacity(300);
     _ = writeln!(buffer, "There are multiple weapons with that name:");
     for (index, &result) in results.iter().enumerate() {
@@ -50,7 +53,8 @@ pub fn sub_weapon_select(gun_data_buffer: &str, results: &Vec<usize>) -> GunData
 }
 
 pub fn new_weapon_list_select(gun_data_buffer: &str, last_input: &str) -> GunData {
-    let csv_lines: Vec<&str> = gun_data_buffer.lines().collect();
+    let mut csv_lines: VecDeque<&str> = gun_data_buffer.lines().collect();
+    csv_lines.pop_front();
     let mut buffer = String::with_capacity(16645);  // NOT ARBITRARY (LEN[1&2]+6)
     let empty = last_input == "";
     let input_first = last_input.to_uppercase().chars().next();

@@ -1,5 +1,6 @@
 use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
-use crate::weapon_structs::GunType;
+use crate::mod_structs::LoadedGunMods;
+use crate::weapon_structs::{GunData, GunType};
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct GunModdingContext {
@@ -110,3 +111,32 @@ pub enum GunModdingCriteria {
     }
 
 }
+
+// pub struct ReportMarker {
+//     pub combination_index: u32,
+//     pub sorting_integer: u32
+// } impl ReportMarker {
+//     
+//     pub fn new(combination_index: u32, sorting_integer: u32) -> Self {
+//         Self {combination_index, sorting_integer}
+//     }
+//     
+// }
+
+// pub struct ReportAggregator {
+//     gun_data: GunData,
+//     loaded_mods: LoadedGunMods,
+//     combinations: Vec<u64>,
+//     shot_damage: Vec<f32>,
+//     burst_damage: Vec<f32>,
+//     sustained_damage: Vec<f32>,
+//     shot_sorting: Vec<ReportMarker>,
+//     burst_sorting: Vec<ReportMarker>,
+//     sustained_sorting: Vec<ReportMarker>
+// } impl ReportAggregator {
+//     
+//     fn new(gun_data: GunData, loaded_gun_mods: LoadedGunMods) {
+//         
+//     }
+//     
+// }

@@ -131,8 +131,8 @@ pub fn yes_no_prompt(prompt: &str, prefer_yes: bool) -> bool {
 }
 
 pub fn results_prompt(page: usize, results: usize) {
-    println!("You are now in viewing mode and may close at any time, or view other results.");
-    println!("Sorting: (P) Per-shot Damage (B) Burst DPS (S) Sustained DPS");
+    println!("You are now in viewing mode and may close this at any time, or view other results.");
+    println!("For sorting changes, enter a letter: Per-shot Damage (P) Burst DPS (B) Sustained DPS (S)");
     println!("Enter a number to change how many results are shown, or press enter to go to the next page.");
     println!("You are currently on Page {}, viewing {} results per page.", page, results);
 }

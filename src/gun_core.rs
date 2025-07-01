@@ -190,7 +190,7 @@ pub struct ReportAggregator {
         let combo = bits_to_mod_combo(mask);
         _ = write!(buffer, "Arcane: {}\n", self.loaded_mods.get_mod_name_u8(combo[8]));
         for mod_id in 0..8 {
-            _ = write!(buffer, "{}, ", self.loaded_mods.get_mod_name_usize(mod_id));
+            _ = write!(buffer, "{}, ", self.loaded_mods.get_mod_name_usize(combo[mod_id as usize] as usize));
         };
         buffer.pop();
         buffer.pop();

@@ -24,7 +24,7 @@ pub fn new_weapon_select(gun_data_buffer: &str) -> GunData {
     println!("Enter the weapon's name (it's case sensitive (out of spite, of course))");
     let input = take_input("Leave blank, or fuck up the input to choose from a list:");
     for (index, &line) in csv_lines.iter().enumerate() {
-        if line.split(",").collect::<Vec<_>>()[1] == &input {
+        if line.split(",").collect::<Vec<_>>()[1] == input.trim() {
             results.push(index)
         };
     };
@@ -49,7 +49,7 @@ pub fn sub_weapon_select(gun_data_buffer: &str, results: &Vec<usize>) -> GunData
     _ = writeln!(buffer, "Please choose the variant number you wish to optimize.");
     buffer.shrink_to_fit();
     let input = take_input(&buffer);
-    GunData::from_csv_line(csv_lines[results[parse_input(&input)]])
+    GunData::from_csv_line(csv_lines[results[parse_input(&input.trim())]])
 }
 
 pub fn new_weapon_list_select(gun_data_buffer: &str, last_input: &str) -> GunData {
@@ -69,19 +69,18 @@ pub fn new_weapon_list_select(gun_data_buffer: &str, last_input: &str) -> GunDat
     _ = writeln!(buffer, "Please enter the number corresponding with the weapon you want to customize...");
     buffer.shrink_to_fit();
     let input = take_input(&buffer);
-    GunData::from_csv_line(csv_lines[parse_input(&input)])
+    GunData::from_csv_line(csv_lines[parse_input(&input.trim())])
 }
 
 pub fn take_input(prompt: &str) -> String {
     let mut buffer = String::new();
     println!("{}", prompt);
     let _ = stdin().read_line(&mut buffer);
-    buffer.pop();
     return buffer;
 }
 
 pub fn parse_input(input: &str) -> usize {
-    if let Ok(parsed) = input.parse() {
+    if let Ok(parsed) = input.trim().parse() {
         parsed
     } else {
         println!(
@@ -96,7 +95,7 @@ pub fn loop_integer_prompt(prompt: &str, min: usize, max: usize) -> usize {
     let mut parsed_int = 0usize;
     while curious {
         let input = take_input(prompt);
-        if let Ok(parsed_input) = input.parse() {
+        if let Ok(parsed_input) = input.trim().parse() {
             parsed_int = parsed_input;
         } else {
             println!("That's not a number! Try again...");
@@ -121,7 +120,7 @@ pub fn yes_no_prompt(prompt: &str, prefer_yes: bool) -> bool {
     };
     let full_prompt = format!("{} {}", prompt, ending);
     let input = take_input(&full_prompt);
-    let lower = input.to_lowercase();
+    let lower = input.trim().to_lowercase();
     return if lower == "y" {
         true
     } else if lower == "n" {
@@ -152,7 +151,7 @@ pub fn cli_build_calculation_workflow() {
         let mut little_loop = true;
         while little_loop {
             let input = take_input("What'll it be?").to_ascii_uppercase();
-            let input_s = input.as_str();
+            let input_s = input.trim();
             match input_s {
                 "P" => {
                     little_loop = false;

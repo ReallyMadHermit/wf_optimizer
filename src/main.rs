@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 mod mod_structs;
 mod weapon_structs;
 mod brute_force_solution;

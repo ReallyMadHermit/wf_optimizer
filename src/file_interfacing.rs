@@ -28,6 +28,8 @@ pub fn load_mods(modding_context: &ModdingContext) -> LoadedGunMods {
         parse_gun_mod(line, modding_context, &mut loaded_mods, false);
     };
     
+    // TODO: add BADMATCH mod check and augments here
+    
     buffer.clear();
     read_csv(&mut buffer, "gun_arcanes.csv");
     let mut csv_lines: VecDeque<&str> = buffer.lines().collect();

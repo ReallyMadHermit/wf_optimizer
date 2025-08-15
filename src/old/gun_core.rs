@@ -1,8 +1,8 @@
-use crate::brute_force_solution::{filter_combinations, generate_combinations};
-use crate::cli_inputs::{loop_integer_prompt, yes_no_prompt};
-use crate::file_interfacing::load_mods;
-use crate::mod_structs::{GunModSums, LoadedGunMods};
-use crate::weapon_structs::{GunData, GunStats, GunType};
+use crate::old::brute_force_solution::{filter_combinations, generate_combinations};
+use crate::old::cli_inputs::{loop_integer_prompt, yes_no_prompt};
+use crate::old::file_interfacing::load_mods;
+use crate::old::mod_structs::{GunModSums, LoadedGunMods};
+use crate::old::weapon_structs::{GunData, GunStats, GunType};
 use std::fmt::Write;
 use std::time::Instant;
 

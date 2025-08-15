@@ -2,9 +2,9 @@ use std::collections::VecDeque;
 use std::io::stdin;
 use std::fmt::Write;
 
-use crate::weapon_structs::GunData;
-use crate::gun_core::{DamageCriteria, ModdingContext, ReportAggregator};
-use crate::file_interfacing::read_csv;
+use crate::old::weapon_structs::GunData;
+use crate::old::gun_core::{DamageCriteria, ModdingContext, ReportAggregator};
+use crate::old::file_interfacing::read_csv;
 
 pub fn establish_the_facts() -> (GunData, ModdingContext) {
     // TODO: maybe we actually parse this buffer some??? lot of cursed splits...

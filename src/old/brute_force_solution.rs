@@ -1,6 +1,6 @@
 // use rayon::prelude::*;
 
-use crate::mod_structs::LoadedGunMods;
+use crate::old::mod_structs::LoadedGunMods;
 
 fn print_combo(combo: &[u8; 8], arcane: u8) {
     println!(

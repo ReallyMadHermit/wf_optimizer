@@ -1,4 +1,4 @@
-use crate::mod_structs::GunModSums;
+use crate::old::mod_structs::GunModSums;
 
 pub struct GunData {
     pub name: String,

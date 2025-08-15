@@ -1,9 +1,9 @@
 use std::path::Path;
 use std::collections::VecDeque;
 
-use crate::mod_structs::{GunStatType, LoadedGunMods};
-use crate::weapon_structs::GunType;
-use crate::gun_core::ModdingContext;
+use crate::old::mod_structs::{GunStatType, LoadedGunMods};
+use crate::old::weapon_structs::GunType;
+use crate::old::gun_core::ModdingContext;
 
 pub fn read_csv(buffer: &mut String, file_name: &str) {
     let full_path = Path::new("game_data").join(file_name);

@@ -11,6 +11,8 @@
 //
 // const TOP_BUILD_COUNT: usize = 20;
 
+mod data;
+
 fn main() {
     println!("hello world");
 }

@@ -1,12 +1,12 @@
 use crate::data::{GUN_MODS, GUN_ARCANES};
-use crate::structs::{ModData, GunModdingContext, WeaponType, LoadedMods, ModBehavior};
+use crate::structs::{ModData, ModdingContext, WeaponType, LoadedMods, ModBehavior};
 
 const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 11];
 const BSI: [usize;2] = BEHAVIOR_SLICE_INDICES;
 const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 
-pub fn load_gun_mods(modding_context: &GunModdingContext) -> LoadedMods {
+pub fn load_mods(modding_context: &ModdingContext) -> LoadedMods {
     let mut mod_lines: Vec<&str> = GUN_MODS.lines().collect();
     let mut arcane_lines: Vec<&str> = GUN_ARCANES.lines().collect();
     let mod_range = &mod_lines[1..];
@@ -19,7 +19,7 @@ pub fn load_gun_mods(modding_context: &GunModdingContext) -> LoadedMods {
         (&mod_range, &mut arcane_scores)
     ] {
         for &line in lines {
-            let score = score_inclusion(line, modding_context);
+            let score = should_include(line, modding_context);
             if score >= 0 {size+=1};
             scores.push(score);
         };
@@ -44,13 +44,13 @@ fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&str], scores: Vec<i8>, arc
     };
 }
 
-fn score_inclusion(csv_line: &str, modding_context: &GunModdingContext) -> i8 {
+fn should_include(csv_line: &str, modding_context: &ModdingContext) -> i8 {
     let split: Vec<&str> = csv_line.split(",").collect();
     if !WeaponType::is_compatible(modding_context.gun_type, WeaponType::from_str(split[0])) { return -1 };
-    return score_context(&split[BSI[0]..=BSI[1]], modding_context);
+    return context_test(&split[BSI[0]..=BSI[1]], modding_context);
 }
 
-fn score_context(behavior_slice: &[&str], modding_context: &GunModdingContext) -> i8 {
+fn context_test(behavior_slice: &[&str], modding_context: &ModdingContext) -> i8 {
     let mut include = false;
     let kills_behavior = ModBehavior::from_str(behavior_slice[0]);
     let aiming_behavior = ModBehavior::from_str(behavior_slice[1]);
@@ -82,7 +82,7 @@ fn score_context(behavior_slice: &[&str], modding_context: &GunModdingContext) -
     }
 }
 
-pub fn generate_illegal_pairs() -> Option<Vec<(u8, u8)>> {  // todo this lmao
+fn generate_illegal_pairs() -> Option<Vec<(u8, u8)>> {  // todo this lmao
     let mut pairs: Vec<(u8, u8)> = Vec::with_capacity(3);
     for &row in &GUN_MODS.lines().collect::<Vec<&str>>()[1..] {
         let s: Vec<&str> = row.split(",").collect();

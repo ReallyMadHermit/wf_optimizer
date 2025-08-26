@@ -469,7 +469,7 @@ impl ModBehavior {
 
 }
 
-impl GunModdingContext {
+impl ModdingContext {
 
     pub fn interview_user(gun_type: WeaponType, semi: bool) -> Self {
         let damage = DamageCriteria::determine_criteria();
@@ -490,9 +490,9 @@ impl GunModdingContext {
         };
         let prefer_amalgam = yes_no_prompt(amalgam_prompt, true);
         let riven = yes_no_prompt("Use Riven mod", false);
-        GunModdingContext {
+        ModdingContext {
             gun_type,
-            damage,
+            damage_criteria: damage,
             kills,
             semi,
             aiming,

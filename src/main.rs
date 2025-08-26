@@ -12,7 +12,7 @@
 // const TOP_BUILD_COUNT: usize = 20;
 
 use std::time::{Duration, Instant};
-use mod_parsing::load_gun_mods;
+use mod_parsing::load_mods;
 
 mod data;
 mod structs;
@@ -25,7 +25,7 @@ mod weapon_select;
 
 fn main() {
     // let (gun_data, modding_context) = establish_the_facts();
-    let loaded_mods = load_gun_mods(&modding_context);
+    let loaded_mods = load_mods(&modding_context);
     for name in loaded_mods.mod_names {
         println!("{}", name);
     }

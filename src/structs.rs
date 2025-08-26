@@ -106,9 +106,9 @@ pub enum ModBehavior {
 }
 
 #[derive(Clone, Eq, PartialEq)]
-pub struct GunModdingContext {
+pub struct ModdingContext {
     pub gun_type: WeaponType,
-    pub damage: DamageCriteria,
+    pub damage_criteria: DamageCriteria,
     pub kills: bool,
     pub aiming: bool,
     pub semi: bool,

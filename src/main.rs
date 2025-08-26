@@ -12,21 +12,21 @@
 // const TOP_BUILD_COUNT: usize = 20;
 
 use std::time::{Duration, Instant};
+use mod_parsing::load_gun_mods;
 
 mod data;
-mod gun_structs;
+mod structs;
 mod combinatorics;
+mod cli_inputs;
+mod traits;
+mod impl_blocks;
+mod mod_parsing;
+mod weapon_select;
 
 fn main() {
-    println!("hello world");
-
-    let c = 60;
-    let mut old_time = Duration::default();
-    let mut start = Instant::now();
-
-    let old_combos = combinatorics::generate_combinations(c);
-    old_time = start.elapsed();
-
-    println!("All done! {:?} elapsed.", old_time);
-    println!("old_first, old_last, {:?}, {:?}", &old_combos.first(), &old_combos.last());
+    // let (gun_data, modding_context) = establish_the_facts();
+    let loaded_mods = load_gun_mods(&modding_context);
+    for name in loaded_mods.mod_names {
+        println!("{}", name);
+    }
 }

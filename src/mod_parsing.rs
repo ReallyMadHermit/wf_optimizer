@@ -1,12 +1,12 @@
 use crate::data::{GUN_MODS, GUN_ARCANES};
-use crate::structs::{GunModData, GunModdingContext, GunType, LoadedGunMods, ModBehavior};
+use crate::structs::{ModData, GunModdingContext, WeaponType, LoadedMods, ModBehavior};
 
 const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 11];
 const BSI: [usize;2] = BEHAVIOR_SLICE_INDICES;
 const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 
-pub fn load_gun_mods(modding_context: &GunModdingContext) -> LoadedGunMods {
+pub fn load_gun_mods(modding_context: &GunModdingContext) -> LoadedMods {
     let mut mod_lines: Vec<&str> = GUN_MODS.lines().collect();
     let mut arcane_lines: Vec<&str> = GUN_ARCANES.lines().collect();
     let mod_range = &mod_lines[1..];
@@ -24,19 +24,19 @@ pub fn load_gun_mods(modding_context: &GunModdingContext) -> LoadedGunMods {
             scores.push(score);
         };
     };
-    let mut loaded_mods = LoadedGunMods::new(size);
+    let mut loaded_mods = LoadedMods::new(size);
     parse_mods(&mut loaded_mods, &mod_range, mod_scores, false);
     parse_mods(&mut loaded_mods, &arcane_range, arcane_scores, true);
     loaded_mods
 }
 
-fn parse_mods(loaded_mods: &mut LoadedGunMods, lines: &[&str], scores: Vec<i8>, arcane: bool) {
+fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&str], scores: Vec<i8>, arcane: bool) {
     for (&line, &score) in lines.iter().zip(scores.iter()) {
         if score < 0 {
             continue;
         };
         let split: Vec<&str> = line.split(",").collect();
-        let data = GunModData::from_split_slice(&split[MDSI[0]..=MDSI[1]]);
+        let data = ModData::from_split_slice(&split[MDSI[0]..=MDSI[1]]);
         let mod_id = loaded_mods.load_mod(split[1], data, arcane);
         if score > 0 {
             loaded_mods.include_mod(mod_id)
@@ -46,7 +46,7 @@ fn parse_mods(loaded_mods: &mut LoadedGunMods, lines: &[&str], scores: Vec<i8>, 
 
 fn score_inclusion(csv_line: &str, modding_context: &GunModdingContext) -> i8 {
     let split: Vec<&str> = csv_line.split(",").collect();
-    if !GunType::is_compatible(modding_context.gun_type, GunType::from_str(split[0])) { return -1 };
+    if !WeaponType::is_compatible(modding_context.gun_type, WeaponType::from_str(split[0])) { return -1 };
     return score_context(&split[BSI[0]..=BSI[1]], modding_context);
 }
 

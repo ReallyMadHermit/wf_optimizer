@@ -1,5 +1,5 @@
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum GunStatType {
+pub enum ModStatType {
     None,
     Damage,
     Heat,
@@ -24,16 +24,16 @@ pub enum GunStatType {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub struct GunModData {
-    pub stat_type_1: GunStatType,
-    pub stat_type_2: GunStatType,
+pub struct ModData {
+    pub stat_type_1: ModStatType,
+    pub stat_type_2: ModStatType,
     pub stat_value_1: i16,
     pub stat_value_2: i16
 }
 
-pub struct LoadedGunMods {
+pub struct LoadedMods {
     pub mod_names: Vec<String>,
-    pub mod_data: Vec<GunModData>,
+    pub mod_data: Vec<ModData>,
     pub included_mods: [u8; 8],
     pub mod_count: u8,
     pub arcane_count: u8
@@ -63,7 +63,7 @@ pub struct HitStats {
 
 pub struct GunData {
     pub name: String,
-    pub gun_type: GunType,
+    pub gun_type: WeaponType,
     pub semi: bool,
     pub gun_stats: GunStats,
 }
@@ -78,7 +78,7 @@ pub struct GunStats {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub enum GunType {
+pub enum WeaponType {
     Rifle,
     Shotgun,
     Pistol,
@@ -107,7 +107,7 @@ pub enum ModBehavior {
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct GunModdingContext {
-    pub gun_type: GunType,
+    pub gun_type: WeaponType,
     pub damage: DamageCriteria,
     pub kills: bool,
     pub aiming: bool,

@@ -20,7 +20,7 @@ pub fn apply_ammo_efficiency(mag_size: f32, ammo_efficiency: i16) -> f32 {
     mag_size / eff_factor
 }
 
-impl GunStatType {
+impl ModStatType {
 
     pub fn from_str(string_slice: &str) -> Self {
         return match string_slice {
@@ -98,18 +98,18 @@ impl GunStatType {
 
 }
 
-impl GunModData {
+impl ModData {
 
     pub fn new(
-        stat_type_1: GunStatType,
-        stat_type_2: GunStatType,
+        stat_type_1: ModStatType,
+        stat_type_2: ModStatType,
         stat_value_1: i16,
         stat_value_2: i16
     ) -> Self {
         Self {stat_type_1, stat_type_2, stat_value_1, stat_value_2}
     }
 
-    pub fn as_array(&self) -> [(GunStatType, i16); 2] {
+    pub fn as_array(&self) -> [(ModStatType, i16); 2] {
         [
             (self.stat_type_1, self.stat_value_1),
             (self.stat_type_2, self.stat_value_2)
@@ -117,13 +117,13 @@ impl GunModData {
     }
 
     pub fn from_split_slice(slice: &[&str]) -> Self {
-        let stat_type_1 = GunStatType::from_str(slice[0]);
+        let stat_type_1 = ModStatType::from_str(slice[0]);
         let stat_value_1: i16 = if let Ok(parsed) = slice[1].parse() {
             parsed
         } else {
             0
         };
-        let stat_type_2 = GunStatType::from_str(slice[2]);
+        let stat_type_2 = ModStatType::from_str(slice[2]);
         let stat_value_2: i16 = if let Ok(parsed) = slice[3].parse() {
             parsed
         } else {
@@ -139,7 +139,7 @@ impl GunModData {
 
 }
 
-impl LoadedGunMods {
+impl LoadedMods {
 
     pub fn new(size: usize) -> Self {
         Self {
@@ -164,7 +164,7 @@ impl LoadedGunMods {
     pub fn load_mod(
         &mut self,
         mod_name: &str,
-        mod_data: GunModData,
+        mod_data: ModData,
         arcane: bool
     ) -> u8 {
         self.mod_names.push(String::from(mod_name));
@@ -181,7 +181,7 @@ impl LoadedGunMods {
         &self.mod_names[mod_id]
     }
 
-    pub fn get_mod_data_usize(&self, mod_id: usize) -> GunModData {
+    pub fn get_mod_data_usize(&self, mod_id: usize) -> ModData {
         self.mod_data[mod_id]
     }
 
@@ -189,7 +189,7 @@ impl LoadedGunMods {
         self.get_mod_name_usize(mod_id as usize)
     }
 
-    pub fn get_mod_data_u8(&self, mod_id: u8) -> GunModData {
+    pub fn get_mod_data_u8(&self, mod_id: u8) -> ModData {
         self.get_mod_data_usize(mod_id as usize)
     }
 
@@ -227,60 +227,60 @@ impl GunModSums {
         }
     }
 
-    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &LoadedGunMods) -> Self {
+    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &LoadedMods) -> Self {
         let mut new_sums = GunModSums::new();
         new_sums.add_many_mods(weapon_mods, loaded_mods);
         return new_sums;
     }
 
-    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedGunMods) {
+    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
         for &mod_id in weapon_mods {
             self.add_mod(mod_id, loaded_mods);
         };
     }
 
-    pub fn add_mod(&mut self, mod_id: u8, loaded_mods: &LoadedGunMods) {
+    pub fn add_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
         for (stat_type, stat_value) in loaded_mods.get_mod_data_u8(mod_id).as_array() {
             self.apply_mod(stat_type, stat_value);
         };
     }
 
-    pub fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedGunMods) {
+    pub fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
         for (stat_type, stat_value) in loaded_mods.get_mod_data_u8(mod_id).as_array() {
             self.apply_mod(stat_type, -stat_value);
         };
     }
 
-    pub fn apply_mod(&mut self, stat_type: GunStatType, stat_value: i16) {
+    pub fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {
         match stat_type {
-            GunStatType::None => {},
-            GunStatType::Damage => {
+            ModStatType::None => {},
+            ModStatType::Damage => {
                 self.damage += stat_value;
             },
-            GunStatType::Cold | GunStatType::Toxic |
-            GunStatType::Heat | GunStatType::Shock |
-            GunStatType::Radiation | GunStatType::Magnetic => {
+            ModStatType::Cold | ModStatType::Toxic |
+            ModStatType::Heat | ModStatType::Shock |
+            ModStatType::Radiation | ModStatType::Magnetic => {
                 self.ele_damage += stat_value;
             },
-            GunStatType::StatusChance => {
+            ModStatType::StatusChance => {
                 self.status += stat_value;
             }
-            GunStatType::Multishot => {
+            ModStatType::Multishot => {
                 self.multishot += stat_value;
             },
-            GunStatType::CritChance => {
+            ModStatType::CritChance => {
                 self.crit_chance += stat_value;
             },
-            GunStatType::CritDamage => {
+            ModStatType::CritDamage => {
                 self.crit_damage += stat_value;
             },
-            GunStatType::FireRate => {
+            ModStatType::FireRate => {
                 self.fire_rate += stat_value;
             },
-            GunStatType::MagazineCapacity => {
+            ModStatType::MagazineCapacity => {
                 self.magazine += stat_value;
             },
-            GunStatType::ReloadSpeed => {
+            ModStatType::ReloadSpeed => {
                 self.reload += stat_value;
             },
             _ => {}
@@ -309,7 +309,7 @@ impl GunData {
         let split: Vec<&str> = line.split(",").collect();
         GunData {
             name: String::from(split[1]),
-            gun_type: GunType::from_str(split[0]),
+            gun_type: WeaponType::from_str(split[0]),
             semi: Self::parse_bool(split[3]),
             gun_stats: GunStats {
                 fire_rate: split[7].parse().unwrap(),
@@ -394,7 +394,7 @@ impl GunStats {
 
 }
 
-impl GunType {
+impl WeaponType {
 
     pub fn from_str(s: &str) -> Self {
         match s {
@@ -471,19 +471,19 @@ impl ModBehavior {
 
 impl GunModdingContext {
 
-    pub fn interview_user(gun_type: GunType, semi: bool) -> Self {
+    pub fn interview_user(gun_type: WeaponType, semi: bool) -> Self {
         let damage = DamageCriteria::determine_criteria();
         let kills = yes_no_prompt("Use kill-reliant benefits", true);
         let aiming = yes_no_prompt("Use aiming-reliant benefits", true);
         let acuity = yes_no_prompt("Use acuity mods", false);
         let amalgam_prompt = match gun_type {
-            GunType::Rifle | GunType::Bow => {
+            WeaponType::Rifle | WeaponType::Bow => {
                 "Prefer Amalgam Serration"
             },
-            GunType::Shotgun => {
+            WeaponType::Shotgun => {
                 "Prefer Amalgam  Shotgun Barrage"
             },
-            GunType::Pistol => {
+            WeaponType::Pistol => {
                 "Prefer Amalgam Diffusion"
             },
             _ => {"YOU SHOULDN'T BE SEEING THIS! BUT DO YOU PREFER AMALGAM MODS!"}

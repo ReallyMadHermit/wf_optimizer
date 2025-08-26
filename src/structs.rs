@@ -1,43 +1,5 @@
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum ModStatType {
-    None,
-    Damage,
-    Heat,
-    Cold,
-    Toxic,
-    Shock,
-    Magnetic,
-    Radiation,
-    Multishot,
-    CritChance,
-    CritDamage,
-    FireRate,
-    StatusChance,
-    ConditionOverload,  // always conditional
-    MagazineCapacity,
-    ReloadSpeed,
-    AcuityBonus,  // crit chance + weak point damage
-    StatusDamage,
-    PunchThrough,
-    AmmoEfficiency,
-    Riven
-}
 
-#[derive(Copy, Clone, Eq, PartialEq)]
-pub struct ModData {
-    pub stat_type_1: ModStatType,
-    pub stat_type_2: ModStatType,
-    pub stat_value_1: i16,
-    pub stat_value_2: i16
-}
 
-pub struct LoadedMods {
-    pub mod_names: Vec<String>,
-    pub mod_data: Vec<ModData>,
-    pub included_mods: [u8; 8],
-    pub mod_count: u8,
-    pub arcane_count: u8
-}
 
 #[derive(Clone)]
 pub struct GunModSums {
@@ -92,17 +54,6 @@ pub enum DamageCriteria {
     PerShot,
     BurstDPS,
     SustainedDPS
-}
-
-#[derive(Copy, Clone, Eq, PartialEq)]
-pub enum ModBehavior {
-    Exclude,
-    Include,
-    Parallel,
-    NotExclude,
-    NotInclude,
-    NotParallel,
-    NothingSpecial
 }
 
 #[derive(Clone, Eq, PartialEq)]

@@ -22,6 +22,8 @@ mod traits;
 mod impl_blocks;
 mod mod_parsing;
 mod weapon_select;
+mod context_core;
+mod build_calc;
 
 fn main() {
     // let (gun_data, modding_context) = establish_the_facts();

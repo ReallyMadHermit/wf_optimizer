@@ -1,5 +1,4 @@
 use crate::data::{GUN_MODS, GUN_ARCANES};
-use crate::structs::{ModdingContext, WeaponType};
 
 const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 11];
 const BSI: [usize;2] = BEHAVIOR_SLICE_INDICES;

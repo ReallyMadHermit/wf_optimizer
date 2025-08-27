@@ -37,7 +37,6 @@ pub fn establish_the_facts() -> (GunData, ModdingContext) {
 impl GunData {
 
     pub fn from_csv_line(line: &str) -> Self {
-        println!("gun: {}", line);
         let split: Vec<&str> = line.split(",").collect();
         GunData {
             name: String::from(split[1]),
@@ -195,12 +194,7 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
         println!("{} results found:", l);
         for (i, &n) in indices.iter().enumerate() {
             let row: Vec<&str> = headless_csv[n].split(",").collect();
-            println!(
-                "{}. {}; {}",
-                i+1,
-                row[1],
-                row[2]
-            );
+            println!("{}. {}; {}", i+1, row[1], row[2]);
         };
         let choice = UserInput::looped_integer_prompt(
             "Please enter a number from above to make a selection.",

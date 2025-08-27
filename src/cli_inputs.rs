@@ -14,10 +14,60 @@ pub enum UserInput {
             return if s.len() > 1 {
                 Some(Self::Full(s))
             } else {
-                Some(Self::Single(char::from(s)))
+                if let Some(c) = s.chars().nth(1) {
+                    Some(Self::Single(c))
+                } else {
+                    None
+                }
             };
         };
         None
+    }
+
+    pub fn yes_no_prompt(prompt: &str, prefer_yes: bool) -> bool {
+        let ending = if prefer_yes {
+            "(Y/n)?"
+        } else {
+            "(y/N)?"
+        };
+        let full_prompt = format!("{} {}", prompt, ending);
+        let input = UserInput::new(&full_prompt);
+        if let Some(UserInput::Single(c)) = input {
+            let cl = c.to_ascii_lowercase();
+            if cl == 'y' {
+                return true;
+            } else if cl == 'n' {
+                return false;
+            };
+        };
+        prefer_yes
+    }
+
+    pub fn looped_integer_prompt(prompt: &str, min: usize, max: usize, default_value: usize) -> usize {
+        let mut curious = true;
+        let mut digit = 0usize;
+        let mut response = UserInput::Digit(0);
+        while curious {
+            let input = UserInput::new(prompt);
+            if let Some(ui) = input {
+                response = ui;
+            } else {
+                return default_value;
+            };
+            match response {
+                UserInput::Digit(d) => {
+                    if d >= min && d <= max {
+                        return d;
+                    } else {
+                        println!("That number exceeds the index boundary! Try again...")
+                    };
+                },
+                _ => {
+                    println!("That's not a number! Try again...");
+                }
+            };
+        };
+        digit
     }
 
     fn cli_input(prompt: &str) -> Option<String> {

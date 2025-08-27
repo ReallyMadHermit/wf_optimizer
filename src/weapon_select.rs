@@ -197,18 +197,18 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
             let row: Vec<&str> = headless_csv[n].split(",").collect();
             println!(
                 "{}. {}; {}",
-                i,
+                i+1,
                 row[1],
                 row[2]
             );
         };
         let choice = UserInput::looped_integer_prompt(
             "Please enter a number from above to make a selection.",
-            0,
-            l-1,
-            0
+            1,
+            l,
+            1
         );
-        indices[choice]
+        indices[choice-1]
     } else {
         let l = headless_csv.len();
         println!("{} results found:", l);
@@ -216,18 +216,18 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
             let split: Vec<&str> = line.split(",").collect();
             println!(
                 "{}. {}; {}",
-                i,
+                i+1,
                 split[1],
                 split[2]
             );
         };
         let choice = UserInput::looped_integer_prompt(
             "Please enter a number from above to make a selection.",
-            0,
-            l-1,
-            0
+            1,
+            l,
+            1
         );
-        choice
+        choice-1
     }
 }
 

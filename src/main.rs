@@ -12,23 +12,22 @@
 // const TOP_BUILD_COUNT: usize = 20;
 
 use std::time::{Duration, Instant};
-use mod_parsing::load_mods;
-
 mod data;
-mod structs;
 mod combinatorics;
 mod cli_inputs;
-mod traits;
-mod impl_blocks;
 mod mod_parsing;
 mod weapon_select;
 mod context_core;
 mod build_calc;
 
 fn main() {
-    // let (gun_data, modding_context) = establish_the_facts();
-    let loaded_mods = load_mods(&modding_context);
-    for name in loaded_mods.mod_names {
-        println!("{}", name);
-    }
+    for n in 0..5 {
+        let i = cli_inputs::UserInput::looped_integer_prompt(
+            "enta it",
+            1,
+            10,
+            7
+        );
+        println!("{}", i);
+    };
 }

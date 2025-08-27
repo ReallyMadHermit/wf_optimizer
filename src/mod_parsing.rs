@@ -1,4 +1,5 @@
 use crate::data::{GUN_MODS, GUN_ARCANES};
+use crate::context_core::{ModdingContext, WeaponType};
 
 const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 11];
 const BSI: [usize;2] = BEHAVIOR_SLICE_INDICES;
@@ -37,11 +38,11 @@ pub struct LoadedMods {
         loaded_mods
     }
 
-    fn get_mod<I>(&self, mod_id: u8) -> ModData {
+    pub fn get_mod(&self, mod_id: u8) -> ModData {
         self.mod_data[mod_id as usize]
     }
 
-    fn get_name(&self, mod_id: u8) -> &str {
+    pub fn get_name(&self, mod_id: u8) -> &str {
         &self.mod_names[mod_id as usize]
     }
 
@@ -160,7 +161,7 @@ impl LoadedMods {
 
     fn should_include(csv_line: &str, modding_context: &ModdingContext) -> i8 {
         let split: Vec<&str> = csv_line.split(",").collect();
-        if !WeaponType::is_compatible(modding_context.gun_type, WeaponType::from_str(split[0])) { return -1 };
+        if !WeaponType::is_compatible(modding_context.weapon_type, WeaponType::from_str(split[0])) { return -1 };
         return Self::context_test(&split[BSI[0]..=BSI[1]], modding_context);
     }
 

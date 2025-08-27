@@ -143,9 +143,6 @@ impl HitStats {
 pub fn weapon_select() -> GunData {
     let full_csv: Vec<&str> = GUN_DATA.lines().collect();
     let headless_csv = &full_csv[1..];
-    for &n in headless_csv {
-        println!("{}", n);
-    };
     println!("Enter the weapon's name (it's case sensitive, (out of spite,) of course)");
     let input = UserInput::new("Leave blank, or fuck up the input to choose from a list:");
     return match input {
@@ -169,7 +166,7 @@ pub fn weapon_select() -> GunData {
 fn weapon_name_search(input_string: &str, headless_csv: &[&str]) -> Option<usize> {
     let mut results:Vec<usize> = Vec::with_capacity(6);
     for (index, &line) in headless_csv.iter().enumerate() {
-        if input_string == line[1] {
+        if input_string == line.split(",").collect::<Vec<&str>>()[1] {
             results.push(index);
         };
     };
@@ -185,10 +182,11 @@ fn weapon_name_search(input_string: &str, headless_csv: &[&str]) -> Option<usize
 fn weapon_first_letter_search(letter: char, headless_csv: &[&str]) -> usize {
     let mut results: Vec<usize> = Vec::with_capacity(36);
     for (index, &line) in headless_csv.iter().enumerate() {
-        if letter == line[1].chars().next().unwrap() {
+        if letter == line.split(",").collect::<Vec<&str>>()[1].chars().next().unwrap() {
             results.push(index)
         };
     };
+    weapon_list_select(Some(results), headless_csv)
 }
 
 fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usize {
@@ -196,7 +194,7 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
         let l = indices.len();
         println!("{} results found:", l);
         for (i, &n) in indices.iter().enumerate() {
-            let row = headless_csv[n].split(",");
+            let row: Vec<&str> = headless_csv[n].split(",").collect();
             println!(
                 "{}. {}; {}",
                 i,
@@ -212,8 +210,24 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
         );
         indices[choice]
     } else {
-        let indices = [0..headless_csv.len()].iter().collect();
-        weapon_list_select(Some(indices), headless_csv)
+        let l = headless_csv.len();
+        println!("{} results found:", l);
+        for (i, &line) in headless_csv.iter().enumerate() {
+            let split: Vec<&str> = line.split(",").collect();
+            println!(
+                "{}. {}; {}",
+                i,
+                split[1],
+                split[2]
+            );
+        };
+        let choice = UserInput::looped_integer_prompt(
+            "Please enter a number from above to make a selection.",
+            0,
+            l-1,
+            0
+        );
+        choice
     }
 }
 

@@ -211,23 +211,7 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
         indices[choice-1]
     } else {
         let l = headless_csv.len();
-        println!("{} results found:", l);
-        for (i, &line) in headless_csv.iter().enumerate() {
-            let split: Vec<&str> = line.split(",").collect();
-            println!(
-                "{}. {}; {}",
-                i+1,
-                split[1],
-                split[2]
-            );
-        };
-        let choice = UserInput::looped_integer_prompt(
-            "Please enter a number from above to make a selection.",
-            1,
-            l,
-            1
-        );
-        choice-1
+        weapon_list_select(Some((0..l).collect::<Vec<usize>>()), headless_csv)
     }
 }
 

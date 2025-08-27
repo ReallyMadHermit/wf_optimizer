@@ -42,15 +42,15 @@ struct GunModSums {
     }
 
     fn add_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
-        for (stat_type, stat_value) in loaded_mods.get_mod_data_u8(mod_id).as_array() {
-            self.apply_mod(stat_type, stat_value);
-        };
+        let mod_data = loaded_mods.get_mod(mod_id);
+        self.apply_mod(mod_data.stat_type_1, mod_data.stat_value_1);
+        self.apply_mod(mod_data.stat_type_2, mod_data.stat_value_2);
     }
 
     fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
-        for (stat_type, stat_value) in loaded_mods.get_mod_data_u8(mod_id).as_array() {
-            self.apply_mod(stat_type, -stat_value);
-        };
+        let mod_data = loaded_mods.get_mod(mod_id);
+        self.apply_mod(mod_data.stat_type_1, -mod_data.stat_value_1);
+        self.apply_mod(mod_data.stat_type_2, -mod_data.stat_value_2);
     }
 
     fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {

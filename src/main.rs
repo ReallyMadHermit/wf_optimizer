@@ -31,7 +31,7 @@ fn workflow() {
     let mut builds = build_calc::calculate_builds(&combinations, &loaded_mods, &gun_data.gun_stats, modding_context.damage_criteria);
     calc_time = start.elapsed();
     start = Instant::now();
-    builds.sort_by_key(|build| build.inverse_damage);
+    builds.sort_by_key(|build| build.inverse_damage);  // TODO: move into the build calc, it's only here for benching
     sort_time = start.elapsed();
     let total = load_time + combo_time + calc_time + sort_time;
     println!("Combos computed: {}", combinations.len());

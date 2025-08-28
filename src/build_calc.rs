@@ -11,8 +11,8 @@ pub fn calculate_builds(
 ) -> Vec<SortingHelper> {
     match criteria {
         DamageCriteria::PerShot => calculate_shot_damage(combinations, loaded_mods, base_gun_stats),
-        DamageCriteria::BurstDPS => {Vec::new()},
-        DamageCriteria::SustainedDPS => {Vec::new()},
+        DamageCriteria::BurstDPS => {Vec::new()},  // TODO: complete burst dps criteria path
+        DamageCriteria::SustainedDPS => {Vec::new()},  // TODO: complete sustained dps criteria path
     }
 }
 

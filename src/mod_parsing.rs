@@ -9,8 +9,8 @@ const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 pub struct LoadedMods {
     mod_names: Vec<String>,
     mod_data: Vec<ModData>,
-    included_mods: [u8; 8],
-    pub mod_count: u8,
+    included_mods: [u8; 8],  // TODO: replace included mods with combinations from combinatorics
+    pub mod_count: u8,  // TODO: filter illegal pairs inside of loaded mods
     pub arcane_count: u8
 } impl LoadedMods {
 
@@ -38,14 +38,17 @@ pub struct LoadedMods {
         loaded_mods
     }
 
+    // TODO: write a get_many(&[u8;8]) -> Option<[ModData; 8]>
     pub fn get_mod(&self, mod_id: u8) -> ModData {
         self.mod_data[mod_id as usize]
     }
 
+    // TODO: write a get_many(&[u8;8]) -> Option<[&str; 8]>
     pub fn get_name(&self, mod_id: u8) -> &str {
         &self.mod_names[mod_id as usize]
     }
 
+    // TODO: delete this??
     pub fn get_mod_data(&self, arcanes: bool) -> &[ModData] {
         if arcanes {
             &self.mod_data[self.mod_count as usize..]
@@ -54,6 +57,7 @@ pub struct LoadedMods {
         }
     }
 
+    // TODO: delete this??
     pub fn get_mod_names(&self, arcanes: bool) -> &[String] {
         if arcanes {
             &self.mod_names[self.mod_count as usize..]
@@ -65,7 +69,7 @@ pub struct LoadedMods {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum ModStatType {
+pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     None,
     Damage,
     Heat,
@@ -79,10 +83,10 @@ pub enum ModStatType {
     CritDamage,
     FireRate,
     StatusChance,
-    ConditionOverload,  // always conditional
+    ConditionOverload,
     MagazineCapacity,
     ReloadSpeed,
-    AcuityBonus,  // crit chance + weak point damage
+    AcuityBonus,
     StatusDamage,
     PunchThrough,
     AmmoEfficiency,
@@ -90,7 +94,7 @@ pub enum ModStatType {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub struct ModData {
+pub struct ModData {  // TODO: impliment riven parsing
     pub stat_type_1: ModStatType,
     pub stat_type_2: ModStatType,
     pub stat_value_1: i16,

@@ -2,6 +2,7 @@ use crate::build_calc::SortingHelper;
 use crate::combinatorics::BuildCombo;
 use crate::mod_parsing::LoadedMods;
 
+// TODO: make a better display function
 pub fn show_top_10(loaded_mods: LoadedMods, build_combos: Vec<BuildCombo>, sorting_helpers: Vec<SortingHelper>) {
     for n in 0..10usize {
         let helper = sorting_helpers[n];

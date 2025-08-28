@@ -36,7 +36,7 @@ pub struct LoadedMods {
         let mut loaded_mods = LoadedMods::empty(size);
         Self::parse_mods(&mut loaded_mods, &mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, &arcane_range, arcane_scores, true);
-        loaded_mods.calculate_combinatorics();
+        loaded_mods.calculate_combinatorics();  // TODO write filtration
         loaded_mods
     }
 

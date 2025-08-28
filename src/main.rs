@@ -1,5 +1,6 @@
 use std::time::{Duration, Instant};
 use crate::display::show_top_10;
+use crate::mod_parsing::LoadedMods;
 
 mod data;
 mod combinatorics;
@@ -41,4 +42,11 @@ fn workflow() {
     println!("Sort time: {:?}", sort_time);
     println!("Total: {:?}", total);
     show_top_10(loaded_mods, combinations, builds);
+}
+
+fn show_mods(loaded_mods: &LoadedMods) {
+    let m = loaded_mods.arcane_count + loaded_mods.mod_count;
+    for n in 0..m  {
+        println!("{}", loaded_mods.get_name(n))
+    };
 }

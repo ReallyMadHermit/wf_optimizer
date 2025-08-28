@@ -271,22 +271,6 @@ impl ModStatType {
 
 impl ModData {
 
-    fn new(
-        stat_type_1: ModStatType,
-        stat_type_2: ModStatType,
-        stat_value_1: i16,
-        stat_value_2: i16
-    ) -> Self {
-        Self {stat_type_1, stat_type_2, stat_value_1, stat_value_2}
-    }
-
-    fn as_array(&self) -> [(ModStatType, i16); 2] {
-        [
-            (self.stat_type_1, self.stat_value_1),
-            (self.stat_type_2, self.stat_value_2)
-        ]
-    }
-
     fn from_split_slice(slice: &[&str]) -> Self {
         let stat_type_1 = ModStatType::from_str(slice[0]);
         let stat_value_1: i16 = if let Ok(parsed) = slice[1].parse() {

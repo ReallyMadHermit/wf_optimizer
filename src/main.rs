@@ -47,6 +47,7 @@ fn workflow() {
     builds.sort_by_key(|build| build.inverse_damage);
     sort_time = start.elapsed();
     let total = load_time + combo_time + calc_time + sort_time;
+    println!("Combos computed: {}", combinations.len());
     println!("Mod load-time: {:?}", load_time);
     println!("Combinatorics time: {:?}", combo_time);
     println!("Calc time: {:?}", calc_time);

@@ -1,3 +1,33 @@
+pub struct BuildCombo {
+    pub mod_combo: [u8; 8],
+    pub arcane: Option<u8>
+} impl BuildCombo {
+    fn new(mod_combo: [u8; 8], arcane: Option<u8>) -> Self {
+        Self {mod_combo, arcane}
+    }
+}
+
+pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildCombo>  {
+    let combination_count = get_combination_count(
+        index_count as usize,
+        8
+    );
+    let size = combination_count * (arcane_count + 1) as usize;
+    let mut combinations: Vec<BuildCombo> = Vec::with_capacity(size);
+    let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
+    for _ in 0..combination_count {
+        live_array[7] = live_array[7] + 1;
+        if live_array[7] == index_count {
+            array_flipper(&mut live_array);
+        };
+        combinations.push(BuildCombo::new(live_array.clone(), None));
+        for a in 0..arcane_count {
+            combinations.push(BuildCombo::new(live_array.clone(), Some(a)));
+        };
+    };
+    combinations
+}
+
 fn get_combination_count(unique_elements: usize, combination_length: usize) -> usize {
     if combination_length > unique_elements {
         return 0;
@@ -7,23 +37,6 @@ fn get_combination_count(unique_elements: usize, combination_length: usize) -> u
         result = result * (unique_elements - i + 1) / i;
     };
     result
-}
-
-pub fn generate_combinations(index_count: u8) -> Vec<[u8; 8]>  {
-    let combination_count = get_combination_count(
-        index_count as usize,
-        8
-    );
-    let mut combinations: Vec<[u8; 8]> = Vec::with_capacity(combination_count);
-    let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
-    for _ in 0..combination_count {
-        live_array[7] = live_array[7] + 1;
-        if live_array[7] == index_count {
-            array_flipper(&mut live_array);
-        };
-        combinations.push(live_array.clone())
-    };
-    combinations
 }
 
 fn array_flipper(array: &mut [u8; 8]) {

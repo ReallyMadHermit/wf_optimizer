@@ -135,7 +135,7 @@ impl LoadedMods {
             };
             let split: Vec<&str> = line.split(",").collect();
             let data = ModData::from_split_slice(&split[MDSI[0]..=MDSI[1]]);
-            let mod_id = loaded_mods.load_mod(split[1], data, arcane);
+            loaded_mods.load_mod(split[1], data, arcane);
             // if score > 0 {
             //     loaded_mods.include_mod(mod_id)
             // };

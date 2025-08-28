@@ -28,7 +28,7 @@ pub struct HitStats {
 
 pub fn establish_the_facts() -> (GunData, ModdingContext) {
     let selected_gun = weapon_select();
-    let mut gun_modding_context = ModdingContext::interview_user(
+    let gun_modding_context = ModdingContext::interview_user(
         selected_gun.gun_type, selected_gun.semi
     );
     return (selected_gun, gun_modding_context);

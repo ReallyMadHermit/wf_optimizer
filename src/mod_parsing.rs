@@ -15,8 +15,8 @@ pub struct LoadedMods {
 } impl LoadedMods {
 
     pub fn new(modding_context: &ModdingContext) -> Self {
-        let mut mod_lines: Vec<&str> = GUN_MODS.lines().collect();
-        let mut arcane_lines: Vec<&str> = GUN_ARCANES.lines().collect();
+        let mod_lines: Vec<&str> = GUN_MODS.lines().collect();
+        let arcane_lines: Vec<&str> = GUN_ARCANES.lines().collect();
         let mod_range = &mod_lines[1..];
         let arcane_range = &arcane_lines[1..];
         let mut mod_scores: Vec<i8> = Vec::with_capacity(mod_range.len());

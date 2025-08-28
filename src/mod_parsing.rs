@@ -10,8 +10,8 @@ pub struct LoadedMods {
     mod_names: Vec<String>,
     mod_data: Vec<ModData>,
     included_mods: [u8; 8],
-    mod_count: u8,
-    arcane_count: u8
+    pub mod_count: u8,
+    pub arcane_count: u8
 } impl LoadedMods {
 
     pub fn new(modding_context: &ModdingContext) -> Self {

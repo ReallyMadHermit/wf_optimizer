@@ -26,14 +26,6 @@ pub struct HitStats {
     pub status: f32
 }
 
-pub fn establish_the_facts() -> (GunData, ModdingContext) {
-    let selected_gun = weapon_select();
-    let gun_modding_context = ModdingContext::interview_user(
-        selected_gun.gun_type, selected_gun.semi
-    );
-    return (selected_gun, gun_modding_context);
-}
-
 impl GunData {
 
     pub fn from_csv_line(line: &str) -> Self {
@@ -67,37 +59,6 @@ impl GunData {
 
     fn parse_bool(s: &str) -> bool {
         s == "TRUE"
-    }
-
-}
-
-impl GunStats {
-
-    pub fn calculate_shot_damage(&self) -> f32 {
-        let mut hit_sum = 0.0;
-        for hit in &self.hit_stats {
-            hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
-        };
-        hit_sum *= self.multishot;
-        return hit_sum;
-    }
-
-    pub fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
-        if self.magazine > 1.1 {
-            self.fire_rate * shot_damage
-        } else {
-            shot_damage
-        }
-    }
-
-    pub fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
-        if self.magazine > 1.1 {
-            let mag_time = self.magazine / self.fire_rate;
-            let firing_ratio = mag_time / (mag_time + self.reload);
-            firing_ratio * burst_dps
-        } else {
-            burst_dps / self.reload
-        }
     }
 
 }

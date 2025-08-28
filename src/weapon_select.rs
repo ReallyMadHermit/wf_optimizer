@@ -63,20 +63,6 @@ impl GunData {
 
 }
 
-impl HitStats {
-
-    pub const fn new(damage: f32, crit_chance: f32, crit_damage: f32, status: f32) -> Self {
-        HitStats {
-            damage, crit_chance, crit_damage, status
-        }
-    }
-
-    pub const fn empty() -> Self {
-        HitStats::new(0.0, 0.0, 0.0, 0.0)
-    }
-
-}
-
 pub fn weapon_select() -> GunData {
     let full_csv: Vec<&str> = GUN_DATA.lines().collect();
     let headless_csv = &full_csv[1..];

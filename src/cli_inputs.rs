@@ -44,13 +44,10 @@ pub enum UserInput {
     }
 
     pub fn looped_integer_prompt(prompt: &str, min: usize, max: usize, default_value: usize) -> usize {
-        let mut curious = true;
-        let mut digit = 0usize;
-        let mut response = UserInput::Digit(0);
-        while curious {
+        for _ in 0..5 {
             let input = UserInput::new(prompt);
-            if let Some(ui) = input {
-                response = ui;
+            let response = if let Some(ui) = input {
+                ui
             } else {
                 return default_value;
             };
@@ -67,7 +64,7 @@ pub enum UserInput {
                 }
             };
         };
-        digit
+        default_value
     }
 
     fn cli_input(prompt: &str) -> Option<String> {

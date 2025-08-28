@@ -24,7 +24,7 @@ pub struct LoadedMods {
         let mut size = 0usize;
         for (&lines, scores) in [
             (&mod_range, &mut mod_scores),
-            (&mod_range, &mut arcane_scores)
+            (&arcane_range, &mut arcane_scores)
         ] {
             for &line in lines {
                 let score = Self::should_include(line, modding_context);

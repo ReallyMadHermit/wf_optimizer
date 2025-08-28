@@ -19,7 +19,7 @@ pub fn calculate_builds(
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone)]
 pub struct SortingHelper {
-    inverse_damage: u32,
+    pub inverse_damage: u32,
     pub index: u32
 } impl SortingHelper {
 
@@ -54,7 +54,6 @@ fn calculate_shot_damage(
         shot_damage = gun_stats.calculate_shot_damage();
         builds.push(SortingHelper::new(shot_damage, index));
     };
-    builds.sort_by_key(|build| build.inverse_damage);
     builds
 }
 

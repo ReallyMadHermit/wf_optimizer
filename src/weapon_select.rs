@@ -71,7 +71,7 @@ impl GunData {
 
 }
 
-impl GunStats {
+impl GunStats {  // TODO: move these to build calc
 
     pub fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;

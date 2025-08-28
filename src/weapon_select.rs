@@ -100,29 +100,6 @@ impl GunStats {
         }
     }
 
-    // pub fn apply_stat_sums(&self, stat_sums: &GunModSums) -> Self {
-    //     let mut modded_self = self.clone();
-    //     modded_self.fire_rate = apply_stat_sum(self.fire_rate, stat_sums.fire_rate);
-    //     modded_self.multishot = apply_stat_sum(self.multishot, stat_sums.multishot);
-    //     modded_self.magazine = apply_stat_sum(self.magazine, stat_sums.magazine).round();
-    //     modded_self.reload = apply_inverse_stat_sum(self.reload, stat_sums.reload);
-    //     for i in 0..self.hit_stats.len() {
-    //         let modded_hit = &mut modded_self.hit_stats[i];
-    //         let self_hit = &self.hit_stats[i];
-    //         modded_hit.damage = apply_stat_sum(self_hit.damage, stat_sums.damage);
-    //         modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
-    //         modded_hit.crit_chance = apply_stat_sum(self_hit.crit_chance, stat_sums.crit_chance);
-    //         modded_hit.crit_damage = apply_stat_sum(self_hit.crit_damage, stat_sums.crit_damage);
-    //         modded_hit.status = apply_stat_sum(self_hit.status, stat_sums.status);
-    //     };
-    //     if stat_sums.ammo_efficiency >= 100 {
-    //         modded_self.reload = 0.0;
-    //     } else if stat_sums.ammo_efficiency > 0 {
-    //         modded_self.magazine = apply_ammo_efficiency(modded_self.magazine, stat_sums.ammo_efficiency);
-    //     };
-    //     return modded_self;
-    // }
-
 }
 
 impl HitStats {
@@ -208,60 +185,6 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
         weapon_list_select(Some((0..l).collect::<Vec<usize>>()), headless_csv)
     }
 }
-
-// fn old_weapon_select() -> GunData {
-//     let mut results:Vec<usize> = Vec::with_capacity(4);
-//     let full_csv: Vec<&str> = GUN_DATA.lines().collect();
-//     let csv_lines: &[&str] = &full_csv[1..];
-//     for n in csv_lines {
-//         println!("{}", n);
-//     };
-//     println!("Enter the weapon's name (it's case sensitive (out of spite, of course))");
-//     let input = ye_olde_input("Leave blank, or fuck up the input to choose from a list:");
-//     for (index, &line) in csv_lines.iter().enumerate() {
-//         if line.split(",").collect::<Vec<_>>()[1] == input.trim() {
-//             results.push(index)
-//         };
-//     };
-//     let l = results.len();
-//     if l < 1 {
-//         return new_weapon_list_select(csv_lines, &input);
-//     } else if l > 1 {
-//         return sub_weapon_select(csv_lines, &results);
-//     };
-//     GunData::from_csv_line(csv_lines[results[0]])
-// }
-//
-// fn sub_weapon_select(csv_lines: &[&str], matches: &Vec<usize>) -> GunData {
-//     let mut buffer = String::with_capacity(300);
-//     _ = writeln!(buffer, "There are multiple weapons with that name:");
-//     for (index, &result) in matches.iter().enumerate() {
-//         let var = csv_lines[result].split(",").collect::<Vec<_>>()[2];
-//         _ = writeln!(buffer, "{}. {}", index, var);
-//     };
-//     _ = writeln!(buffer, "Please choose the variant number you wish to optimize.");
-//     buffer.shrink_to_fit();
-//     let input = ye_olde_input(&buffer);
-//     GunData::from_csv_line(csv_lines[matches[parse_input(&input.trim())]])
-// }
-//
-// fn new_weapon_list_select(csv_lines: &[&str], last_input: &str) -> GunData {
-//     let mut buffer = String::with_capacity(16645);  // NOT ARBITRARY (LEN[1&2]+6)
-//     let empty = last_input == "";
-//     let input_first = last_input.to_uppercase().chars().next();
-//     for (index, &line) in csv_lines.iter().enumerate() {
-//         let split: Vec<&str> = line.split(",").collect();
-//         let name = split[1];
-//         let attack = split[2];
-//         if empty || input_first == name.chars().next() {  // checks if input is empty
-//             _ = writeln!(buffer, "{}. {} - {}", index, name, attack);
-//         };
-//     };
-//     _ = writeln!(buffer, "Please enter the number corresponding with the weapon you want to customize...");
-//     buffer.shrink_to_fit();
-//     let input = ye_olde_input(&buffer);
-//     GunData::from_csv_line(csv_lines[parse_input(&input.trim())])
-// }
 
 fn results_prompt(page: usize, results: usize) {
     println!("You are now in viewing mode and may close this at any time, or view other results.");

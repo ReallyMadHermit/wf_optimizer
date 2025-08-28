@@ -122,15 +122,6 @@ impl LoadedMods {
         self.included_mods[i as usize] = mod_id;
     }
 
-    fn included_mods_count(&self) -> u8 {
-        self.included_mods[0]
-    }
-
-    fn included_mods_slice(&self) -> &[u8] {
-        let count = self.included_mods[0] as usize;
-        &self.included_mods[1..1+count]
-    }
-
     fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&str], scores: Vec<i8>, arcane: bool) {
         for (&line, &score) in lines.iter().zip(scores.iter()) {
             if score < 0 {

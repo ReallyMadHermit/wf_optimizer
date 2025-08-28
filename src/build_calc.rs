@@ -41,17 +41,13 @@ fn calculate_shot_damage(
     base_gun_stats: &GunStats
 ) -> Vec<SortingHelper> {
     let mut builds = Vec::with_capacity(combinations.len());
-    let mut gun_stats = base_gun_stats.clone();
-    let mut mod_sums = GunModSums::new();
-    let mut shot_damage = 0f32;
     for (index, build_combo) in combinations.iter().enumerate() {
-        mod_sums = GunModSums::from_mod_list(&build_combo.mod_combo, loaded_mods);
+        let mut mod_sums = GunModSums::from_mod_list(&build_combo.mod_combo, loaded_mods);
         if let Some(a) = build_combo.arcane {
             mod_sums.add_mod(a, loaded_mods);
         };
-        gun_stats = apply_stat_sums(base_gun_stats, &mod_sums);
-        shot_damage = gun_stats.calculate_shot_damage();
-        builds.push(SortingHelper::new(shot_damage, index));
+        builds.push(SortingHelper::new(apply_stat_sums(base_gun_stats, &mod_sums)
+                .calculate_shot_damage(), index));
     };
     builds
 }

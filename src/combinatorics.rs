@@ -23,7 +23,7 @@ pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildComb
         };
         combinations.push(BuildCombo::new(live_array.clone(), None));
         for a in 0..arcane_count {
-            combinations.push(BuildCombo::new(live_array.clone(), Some(a)));
+            combinations.push(BuildCombo::new(live_array.clone(), Some(index_count + a)));
         };
     };
     combinations

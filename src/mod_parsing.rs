@@ -1,3 +1,4 @@
+use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};
 
@@ -9,7 +10,7 @@ const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 pub struct LoadedMods {
     mod_names: Vec<String>,
     mod_data: Vec<ModData>,
-    included_mods: [u8; 8],  // TODO: replace included mods with combinations from combinatorics
+    pub combinations: Vec<BuildCombo>,  // TODO: replace included mods with combinations from combinatorics
     pub mod_count: u8,  // TODO: filter illegal pairs inside of loaded mods
     pub arcane_count: u8
 } impl LoadedMods {
@@ -35,6 +36,7 @@ pub struct LoadedMods {
         let mut loaded_mods = LoadedMods::empty(size);
         Self::parse_mods(&mut loaded_mods, &mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, &arcane_range, arcane_scores, true);
+        loaded_mods.calculate_combinatorics();
         loaded_mods
     }
 
@@ -90,10 +92,14 @@ impl LoadedMods {
         Self {
             mod_names: Vec::with_capacity(size),
             mod_data: Vec::with_capacity(size),
-            included_mods: [0; 8],  // 0 is count, 1 through 7 are mod ids
+            combinations: Vec::new(),
             mod_count: 0,
             arcane_count: 0
         }
+    }
+
+    fn calculate_combinatorics(&mut self) {
+        self.combinations = generate_combinations(self.mod_count, self.arcane_count);
     }
 
     fn len(&self) -> usize {
@@ -116,11 +122,11 @@ impl LoadedMods {
         self.len() as u8 - 1
     }
 
-    fn include_mod(&mut self, mod_id: u8) {
-        let i = self.included_mods[0].wrapping_add(1);
-        self.included_mods[0] = i;
-        self.included_mods[i as usize] = mod_id;
-    }
+    // fn include_mod(&mut self, mod_id: u8) {
+    //     let i = self.included_mods[0].wrapping_add(1);
+    //     self.included_mods[0] = i;
+    //     self.included_mods[i as usize] = mod_id;
+    // }
 
     fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&str], scores: Vec<i8>, arcane: bool) {
         for (&line, &score) in lines.iter().zip(scores.iter()) {
@@ -130,9 +136,9 @@ impl LoadedMods {
             let split: Vec<&str> = line.split(",").collect();
             let data = ModData::from_split_slice(&split[MDSI[0]..=MDSI[1]]);
             let mod_id = loaded_mods.load_mod(split[1], data, arcane);
-            if score > 0 {
-                loaded_mods.include_mod(mod_id)
-            };
+            // if score > 0 {
+            //     loaded_mods.include_mod(mod_id)
+            // };
         };
     }
 

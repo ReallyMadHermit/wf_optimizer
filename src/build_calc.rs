@@ -9,11 +9,10 @@ pub fn calculate_builds(
     base_gun_stats: &GunStats,
     criteria: DamageCriteria
 ) -> Vec<SortingHelper> {
-    let mut builds = Vec::with_capacity(combinations.len());
     match criteria {
-        DamageCriteria::PerShot => calculate_shot_damage(combinations, loaded_mods, base_gun_stats, builds),
-        DamageCriteria::BurstDPS => {builds},
-        DamageCriteria::SustainedDPS => {builds},
+        DamageCriteria::PerShot => calculate_shot_damage(combinations, loaded_mods, base_gun_stats),
+        DamageCriteria::BurstDPS => {Vec::new()},
+        DamageCriteria::SustainedDPS => {Vec::new()},
     }
 }
 
@@ -39,9 +38,9 @@ pub struct SortingHelper {
 fn calculate_shot_damage(
     combinations: &Vec<BuildCombo>,
     loaded_mods: &LoadedMods,
-    base_gun_stats: &GunStats,
-    mut builds: Vec<SortingHelper>
+    base_gun_stats: &GunStats
 ) -> Vec<SortingHelper> {
+    let mut builds = Vec::with_capacity(combinations.len());
     let mut gun_stats = base_gun_stats.clone();
     let mut mod_sums = GunModSums::new();
     let mut shot_damage = 0f32;

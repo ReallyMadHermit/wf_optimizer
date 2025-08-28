@@ -183,7 +183,7 @@ impl LoadedMods {
         }
     }
 
-    fn generate_illegal_pairs() -> Option<Vec<(u8, u8)>> {  // todo this lmao
+    fn generate_illegal_pairs() -> Option<Vec<(u8, u8)>> {  // TODO: write the illegal pair filter
         let mut pairs: Vec<(u8, u8)> = Vec::with_capacity(3);
         for &row in &GUN_MODS.lines().collect::<Vec<&str>>()[1..] {
             let s: Vec<&str> = row.split(",").collect();

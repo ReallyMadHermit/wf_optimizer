@@ -48,24 +48,6 @@ pub struct LoadedMods {
         &self.mod_names[mod_id as usize]
     }
 
-    // TODO: delete this??
-    pub fn get_mod_data(&self, arcanes: bool) -> &[ModData] {
-        if arcanes {
-            &self.mod_data[self.mod_count as usize..]
-        } else {
-            &self.mod_data[0..self.mod_count as usize]
-        }
-    }
-
-    // TODO: delete this??
-    pub fn get_mod_names(&self, arcanes: bool) -> &[String] {
-        if arcanes {
-            &self.mod_names[self.mod_count as usize..]
-        } else {
-            &self.mod_names[0..self.mod_count as usize]
-        }
-    }
-
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]

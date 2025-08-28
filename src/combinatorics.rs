@@ -1,3 +1,4 @@
+#[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone)]
 pub struct BuildCombo {
     pub mod_combo: [u8; 8],
     pub arcane: Option<u8>

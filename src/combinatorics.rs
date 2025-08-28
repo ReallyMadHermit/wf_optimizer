@@ -13,7 +13,11 @@ pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildComb
         index_count as usize,
         8
     );
-    let size = combination_count * (arcane_count + 1) as usize;
+    let size = if arcane_count > 0 {
+        combination_count * arcane_count as usize
+    } else {
+        combination_count
+    };
     let mut combinations: Vec<BuildCombo> = Vec::with_capacity(size);
     let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
     for _ in 0..combination_count {
@@ -21,9 +25,12 @@ pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildComb
         if live_array[7] == index_count {
             array_flipper(&mut live_array);
         };
-        combinations.push(BuildCombo::new(live_array.clone(), None));
-        for a in 0..arcane_count {
-            combinations.push(BuildCombo::new(live_array.clone(), Some(index_count + a)));
+        if arcane_count < 1 {
+            combinations.push(BuildCombo::new(live_array.clone(), None));
+        } else {
+            for a in 0..arcane_count {
+                combinations.push(BuildCombo::new(live_array.clone(), Some(index_count + a)));
+            };
         };
     };
     combinations

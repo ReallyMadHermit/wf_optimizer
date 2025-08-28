@@ -11,8 +11,8 @@ pub fn calculate_builds(
 ) -> Vec<SortingHelper> {
     match criteria {
         DamageCriteria::PerShot => calculate_shot_damage(combinations, loaded_mods, base_gun_stats),
-        DamageCriteria::BurstDPS => {Vec::new()},  // TODO: complete burst dps criteria path
-        DamageCriteria::SustainedDPS => {Vec::new()},  // TODO: complete sustained dps criteria path
+        DamageCriteria::BurstDPS => {calculate_burst_damage(combinations, loaded_mods, base_gun_stats)},
+        DamageCriteria::SustainedDPS => {calculate_sustained_damage(combinations, loaded_mods, base_gun_stats)}
     }
 }
 
@@ -46,8 +46,48 @@ fn calculate_shot_damage(
         if let Some(a) = build_combo.arcane {
             mod_sums.add_mod(a, loaded_mods);
         };
-        builds.push(SortingHelper::new(apply_stat_sums(base_gun_stats, &mod_sums)
-                .calculate_shot_damage(), index));
+        let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
+        let shot_damage = modded_stats.calculate_shot_damage();
+        builds.push(SortingHelper::new(shot_damage, index));
+    };
+    builds
+}
+
+fn calculate_burst_damage(
+    combinations: &Vec<BuildCombo>,
+    loaded_mods: &LoadedMods,
+    base_gun_stats: &GunStats
+) -> Vec<SortingHelper> {
+    let mut builds = Vec::with_capacity(combinations.len());
+    for (index, build_combo) in combinations.iter().enumerate() {
+        let mut mod_sums = GunModSums::from_mod_list(&build_combo.mod_combo, loaded_mods);
+        if let Some(a) = build_combo.arcane {
+            mod_sums.add_mod(a, loaded_mods);
+        };
+        let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
+        let shot_damage = modded_stats.calculate_shot_damage();
+        let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
+        builds.push(SortingHelper::new(burst_damage, index));
+    };
+    builds
+}
+
+fn calculate_sustained_damage(
+    combinations: &Vec<BuildCombo>,
+    loaded_mods: &LoadedMods,
+    base_gun_stats: &GunStats
+) -> Vec<SortingHelper> {
+    let mut builds = Vec::with_capacity(combinations.len());
+    for (index, build_combo) in combinations.iter().enumerate() {
+        let mut mod_sums = GunModSums::from_mod_list(&build_combo.mod_combo, loaded_mods);
+        if let Some(a) = build_combo.arcane {
+            mod_sums.add_mod(a, loaded_mods);
+        };
+        let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
+        let shot_damage = modded_stats.calculate_shot_damage();
+        let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
+        let sustained_damage = modded_stats.calculate_sustained_dps(burst_damage);
+        builds.push(SortingHelper::new(sustained_damage, index));
     };
     builds
 }

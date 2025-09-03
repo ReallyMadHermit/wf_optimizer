@@ -1,4 +1,5 @@
-use std::time::{Duration, Instant};
+// use std::time::{Duration, Instant};
+
 use crate::display::show_top_10;
 
 mod data;

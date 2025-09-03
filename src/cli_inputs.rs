@@ -6,7 +6,7 @@ pub enum UserInput {
     Digit(usize)
 } impl UserInput {
 
-    pub fn new(prompt: &str) -> Option<Self> {
+    pub fn new(prompt: &str) -> Option<UserInput> {
         let input = Self::cli_input(prompt);
         if let Some(integer) = Self::parse_integer(&input) {
             return Some(Self::Digit(integer));

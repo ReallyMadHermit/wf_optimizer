@@ -1,18 +1,19 @@
 use crate::context_core::DamageCriteria;
 use crate::mod_parsing::{LoadedMods, ModStatType};
 use crate::weapon_select::GunStats;
-use crate::combinatorics::BuildCombo;
 
 pub fn calculate_builds(
     loaded_mods: &LoadedMods,
     base_gun_stats: &GunStats,
     criteria: DamageCriteria
 ) -> Vec<SortingHelper> {
-    match criteria {
+    let mut results = match criteria {
         DamageCriteria::PerShot => calculate_shot_damage(loaded_mods, base_gun_stats),
         DamageCriteria::BurstDPS => {calculate_burst_damage(loaded_mods, base_gun_stats)},
         DamageCriteria::SustainedDPS => {calculate_sustained_damage(loaded_mods, base_gun_stats)}
-    }
+    };
+    results.sort_by_key(|build| build.inverse_damage);
+    results
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone)]

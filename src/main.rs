@@ -19,9 +19,8 @@ fn workflow() {
     let modding_context = context_core::ModdingContext::interview_user(
         gun_data.gun_type, gun_data.semi);
     let loaded_mods = mod_parsing::LoadedMods::new(&modding_context);
-    let mut builds = build_calc::calculate_builds(
+    let builds = build_calc::calculate_builds(
         &loaded_mods, &gun_data.gun_stats, modding_context.damage_criteria);
-    builds.sort_by_key(|build| build.inverse_damage);  // TODO: move into the build calc, it's only here for benching
     show_top_10(loaded_mods, builds);
 }
 

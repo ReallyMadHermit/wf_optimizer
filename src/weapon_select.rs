@@ -3,7 +3,7 @@ use crate::context_core::{WeaponType, ModdingContext};
 use crate::cli_inputs::UserInput;
 
 pub struct GunData {
-    pub name: String,
+    pub name: &'static str,
     pub gun_type: WeaponType,
     pub semi: bool,
     pub gun_stats: GunStats,
@@ -36,10 +36,10 @@ pub fn establish_the_facts() -> (GunData, ModdingContext) {
 
 impl GunData {
 
-    pub fn from_csv_line(line: &str) -> Self {
-        let split: Vec<&str> = line.split(",").collect();
+    pub fn from_csv_line(line: &'static str) -> Self {
+        let split: Vec<&'static str> = line.split(",").collect();
         GunData {
-            name: String::from(split[1]),
+            name: split[1],
             gun_type: WeaponType::from_str(split[0]),
             semi: Self::parse_bool(split[3]),
             gun_stats: GunStats {
@@ -158,7 +158,9 @@ fn weapon_name_search(input_string: &str, headless_csv: &[&str]) -> Option<usize
 fn weapon_first_letter_search(letter: char, headless_csv: &[&str]) -> usize {
     let mut results: Vec<usize> = Vec::with_capacity(36);
     for (index, &line) in headless_csv.iter().enumerate() {
-        if letter == line.split(",").collect::<Vec<&str>>()[1].chars().next().unwrap() {
+        if letter.to_ascii_lowercase() ==
+            line.split(",")
+                .collect::<Vec<&str>>()[1].chars().next().unwrap().to_ascii_lowercase() {
             results.push(index)
         };
     };

@@ -8,7 +8,7 @@ const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 
 pub struct LoadedMods {
-    mod_names: Vec<String>,
+    mod_names: Vec<&'static str>,
     mod_data: Vec<ModData>,
     pub combinations: Vec<BuildCombo>,  // TODO: replace included mods with combinations from combinatorics
     pub mod_count: u8,  // TODO: filter illegal pairs inside of loaded mods
@@ -16,8 +16,8 @@ pub struct LoadedMods {
 } impl LoadedMods {
 
     pub fn new(modding_context: &ModdingContext) -> Self {
-        let mod_lines: Vec<&str> = GUN_MODS.lines().collect();
-        let arcane_lines: Vec<&str> = GUN_ARCANES.lines().collect();
+        let mod_lines: Vec<&'static str> = GUN_MODS.lines().collect();
+        let arcane_lines: Vec<&'static str> = GUN_ARCANES.lines().collect();
         let mod_range = &mod_lines[1..];
         let arcane_range = &arcane_lines[1..];
         let mut mod_scores: Vec<i8> = Vec::with_capacity(mod_range.len());
@@ -108,11 +108,11 @@ impl LoadedMods {
 
     fn load_mod(
         &mut self,
-        mod_name: &str,
+        mod_name: &'static str,
         mod_data: ModData,
         arcane: bool
     ) -> u8 {
-        self.mod_names.push(String::from(mod_name));
+        self.mod_names.push(mod_name);
         self.mod_data.push(mod_data);
         if arcane {
             self.arcane_count += 1;
@@ -128,7 +128,7 @@ impl LoadedMods {
     //     self.included_mods[i as usize] = mod_id;
     // }
 
-    fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&str], scores: Vec<i8>, arcane: bool) {
+    fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&'static str], scores: Vec<i8>, arcane: bool) {
         for (&line, &score) in lines.iter().zip(scores.iter()) {
             if score < 0 {
                 continue;

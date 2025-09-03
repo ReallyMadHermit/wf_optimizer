@@ -180,20 +180,33 @@ impl LoadedMods {
         }
     }
 
-    fn generate_illegal_pairs() -> Option<Vec<(u8, u8)>> {  // TODO: write the illegal pair filter
-        let mut pairs: Vec<(u8, u8)> = Vec::with_capacity(3);
-        for &row in &GUN_MODS.lines().collect::<Vec<&str>>()[1..] {
-            let s: Vec<&str> = row.split(",").collect();
-            if s[12] != "" {
-                println!("{}, {}", s[1], s[12]);
-            };
-        };
-        if pairs.len() > 0 {
-            Option::Some(pairs)
-        } else {
-            Option::None
-        }
-    }
+    // fn lookup_illegal_pairs(&self, illegal_pairs: Vec<(&str, &str)>) -> Vec<(u8, u8)> {
+    //     let mut results: Vec<(u8, u8)> = Vec::with_capacity(illegal_pairs.len());
+    //     for &(name_a, name_b) in illegal_pairs.iter() {
+    //         for name in self.mod_names {
+    //
+    //         }
+    //     };
+    //     results
+    // }
+    //
+    // fn generate_illegal_pairs() -> Option<Vec<(&'static str, &'static str)>> {  // TODO: write the illegal pair filter
+    //     let mut pairs: Vec<(&str, &str)> = Vec::with_capacity(3);
+    //     for &row in &GUN_MODS.lines().collect::<Vec<&str>>()[1..] {
+    //         let s: Vec<&str> = row.split(",").collect();
+    //         if s[12] != "" {
+    //             pairs.push((
+    //                 s[1],
+    //                 s[12]
+    //             ));
+    //         };
+    //     };
+    //     if pairs.len() > 0 {
+    //         Some(pairs)
+    //     } else {
+    //         None
+    //     }
+    // }
 
 }
 

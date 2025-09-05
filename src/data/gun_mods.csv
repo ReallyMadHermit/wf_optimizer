@@ -1,7 +1,7 @@
 0-Type,1-Name,2-Type1,3-Value1,4-Type2,5-Value2,6-Kills?,7-Aiming?,8-Semi?,9-Acuity?,10-Prefer Amalgam?,11-Riven?,12-BADMATCH
 Shotgun,Accelerated Blast,FireRate,60,None,0,,,EXC,,,,
 Pistol,Accelerated Isotope,Radiation,60,FireRate,40,,,,,,,
-Pistol,Amalgam Barrel Diffusion,Multishot,110,None,0,,,,EXC,INC,,
+Pistol,Amalgam Barrel Diffusion,Multishot,110,None,0,,,,EXC,PAR,,Galvanized Diffusion
 Rifle,Amalgam Serration,Damage,155,None,0,,,,,PAR,,
 Shotgun,Amalgam Shotgun Barrage,FireRate,85,None,0,,,EXC,,PAR,,
 Pistol,Anemic Agility,FireRate,90,Damage,-15,,,EXC,,,,
@@ -23,7 +23,7 @@ Pistol,Frostbite,Cold,60,StatusChance,60,,,,,,,
 Rifle,Galvanized Aptitude,StatusChance,80,ConditionOverload,80,!EXC,,,,,,
 Rifle,Galvanized Chamber,Multishot,230,None,0,!EXC,,,EXC,,,
 Pistol,Galvanized Crosshairs,CritChance,320,None,0,!EXC,!EXC,,,,,
-Pistol,Galvanized Diffusion,Multishot,230,None,0,!EXC,,,EXC,EXC,,
+Pistol,Galvanized Diffusion,Multishot,230,None,0,!EXC,,,EXC,EXC,,Amalgam Barrel Diffusion
 Shotgun,Galvanized Hell,Multishot,230,None,0,!EXC,,,EXC,,,
 Shotgun,Galvanized Savvy,StatusChance,80,ConditionOverload,80,!EXC,,,,,,
 Rifle,Galvanized Scope,CritChance,320,None,0,!EXC,!EXC,,,,,

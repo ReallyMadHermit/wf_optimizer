@@ -82,7 +82,7 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub struct ModData {  // TODO: impliment riven parsing
+pub struct ModData {
     pub stat_type_1: ModStatType,
     pub stat_type_2: ModStatType,
     pub stat_value_1: i16,

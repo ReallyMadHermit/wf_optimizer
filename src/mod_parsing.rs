@@ -199,6 +199,7 @@ impl LoadedMods {
             self.combinations.retain(|combo| Self::contains_required_mods(&combo.mod_combo, included))
         };
         self.combinations.retain(|combo| !Self::contains_illegal_pair(&combo.mod_combo, &pairs));
+        self.combinations.shrink_to_fit();
     }
 
     fn contains_required_mods(combo: &[u8; 8], included_mods: &Vec<u8>) -> bool {

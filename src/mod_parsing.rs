@@ -11,7 +11,7 @@ pub struct LoadedMods {
     mod_names: Vec<&'static str>,
     mod_data: Vec<ModData>,
     included_mods: Option<Vec<u8>>,
-    pub combinations: Vec<BuildCombo>,  // TODO: included mods
+    pub combinations: Vec<BuildCombo>,
     pub mod_count: u8,
     pub arcane_count: u8
 } impl LoadedMods {
@@ -37,7 +37,7 @@ pub struct LoadedMods {
         let mut loaded_mods = LoadedMods::empty(size);
         Self::parse_mods(&mut loaded_mods, &mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, &arcane_range, arcane_scores, true);
-        loaded_mods.calculate_combinatorics();  // TODO write filtration
+        loaded_mods.calculate_combinatorics();
         loaded_mods.filter_loaded_mods(modding_context);
         loaded_mods
     }

@@ -91,7 +91,7 @@ pub struct ModData {  // TODO: impliment riven parsing
 pub struct RivenMod {
     pub stats: Vec<(ModStatType, i16)>
 } impl RivenMod {
-    
+
     pub fn from_str(input: &str) -> Option<Self> {
         let mut stat_type = ModStatType::None;
         let mut stat_value = 0i16;
@@ -99,7 +99,7 @@ pub struct RivenMod {
         let mut value_flag = false;
         let mut type_flag = false;
         for s in input.split(" ") {
-            if let Some(i) = s.parse() {
+            if let Ok(i) = s.parse() {
                 stat_value = i;
                 value_flag = true;
             } else {
@@ -122,13 +122,13 @@ pub struct RivenMod {
             None
         }
     }
-    
+
     pub fn println_stats(&self) {
         for (stat_type, stat_value) in self.stats {
             println!("+{}% {}", stat_type.to_str(), stat_value);
         };
     }
-    
+
 }
 
 // private block

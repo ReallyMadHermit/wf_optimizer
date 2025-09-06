@@ -14,7 +14,7 @@ pub enum UserInput {
             return if s.len() > 1 {
                 Some(Self::Full(s))
             } else {
-                if let Some(c) = s.chars().nth(1) {
+                if let Some(c) = s.chars().nth(0) {
                     Some(Self::Single(c))
                 } else {
                     None

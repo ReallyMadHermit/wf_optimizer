@@ -1,5 +1,5 @@
 use crate::context_core::{DamageCriteria, ModdingContext};
-use crate::mod_parsing::{LoadedMods, ModStatType};
+use crate::mod_parsing::{LoadedMods, ModStatType, RivenMod};
 use crate::weapon_select::GunStats;
 
 pub fn calculate_builds(
@@ -115,7 +115,7 @@ pub struct GunModSums {
     pub ammo_efficiency: i16
 } impl GunModSums {
 
-    fn new() -> Self {
+    pub fn new() -> Self {
         GunModSums {
             damage: 100,
             ele_damage: 100,
@@ -130,10 +130,18 @@ pub struct GunModSums {
         }
     }
 
-    fn from_mod_list(weapon_mods: &[u8], loaded_mods: &LoadedMods) -> Self {
+    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &LoadedMods) -> Self {
         let mut new_sums = GunModSums::new();
         new_sums.add_many_mods(weapon_mods, loaded_mods);
         return new_sums;
+    }
+
+    pub fn from_riven(riven_mod: &RivenMod) -> Self {
+        let mut new_sums = Self::new();
+        for &(stat_type, stat_value) in &riven_mod.stats {
+            new_sums.apply_mod(stat_type, stat_value);
+        };
+        new_sums
     }
 
     fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {

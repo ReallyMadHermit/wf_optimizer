@@ -67,6 +67,28 @@ pub enum UserInput {
         default_value
     }
 
+    pub fn riven_prompt() -> Option<Self> {
+        println!("Please enter the details of your riven mod, using the stat-key below.");
+        println!("C: Cold");
+        println!("CC: CritChance");
+        println!("CD: Crit Damage");
+        println!("D: Damage");
+        println!("E: Electricity");
+        println!("H: Heat");
+        println!("F: Firerate");
+        println!("MG: Magazine Capacity");
+        println!("MS: Multi-shot");
+        println!("T: Toxic");
+        println!("R: Reload Speed");
+        println!("S: Status Chance");
+        println!("Some examples of valid responses:");
+        println!("134 D 80 T -20 CC");
+        println!("200 C -20 R");
+        println!("CC 140 CD 150 D -60");
+        println!("As long as you alternate between key and values, they can be in either order.");
+        Self::new("Enter your key:")
+    }
+
     fn cli_input(prompt: &str) -> Option<String> {
         let mut buffer = String::with_capacity(25);
         println!("{}", prompt);

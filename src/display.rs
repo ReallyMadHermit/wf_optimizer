@@ -3,7 +3,7 @@ use crate::combinatorics::BuildCombo;
 use crate::mod_parsing::LoadedMods;
 
 // TODO: make a better display function
-pub fn show_top_10(loaded_mods: LoadedMods, sorting_helpers: Vec<SortingHelper>) {
+pub fn show_top_10(loaded_mods: &LoadedMods, sorting_helpers: Vec<SortingHelper>) {
     for n in 0..10usize {
         let helper = sorting_helpers[n];
         let combo = &loaded_mods.combinations[helper.index as usize];

@@ -1,3 +1,4 @@
+use std::ascii::AsciiExt;
 use crate::cli_inputs::UserInput;
 use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
@@ -93,12 +94,13 @@ pub struct RivenMod {
 } impl RivenMod {
 
     pub fn from_str(input: &str) -> Option<Self> {
+        let upper = input.to_ascii_uppercase();
         let mut stat_type = ModStatType::None;
         let mut stat_value = 0i16;
         let mut stats = Vec::with_capacity(4);
         let mut value_flag = false;
         let mut type_flag = false;
-        for s in input.split(" ") {
+        for s in upper.split(" ") {
             if let Ok(i) = s.parse() {
                 stat_value = i;
                 value_flag = true;

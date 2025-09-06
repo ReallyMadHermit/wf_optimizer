@@ -1,3 +1,4 @@
+use crate::cli_inputs::UserInput;
 use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};
@@ -85,6 +86,49 @@ pub struct ModData {  // TODO: impliment riven parsing
     pub stat_type_2: ModStatType,
     pub stat_value_1: i16,
     pub stat_value_2: i16
+}
+
+pub struct RivenMod {
+    pub stats: Vec<(ModStatType, i16)>
+} impl RivenMod {
+    
+    pub fn from_str(input: &str) -> Option<Self> {
+        let mut stat_type = ModStatType::None;
+        let mut stat_value = 0i16;
+        let mut stats = Vec::with_capacity(4);
+        let mut value_flag = false;
+        let mut type_flag = false;
+        for s in input.split(" ") {
+            if let Some(i) = s.parse() {
+                stat_value = i;
+                value_flag = true;
+            } else {
+                stat_type = ModStatType::from_riven_str(s);
+                type_flag = true;
+            };
+            if value_flag & type_flag {
+                stats.push((stat_type, stat_value));
+                value_flag = false;
+                type_flag = false;
+            };
+        };
+        if stats.len() > 0 {
+            Some(
+                Self {
+                    stats
+                }
+            )
+        } else {
+            None
+        }
+    }
+    
+    pub fn println_stats(&self) {
+        for (stat_type, stat_value) in self.stats {
+            println!("+{}% {}", stat_type.to_str(), stat_value);
+        };
+    }
+    
 }
 
 // private block

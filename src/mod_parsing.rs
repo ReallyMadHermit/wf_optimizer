@@ -192,7 +192,7 @@ impl LoadedMods {
     }
 
     fn contains_illegal_pair(combo: &[u8; 8], illegal_pairs: &Vec<(u8, u8)>) -> bool {
-        let mut flag_array = [false; 256];
+        let mut flag_array = [false; 64];
         for &i in combo {
             flag_array[i as usize] = true;
         };

@@ -124,7 +124,7 @@ pub struct RivenMod {
     }
 
     pub fn println_stats(&self) {
-        for (stat_type, stat_value) in self.stats {
+        for (stat_type, stat_value) in &self.stats {
             println!("+{}% {}", stat_type.to_str(), stat_value);
         };
     }

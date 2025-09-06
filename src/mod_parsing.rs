@@ -10,6 +10,7 @@ const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 pub struct LoadedMods {
     mod_names: Vec<&'static str>,
     mod_data: Vec<ModData>,
+    included_mods: Option<Vec<u8>>,
     pub combinations: Vec<BuildCombo>,  // TODO: included mods
     pub mod_count: u8,
     pub arcane_count: u8
@@ -37,7 +38,7 @@ pub struct LoadedMods {
         Self::parse_mods(&mut loaded_mods, &mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, &arcane_range, arcane_scores, true);
         loaded_mods.calculate_combinatorics();  // TODO write filtration
-        loaded_mods.remove_illegal_pairs(modding_context);
+        loaded_mods.filter_loaded_mods(modding_context);
         loaded_mods
     }
 
@@ -93,6 +94,7 @@ impl LoadedMods {
         Self {
             mod_names: Vec::with_capacity(size),
             mod_data: Vec::with_capacity(size),
+            included_mods: None,
             combinations: Vec::new(),
             mod_count: 0,
             arcane_count: 0
@@ -123,11 +125,16 @@ impl LoadedMods {
         self.len() as u8 - 1
     }
 
-    // fn include_mod(&mut self, mod_id: u8) {
-    //     let i = self.included_mods[0].wrapping_add(1);
-    //     self.included_mods[0] = i;
-    //     self.included_mods[i as usize] = mod_id;
-    // }
+    fn include_mod(&mut self, mod_id: u8) {
+        match &mut self.included_mods {
+            Some(ref mut vec) => vec.push(mod_id),
+            None => {
+                let mut vec = Vec::with_capacity(3);
+                vec.push(mod_id);
+                self.included_mods = Some(vec);
+            }
+        }
+    }
 
     fn parse_mods(loaded_mods: &mut LoadedMods, lines: &[&'static str], scores: Vec<i8>, arcane: bool) {
         for (&line, &score) in lines.iter().zip(scores.iter()) {
@@ -136,10 +143,10 @@ impl LoadedMods {
             };
             let split: Vec<&str> = line.split(",").collect();
             let data = ModData::from_split_slice(&split[MDSI[0]..=MDSI[1]]);
-            loaded_mods.load_mod(split[1], data, arcane);
-            // if score > 0 {
-            //     loaded_mods.include_mod(mod_id)
-            // };
+            let mod_id = loaded_mods.load_mod(split[1], data, arcane);
+            if score > 0 {
+                loaded_mods.include_mod(mod_id)
+            };
         };
     }
 
@@ -181,14 +188,25 @@ impl LoadedMods {
         }
     }
 
-    fn remove_illegal_pairs(&mut self, modding_context: &ModdingContext) {
+    fn filter_loaded_mods(&mut self, modding_context: &ModdingContext) {
         let illegals = Self::generate_illegal_pairs(modding_context);
         let pairs: Vec<(u8, u8)> = if let Some(name_pairs) = illegals {
              self.lookup_illegal_pairs(name_pairs)
         } else {
             return;
         };
+        if let Some(included) = &self.included_mods {
+            self.combinations.retain(|combo| Self::contains_required_mods(&combo.mod_combo, included))
+        };
         self.combinations.retain(|combo| !Self::contains_illegal_pair(&combo.mod_combo, &pairs));
+    }
+
+    fn contains_required_mods(combo: &[u8; 8], included_mods: &Vec<u8>) -> bool {
+        let mut flag_array = [false; 64];
+        for &i in combo {
+            flag_array[i as usize] = true;
+        };
+        included_mods.iter().all(|&i| flag_array[i as usize])
     }
 
     fn contains_illegal_pair(combo: &[u8; 8], illegal_pairs: &Vec<(u8, u8)>) -> bool {

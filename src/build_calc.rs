@@ -5,13 +5,18 @@ use crate::weapon_select::GunStats;
 pub fn calculate_builds(
     loaded_mods: &LoadedMods,
     base_gun_stats: &GunStats,
-    modding_context: &ModdingContext
+    modding_context: &ModdingContext,
+    base_sums: Option<GunModSums>
 ) -> Vec<SortingHelper> {
-    let base_sums = GunModSums::new();
+    let sums = if let Some(sums) = base_sums {
+        sums
+    } else {
+        GunModSums::new()
+    };
     let mut results = match modding_context.damage_criteria {
-        DamageCriteria::PerShot => calculate_shot_damage(loaded_mods, base_gun_stats, base_sums),
-        DamageCriteria::BurstDPS => {calculate_burst_damage(loaded_mods, base_gun_stats, base_sums)},
-        DamageCriteria::SustainedDPS => {calculate_sustained_damage(loaded_mods, base_gun_stats, base_sums)}
+        DamageCriteria::PerShot => calculate_shot_damage(loaded_mods, base_gun_stats, sums),
+        DamageCriteria::BurstDPS => {calculate_burst_damage(loaded_mods, base_gun_stats, sums)},
+        DamageCriteria::SustainedDPS => {calculate_sustained_damage(loaded_mods, base_gun_stats, sums)}
     };
     results.sort_by_key(|build| build.inverse_damage);
     results

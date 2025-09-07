@@ -164,7 +164,6 @@ pub struct GunModSums {
 
     fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {
         match stat_type {
-            ModStatType::None => {},
             ModStatType::Damage => {
                 self.damage += stat_value;
             },

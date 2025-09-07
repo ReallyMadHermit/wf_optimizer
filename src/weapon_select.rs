@@ -187,10 +187,3 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
         weapon_list_select(Some((0..l).collect::<Vec<usize>>()), headless_csv)
     }
 }
-
-fn results_prompt(page: usize, results: usize) { // TODO: remove this or reuse it elsehwere
-    println!("You are now in viewing mode and may close this at any time, or view other results.");
-    println!("For sorting changes, enter a letter: Per-shot Damage (P) Burst DPS (B) Sustained DPS (S)");
-    println!("Enter a number to change how many results are shown, or press enter to go to the next page.");
-    println!("You are currently on Page {}, viewing {} results per page.", page, results);
-}

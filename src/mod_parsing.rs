@@ -289,7 +289,7 @@ impl LoadedMods {
         results
     }
 
-    fn generate_illegal_pairs(modding_context: &ModdingContext) -> Option<Vec<(&'static str, &'static str)>> {  // TODO: write the illegal pair filter
+    fn generate_illegal_pairs(modding_context: &ModdingContext) -> Option<Vec<(&'static str, &'static str)>> {
         let weapon_type = modding_context.weapon_type;
         let mut pairs: Vec<(&str, &str)> = Vec::with_capacity(4);
         for &row in &GUN_MODS.lines().collect::<Vec<&str>>()[1..] {

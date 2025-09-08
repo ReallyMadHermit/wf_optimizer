@@ -44,19 +44,19 @@ pub struct LoadedMods {
         loaded_mods
     }
 
-    // TODO: write a get_many(&[u8;8]) -> Option<[ModData; 8]>
+    // TODO: write a get_many(&[u8;8]) -> Result<[ModData; 8]>
     pub fn get_mod(&self, mod_id: u8) -> ModData {
         self.mod_data[mod_id as usize]
     }
 
-    // TODO: write a get_many(&[u8;8]) -> Option<[&str; 8]>
+    // TODO: write a get_many(&[u8;8]) -> Result<[&str; 8]>
     pub fn get_name(&self, mod_id: u8) -> &str {
         &self.mod_names[mod_id as usize]
     }
 
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]  // TODO: parse "Headshot" as weakpoint damage
 pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     None,
     Damage,
@@ -347,7 +347,7 @@ impl ModStatType {
         };
     }
 
-    fn from_riven_str(s: &str) -> Self {
+    fn from_riven_str(s: &str) -> Self {  // TODO: update these alongside riven_prompt() & return option self
         match s {
             "C" => Self::Cold,
             "CC" => Self::CritChance,
@@ -365,7 +365,7 @@ impl ModStatType {
         }
     }
 
-    fn to_str(&self) -> &str {
+    fn to_str(&self) -> &str {  // TODO: update these alongside riven_prompt()
         match self {
             Self::None => "None",
             Self::Damage => "Damage",

@@ -8,6 +8,7 @@ pub struct BuildCombo {
     }
 }
 
+// TODO: test if filters are faster to do here than as .retain()
 pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildCombo>  {
     let combination_count = get_combination_count(
         index_count as usize,

@@ -67,7 +67,7 @@ pub enum UserInput {
         default_value
     }
 
-    pub fn riven_prompt() -> Option<Self> {
+    pub fn riven_prompt() -> Option<Self> {  // TODO: these aren't very intuitive
         println!("Please enter the details of your riven mod, using the stat-key below.");
         println!("C: Cold");
         println!("CC: CritChance");
@@ -76,7 +76,7 @@ pub enum UserInput {
         println!("E: Electricity");
         println!("H: Heat");
         println!("F: Firerate");
-        println!("MG: Magazine Capacity");
+        println!("MG: Magazine Capacity");  // TODO: TYPO LMAO
         println!("MS: Multi-shot");
         println!("T: Toxic");
         println!("R: Reload Speed");

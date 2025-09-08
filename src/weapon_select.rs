@@ -2,7 +2,7 @@ use crate::data::GUN_DATA;
 use crate::context_core::{WeaponType, ModdingContext};
 use crate::cli_inputs::UserInput;
 
-pub struct GunData {
+pub struct GunData {  // TODO: restructure to include other fire modes
     pub name: &'static str,
     pub gun_type: WeaponType,
     pub semi: bool,
@@ -15,7 +15,7 @@ pub struct GunStats {
     pub multishot: f32,
     pub magazine: f32,
     pub reload: f32,
-    pub hit_stats: [HitStats; 2]
+    pub hit_stats: [HitStats; 2]  // TODO: update to [Option<HitStats>; 2]
 }
 
 #[derive(Copy, Clone)]
@@ -71,7 +71,7 @@ impl GunData {
 
 }
 
-impl GunStats {
+impl GunStats {  // TODO: move these into build calc.rs
 
     pub fn calculate_shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;

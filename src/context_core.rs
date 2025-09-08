@@ -23,6 +23,7 @@ pub struct ModdingContext {
     pub damage_criteria: DamageCriteria,
     pub kills: bool,
     pub aiming: bool,
+    pub headshot: bool,
     pub semi: bool,
     pub acuity: bool,
     pub prefer_amalgam: bool,
@@ -94,7 +95,12 @@ impl ModdingContext {
         let damage = DamageCriteria::criteria_quiz();
         let kills = UserInput::yes_no_prompt("Use kill-reliant benefits", true);
         let aiming = UserInput::yes_no_prompt("Use aiming-reliant benefits", true);
-        let acuity = UserInput::yes_no_prompt("Use acuity mods", false);
+        let headshot = UserInput::yes_no_prompt("Hitting headshots often", false);
+        let acuity = if headshot {
+            UserInput::yes_no_prompt("Use acuity mods", true)
+        } else {
+            false
+        };
         let (amalgam_prompt, default_bool) = match gun_type {
             WeaponType::Rifle | WeaponType::Bow => {
                 ("Prefer Amalgam Serration", true)
@@ -115,6 +121,7 @@ impl ModdingContext {
             kills,
             semi,
             aiming,
+            headshot,
             acuity,
             riven,
             prefer_amalgam

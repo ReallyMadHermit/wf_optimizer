@@ -4,10 +4,11 @@ use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};
 
-const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 11];
+const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 12];
 const BSI: [usize;2] = BEHAVIOR_SLICE_INDICES;
 const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
+const BADMATCH_INDEX: usize = 13;
 
 pub struct LoadedMods {
     mod_names: Vec<&'static str>,
@@ -206,13 +207,15 @@ impl LoadedMods {
         let mut include = false;
         let kills_behavior = ModBehavior::from_str(behavior_slice[0]);
         let aiming_behavior = ModBehavior::from_str(behavior_slice[1]);
-        let semi_behavior = ModBehavior::from_str(behavior_slice[2]);
-        let acuity_behavior = ModBehavior::from_str(behavior_slice[3]);
-        let amalgam_behavior = ModBehavior::from_str(behavior_slice[4]);
-        let riven_behavior = ModBehavior::from_str(behavior_slice[5]);
+        let headshot_behavior = ModBehavior::from_str(behavior_slice[2]);
+        let semi_behavior = ModBehavior::from_str(behavior_slice[3]);
+        let acuity_behavior = ModBehavior::from_str(behavior_slice[4]);
+        let amalgam_behavior = ModBehavior::from_str(behavior_slice[5]);
+        let riven_behavior = ModBehavior::from_str(behavior_slice[6]);
         for (behavior, truth) in [
             (kills_behavior, modding_context.kills),
             (aiming_behavior, modding_context.aiming),
+            (headshot_behavior, modding_context.headshot),
             (semi_behavior, modding_context.semi),
             (acuity_behavior, modding_context.acuity),
             (amalgam_behavior, modding_context.prefer_amalgam),
@@ -298,10 +301,10 @@ impl LoadedMods {
             if !WeaponType::is_compatible(weapon_type, mod_type) {
                 continue;
             };
-            if s[12] != "" {
+            if s[BADMATCH_INDEX] != "" {
                 pairs.push((
                     s[1],
-                    s[12]
+                    s[BADMATCH_INDEX]
                 ));
             };
         };

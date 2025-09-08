@@ -127,8 +127,12 @@ pub struct RivenMod {
     }
 
     pub fn println_stats(&self) {
-        for (stat_type, stat_value) in &self.stats {
-            println!("+{}% {}", stat_type.to_str(), stat_value);
+        for &(stat_type, stat_value) in &self.stats {
+            if stat_value > 0 {
+                println!("+{}% {}", stat_value, stat_type.to_str());
+            } else {
+                println!("-{}% {}", stat_value.abs(), stat_type.to_str());
+            };
         };
     }
 

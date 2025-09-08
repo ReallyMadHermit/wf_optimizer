@@ -350,7 +350,7 @@ impl ModStatType {
         };
     }
 
-    fn from_riven_str(s: &str) -> Self {  // TODO: update these alongside riven_prompt() & return option self
+    fn from_riven_str(s: &str) -> Self {  // TODO: return option self
         match s {
             "C" => Self::Cold,
             "CC" => Self::CritChance,
@@ -358,30 +358,30 @@ impl ModStatType {
             "D" => Self::Damage,
             "E" => Self::Shock,
             "H" => Self::Heat,
-            "F" => Self::FireRate,
+            "FR" => Self::FireRate,
             "MG" => Self::MagazineCapacity,
             "MS" => Self::Multishot,
             "T" => Self::Toxic,
-            "R" => Self::ReloadSpeed,
-            "S" => Self::StatusChance,
+            "RS" => Self::ReloadSpeed,
+            "SC" => Self::StatusChance,
             _ => Self::None
         }
     }
 
-    fn to_str(&self) -> &str {  // TODO: update these alongside riven_prompt()
+    fn to_str(&self) -> &str {
         match self {
             Self::None => "None",
             Self::Damage => "Damage",
             Self::Heat => "Heat",
             Self::Cold => "Cold",
             Self::Toxic => "Toxic",
-            Self::Shock => "Shock",
+            Self::Shock => "Electricity",
             Self::Magnetic => "Magnetic",
             Self::Radiation => "Radiation",
-            Self::Multishot => "Multishot",
+            Self::Multishot => "Multi-Shot",
             Self::CritChance => "Crit Chance",
             Self::CritDamage => "Crit Damage",
-            Self::FireRate => "Firerate",
+            Self::FireRate => "Fire-Rate",
             Self::StatusChance => "Status Chance",
             Self::ConditionOverload => "Condition Overload",
             Self::MagazineCapacity => "Magazine Capacity",

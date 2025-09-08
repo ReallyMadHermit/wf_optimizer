@@ -114,7 +114,8 @@ pub struct GunModSums {  // TODO: build acuity support
     pub fire_rate: i16,
     pub magazine: i16,
     pub reload: i16,
-    pub ammo_efficiency: i16
+    pub ammo_efficiency: i16,
+    pub headshot: f32
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -128,7 +129,8 @@ pub struct GunModSums {  // TODO: build acuity support
             fire_rate: 100,
             magazine: 100,
             reload: 100,
-            ammo_efficiency: 0
+            ammo_efficiency: 0,
+            headshot: 1.0,
         }
     }
 
@@ -156,12 +158,6 @@ pub struct GunModSums {  // TODO: build acuity support
         let mod_data = loaded_mods.get_mod(mod_id);
         self.apply_mod(mod_data.stat_type_1, mod_data.stat_value_1);
         self.apply_mod(mod_data.stat_type_2, mod_data.stat_value_2);
-    }
-
-    fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
-        let mod_data = loaded_mods.get_mod(mod_id);
-        self.apply_mod(mod_data.stat_type_1, -mod_data.stat_value_1);
-        self.apply_mod(mod_data.stat_type_2, -mod_data.stat_value_2);
     }
 
     fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {
@@ -194,6 +190,13 @@ pub struct GunModSums {  // TODO: build acuity support
             },
             ModStatType::ReloadSpeed => {
                 self.reload += stat_value;
+            },
+            ModStatType::Headshot => {
+                if stat_value > 0 {
+                    let eff = 100 + stat_value;
+                    let m = eff as f32 / 100.0;
+                    self.headshot *= m;
+                };
             },
             _ => {}
         };
@@ -231,6 +234,9 @@ fn apply_stat_sums(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
         let base_hit = &gun_stats.hit_stats[i];
         modded_hit.damage = apply_stat_sum(base_hit.damage, stat_sums.damage);
         modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
+        if i == 0 {
+            modded_hit.damage *= stat_sums.headshot;
+        };
         modded_hit.crit_chance = apply_stat_sum(base_hit.crit_chance, stat_sums.crit_chance);
         modded_hit.crit_damage = apply_stat_sum(base_hit.crit_damage, stat_sums.crit_damage);
         modded_hit.status = apply_stat_sum(base_hit.status, stat_sums.status);

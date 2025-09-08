@@ -74,10 +74,10 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     ConditionOverload,
     MagazineCapacity,
     ReloadSpeed,
-    AcuityBonus,
     StatusDamage,
     PunchThrough,
     AmmoEfficiency,
+    Headshot,
     Riven
 }
 
@@ -335,10 +335,10 @@ impl ModStatType {
             "ConditionOverload" => Self::ConditionOverload,
             "MagazineCapacity" => Self::MagazineCapacity,
             "ReloadSpeed" => Self::ReloadSpeed,
-            "AcuityBonus" => Self::AcuityBonus,
             "StatusDamage" => Self::StatusDamage,
             "PunchThrough" => Self::PunchThrough,
             "AmmoEfficiency" => Self::AmmoEfficiency,
+            "Headshot" => Self::Headshot,
             "Riven" => Self::Riven,
             _ => {
                 println!("{} not found! Using 'None'", string_slice);
@@ -383,10 +383,10 @@ impl ModStatType {
             Self::ConditionOverload => "Condition Overload",
             Self::MagazineCapacity => "Magazine Capacity",
             Self::ReloadSpeed => "Reload Speed",
-            Self::AcuityBonus => "Acuity Bonus",
             Self::StatusDamage => "Status Damage",
             Self::PunchThrough => "Punch Through",
             Self::AmmoEfficiency => "Ammo Efficiency",
+            Self::Headshot => "Weakpoint Damage",
             Self::Riven => "Riven"
         }
     }

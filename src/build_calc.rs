@@ -4,6 +4,19 @@ use crate::weapon_select::GunStats;
 
 // TODO: write simple function to find single, rop-rated build
 
+pub fn get_highest_damage(
+    loaded_mods: &LoadedMods,
+    base_gun_stats: &GunStats,
+    modding_context: &ModdingContext,
+    base_sums: Option<GunModSums>,
+) -> Option<u32> {
+    if let Some(top) = calculate_builds(loaded_mods, base_gun_stats, modding_context, base_sums).first() {
+        Some(u32::MAX - top.inverse_damage)
+    } else {
+        None
+    }
+}
+
 pub fn calculate_builds(
     loaded_mods: &LoadedMods,
     base_gun_stats: &GunStats,

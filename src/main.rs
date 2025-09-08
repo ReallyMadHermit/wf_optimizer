@@ -1,6 +1,6 @@
 // use std::time::Instant;
 
-use crate::build_calc::GunModSums;
+use crate::build_calc::{get_highest_damage, GunModSums};
 use crate::cli_inputs::UserInput;
 use crate::context_core::ModdingContext;
 use crate::display::show_top_10;
@@ -38,6 +38,18 @@ fn workflow() {
 }
 
 fn riven_loop(gun_data: GunData, modding_context: ModdingContext, loaded_mods: LoadedMods) {
+    let reference_score = {
+        let mut reference_context = modding_context.clone();
+        reference_context.riven = false;
+        let reference_mods = LoadedMods::new(&reference_context);
+        let score = get_highest_damage(&reference_mods, &gun_data.gun_stats, &modding_context, None);
+        if let Some(i) = score {
+            i as f32
+        } else {
+            println!("Something went wrong with the riven score reference, do not trust your score!");
+            1.0
+        }
+    };
     let mut running = true;
     while running {
         let s: String;
@@ -63,6 +75,9 @@ fn riven_loop(gun_data: GunData, modding_context: ModdingContext, loaded_mods: L
         };
         let build_scores = build_calc::calculate_builds(
             &loaded_mods, &gun_data.gun_stats, &modding_context, Some(GunModSums::from_riven(&riven_mod)));
+        let top_score = (u32::MAX - build_scores.first().unwrap().inverse_damage) as f32;
+        let riven_score = (((top_score / reference_score) - 1.0) * 1000.0).round() as i32;
+        println!("Riven score: {}", riven_score);
         show_top_10(&loaded_mods, build_scores);
     }
 }

@@ -1,6 +1,7 @@
 0-Type,1-Name,2-Type1,3-Value1,4-Type2,5-Value2,6-Kills?,7-Aiming?,8-Semi?,9-Acuity?,10-Prefer Amalgam?,11-Riven?,12-BADMATCH
+Riven,Deadhead,Damage,360,Headshot,30,!EXC,!EXC,,,,,
+Riven,Merciless,Damage,360,ReloadSpeed,30,!EXC,,,,,,
 Primary,Primary Blight,CritDamage,144,Multishot,72,,,,,,,
 Primary,Primary Crux,StatusChance,300,AmmoEfficiency,60,,,,,,,
 Primary,Primary Frostbite,CritDamage,120,Multishot,90,,,,,,,
-Riven,Steelpath Arcane,Damage,360,None,0,!EXC,,,,,,
 Shotgun,Shotgun Vandetta,Multishot,180,ReloadSpeed,75,!EXC,,,,,,

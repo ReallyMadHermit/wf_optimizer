@@ -104,7 +104,7 @@ fn calculate_sustained_damage(
 }
 
 #[derive(Clone)]
-pub struct GunModSums {  // TODO: build acuity support
+pub struct GunModSums {
     pub damage: i16,
     pub ele_damage: i16,
     pub multishot: i16,

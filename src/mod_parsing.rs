@@ -57,7 +57,7 @@ pub struct LoadedMods {
 
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]  // TODO: parse "Headshot" as weakpoint damage
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     None,
     Damage,

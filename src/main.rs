@@ -53,7 +53,7 @@ fn riven_loop(gun_data: GunData, modding_context: ModdingContext, loaded_mods: L
             println!("Just to verify your input, this is roughly what you meant...");
             riven_mod.println_stats();
             let c_prompt = UserInput::yes_no_prompt("Continue with these stats", true);
-            if !c_prompt {
+            if !c_prompt {  // TODO loop the input instead of a Y/N here
                 continue;
             };
             riven_mod

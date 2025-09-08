@@ -1,5 +1,3 @@
-use std::ascii::AsciiExt;
-use crate::cli_inputs::UserInput;
 use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};

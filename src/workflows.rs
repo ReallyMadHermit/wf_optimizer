@@ -20,43 +20,6 @@ pub fn cli_workflow_entry() {
     }
 }
 
-// fn riven_workflow(gun_data: GunData, modding_context: ModdingContext, loaded_mods: LoadedMods) {
-//     let reference_score = generate_reference_score(&modding_context, &gun_data.gun_stats);
-//     let mut running = true;
-//     while running {
-//         // riven prompt
-//         let s: String;
-//         RivenMod::show_riven_key();
-//         // if let Some(UserInput::Full(full_string)) =  {
-//         //     s = full_string
-//         // } else {
-//         //     println!("That wasn't right, try again.");
-//         //     continue;
-//         // };
-//         let riven_parsed = RivenMod::from_str(&s);
-//         let riven_mod = if let Some(riven_mod) = riven_parsed {
-//             println!("Just to verify your input, this is what was read...");
-//             riven_mod.println_stats();
-//             let c_prompt = UserInput::yes_no_prompt("Continue with these stats", true);
-//             if !c_prompt {  // TODO loop the input instead of a Y/N here
-//                 continue;
-//             };
-//             riven_mod
-//         } else {
-//             println!("That wasn't right, try again.");
-//             continue;
-//         };
-//
-//         // do builds
-//         let build_scores = build_calc::calculate_builds(
-//             &loaded_mods, &gun_data.gun_stats, &modding_context, Some(GunModSums::from_riven(&riven_mod)));
-//         let top_score = (u32::MAX - build_scores.first().unwrap().inverse_damage) as f32;
-//         let riven_score = (((top_score / reference_score) - 1.0) * 1000.0).round() as i32;
-//         println!("Riven score: {}", riven_score);
-//         show_top_builds(&loaded_mods, &build_scores, 6);
-//     }
-// }
-
 enum PromptChoice {
     Neutral,
     Parsed,

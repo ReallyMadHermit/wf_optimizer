@@ -19,7 +19,10 @@ pub fn cli_workflow_entry() {
             let loaded_mods = LoadedMods::new(&modding_context);
             let build_scores = calculate_builds(
                 &loaded_mods, &gun_data.gun_stats, &modding_context, None);
-            show_top_builds(&loaded_mods, &build_scores, 6);
+            let count = UserInput::looped_integer_prompt(
+                "Done! How many results do you want to see? Press enter to show 6.",
+                1, build_scores.len(), 6);
+            show_top_builds(&loaded_mods, &build_scores, count);
         };
     } else {
         test_all_weapons();

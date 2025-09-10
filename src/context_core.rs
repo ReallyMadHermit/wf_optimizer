@@ -98,7 +98,7 @@ impl ModdingContext {
         let aiming = UserInput::yes_no_prompt("Use aiming-reliant benefits", true);
         let headshot = UserInput::yes_no_prompt("Hitting headshots often", false);
         let acuity = if headshot {
-            UserInput::yes_no_prompt("Use acuity mods", true)
+            UserInput::yes_no_prompt("Use acuity mods", false)
         } else {
             false
         };
@@ -112,7 +112,7 @@ impl ModdingContext {
             WeaponType::Pistol => {
                 ("Use Amalgam Diffusion", false)
             },
-            _ => {("YOU SHOULDN'T BE SEEING THIS! BUT DO YOU PREFER AMALGAM MODS!", true)}
+            _ => {("YOU SHOULDN'T BE SEEING THIS! BUT YOU USE AMALGAM MODS!", true)}
         };
         let prefer_amalgam = UserInput::yes_no_prompt(amalgam_prompt, default_bool);
         let riven = UserInput::yes_no_prompt("Use Riven mod", false);

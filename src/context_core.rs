@@ -104,13 +104,13 @@ impl ModdingContext {
         };
         let (amalgam_prompt, default_bool) = match gun_type {
             WeaponType::Rifle | WeaponType::Bow => {
-                ("Prefer Amalgam Serration", true)
+                ("Use Amalgam Serration", true)
             },
             WeaponType::Shotgun => {
-                ("Prefer Amalgam Shotgun Barrage", true)
+                ("Use Amalgam Shotgun Barrage", false)
             },
             WeaponType::Pistol => {
-                ("Prefer Amalgam Diffusion", false)
+                ("Use Amalgam Diffusion", false)
             },
             _ => {("YOU SHOULDN'T BE SEEING THIS! BUT DO YOU PREFER AMALGAM MODS!", true)}
         };

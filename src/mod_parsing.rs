@@ -252,7 +252,7 @@ impl LoadedMods {
                 (true, ModBehavior::Exclude | ModBehavior::NotParallel) |
                 (false, ModBehavior::NotExclude | ModBehavior::Parallel) => return -1,
                 (true, ModBehavior::Include | ModBehavior::Parallel) |
-                (false, ModBehavior::NotInclude | ModBehavior::NotParallel) => include = true,
+                (false, ModBehavior::NotParallel) => include = true,
                 _ => continue
             };
         };
@@ -453,7 +453,6 @@ enum ModBehavior {
     Include,
     Parallel,
     NotExclude,
-    NotInclude,
     NotParallel,
     NothingSpecial
 } impl ModBehavior {

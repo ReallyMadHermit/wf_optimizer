@@ -26,14 +26,6 @@ pub struct HitStats {
     pub status: f32
 }
 
-pub fn establish_the_facts() -> (GunData, ModdingContext) {
-    let selected_gun = weapon_select();
-    let gun_modding_context = ModdingContext::interview_user(
-        selected_gun.gun_type, selected_gun.semi
-    );
-    return (selected_gun, gun_modding_context);
-}
-
 impl GunData {
 
     pub fn from_csv_line(line: &'static str) -> Self {
@@ -67,20 +59,6 @@ impl GunData {
 
     fn parse_bool(s: &str) -> bool {
         s == "TRUE"
-    }
-
-}
-
-impl HitStats {
-
-    pub const fn new(damage: f32, crit_chance: f32, crit_damage: f32, status: f32) -> Self {
-        HitStats {
-            damage, crit_chance, crit_damage, status
-        }
-    }
-
-    pub const fn empty() -> Self {
-        HitStats::new(0.0, 0.0, 0.0, 0.0)
     }
 
 }

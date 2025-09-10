@@ -1,7 +1,7 @@
 use crate::context_core::ModdingContext;
 use crate::mod_parsing::{LoadedMods, RivenMod};
-use crate::{build_calc, weapon_select};
-use crate::build_calc::{calculate_builds, calculate_riven_builds, get_highest_damage, GunModSums, SortingHelper};
+use crate::weapon_select;
+use crate::build_calc::{calculate_builds, calculate_riven_builds, get_highest_damage, SortingHelper};
 use crate::cli_inputs::UserInput;
 use crate::display::show_top_builds;
 use crate::weapon_select::{GunData, GunStats};
@@ -42,14 +42,13 @@ enum PromptChoice {
 
 fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
     let loaded_mods = LoadedMods::new(&modding_context);
-    let mut input_option: Option<UserInput> = None;
     let mut builds_option: Option<Vec<SortingHelper>> = None;
     let mut reference_option: Option<f32> = None;
     let mut riven_option: Option<RivenMod> = None;
     let mut prompt_choice = PromptChoice::Neutral;
     RivenMod::show_riven_key();
     loop {
-        input_option = UserInput::new(prompt_choice.str());
+        let input_option = UserInput::new(prompt_choice.str());
         match input_option {
             Some(UserInput::Full(s)) => {
                 if let Some(riven_mod) = RivenMod::from_str(&s) {

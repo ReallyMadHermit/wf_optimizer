@@ -43,12 +43,10 @@ pub struct LoadedMods {
         loaded_mods
     }
 
-    // TODO: write a get_many(&[u8;8]) -> Result<[ModData; 8]>
     pub fn get_mod(&self, mod_id: u8) -> ModData {
         self.mod_data[mod_id as usize]
     }
 
-    // TODO: write a get_many(&[u8;8]) -> Result<[&str; 8]>
     pub fn get_name(&self, mod_id: u8) -> &str {
         &self.mod_names[mod_id as usize]
     }
@@ -378,7 +376,7 @@ impl ModStatType {
         };
     }
 
-    fn from_riven_str(s: &str) -> Self {  // TODO: return option self
+    fn from_riven_str(s: &str) -> Self {
         match s {
             "C" => Self::Cold,
             "CC" => Self::CritChance,

@@ -68,7 +68,7 @@ impl DamageCriteria {
         println!("Okay, what are we optimizing this for?");
         println!("1: Per-Shot Damage");
         println!("2: Burst DPS");
-        println!("3: Sustained DPS");
+        println!("3: Sustained DPS*");
         let input = UserInput::looped_integer_prompt(
             "Please enter the numer corresponding with your preferred criteria.", 1, 3, 3
         );
@@ -76,7 +76,7 @@ impl DamageCriteria {
             1 => DamageCriteria::PerShot,
             2 => DamageCriteria::BurstDPS,
             3 => DamageCriteria::SustainedDPS,
-            _ => DamageCriteria::PerShot
+            _ => DamageCriteria::SustainedDPS
         };
     }
 

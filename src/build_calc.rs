@@ -2,8 +2,6 @@ use crate::context_core::{DamageCriteria, ModdingContext};
 use crate::mod_parsing::{LoadedMods, ModStatType, RivenMod};
 use crate::weapon_select::GunStats;
 
-// TODO: write simple function to find single, rop-rated build
-
 pub fn calculate_riven_builds(
     loaded_mods: &LoadedMods,
     base_gun_stats: &GunStats,

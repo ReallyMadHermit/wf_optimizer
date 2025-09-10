@@ -27,7 +27,8 @@ pub struct ModdingContext {
     pub semi: bool,
     pub acuity: bool,
     pub prefer_amalgam: bool,
-    pub riven: bool
+    pub riven: bool,
+    pub timed: bool
 }
 
 impl WeaponType {
@@ -115,6 +116,8 @@ impl ModdingContext {
         };
         let prefer_amalgam = UserInput::yes_no_prompt(amalgam_prompt, default_bool);
         let riven = UserInput::yes_no_prompt("Use Riven mod", false);
+        // let timed = UserInput::yes_no_prompt("Show processing times", false);
+        let timed = false;
         ModdingContext {
             weapon_type: gun_type,
             damage_criteria: damage,
@@ -124,7 +127,8 @@ impl ModdingContext {
             headshot,
             acuity,
             riven,
-            prefer_amalgam
+            prefer_amalgam,
+            timed
         }
     }
 

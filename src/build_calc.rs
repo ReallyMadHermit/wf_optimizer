@@ -4,6 +4,20 @@ use crate::weapon_select::GunStats;
 
 // TODO: write simple function to find single, rop-rated build
 
+pub fn calculate_riven_builds(
+    loaded_mods: &LoadedMods,
+    base_gun_stats: &GunStats,
+    modding_context: &ModdingContext,
+    riven_mod: &RivenMod
+) -> Vec<SortingHelper> {
+    calculate_builds(
+        loaded_mods,
+        base_gun_stats,
+        modding_context,
+        Some(GunModSums::from_riven(riven_mod))
+    )
+}
+
 pub fn get_highest_damage(
     loaded_mods: &LoadedMods,
     base_gun_stats: &GunStats,

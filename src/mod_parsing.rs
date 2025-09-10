@@ -125,6 +125,7 @@ pub struct RivenMod {
     }
 
     pub fn println_stats(&self) {
+        println!("Your riven stats are:");
         for &(stat_type, stat_value) in &self.stats {
             if stat_value > 0 {
                 println!("+{}% {}", stat_value, stat_type.to_str());
@@ -132,6 +133,31 @@ pub struct RivenMod {
                 println!("-{}% {}", stat_value.abs(), stat_type.to_str());
             };
         };
+    }
+
+    pub fn show_riven_key() {
+        println!("Use the below stat-keys and a number for each value to describe your rolls:");
+        println!("D: Damage");
+        println!("MS: Multi-Shot");
+        println!("-");
+        println!("CC: CritChance");
+        println!("CD: Crit Damage");
+        println!("-");
+        println!("C: Cold");
+        println!("E: Electricity");
+        println!("H: Heat");
+        println!("T: Toxic");
+        println!("SC: Status Chance");
+        println!("-");
+        println!("FR: Fire-Rate");
+        println!("MC: Magazine Capacity");
+        println!("RS: Reload Speed");
+        println!("-");
+        println!("Some examples of valid combinations:");
+        println!("140 D 80 T -20 CC");
+        println!("200 C -80 FR");
+        println!("CC 140 CD 150 D -60");
+        println!("As long as you alternate between key and values, they can be in either order.");
     }
 
 }

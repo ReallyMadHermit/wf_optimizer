@@ -1,6 +1,6 @@
 use crate::cli_inputs::UserInput;
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub enum WeaponType {
     Rifle,
     Shotgun,
@@ -10,14 +10,14 @@ pub enum WeaponType {
     Primary
 }
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub enum DamageCriteria {
     PerShot,
     BurstDPS,
     SustainedDPS
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub struct ModdingContext {
     pub weapon_type: WeaponType,
     pub damage_criteria: DamageCriteria,
@@ -50,6 +50,7 @@ impl WeaponType {
 
     pub fn is_compatible(gun_type: Self, mod_type: Self) -> bool {
         match (gun_type, mod_type) {
+            (Self::Riven, _) => true,
             (Self::Rifle, Self::Rifle | Self::Primary) => true,
             (Self::Shotgun, Self::Shotgun | Self::Primary) => true,
             (Self::Pistol, Self::Pistol) => true,
@@ -111,6 +112,9 @@ impl ModdingContext {
             },
             WeaponType::Pistol => {
                 ("Use Amalgam Diffusion", false)
+            },
+            WeaponType::Riven => {
+                ("Use amalgam mods?", false)
             },
             _ => {("YOU SHOULDN'T BE SEEING THIS! BUT YOU USE AMALGAM MODS!", true)}
         };

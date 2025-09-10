@@ -4,6 +4,7 @@ use crate::cli_inputs::UserInput;
 
 pub struct GunData {  // TODO: restructure to include other fire modes
     pub name: &'static str,
+    pub fire_mode: &'static str,
     pub gun_type: WeaponType,
     pub semi: bool,
     pub gun_stats: GunStats,
@@ -32,6 +33,7 @@ impl GunData {
         let split: Vec<&'static str> = line.split(",").collect();
         GunData {
             name: split[1],
+            fire_mode: split[2],
             gun_type: WeaponType::from_str(split[0]),
             semi: Self::parse_bool(split[3]),
             gun_stats: GunStats {
@@ -63,25 +65,29 @@ impl GunData {
 
 }
 
-pub fn weapon_select() -> GunData {
+pub fn weapon_select() -> Option<GunData> {
     let full_csv: Vec<&str> = GUN_DATA.lines().collect();
     let headless_csv = &full_csv[1..];
     println!("Enter the weapon's name (it's case sensitive, (out of spite,) of course)");
-    let input = UserInput::new("Leave blank, or fuck up the input to choose from a list:");
+    println!("Leave blank, or fuck up the input to choose from a list:");
+    let input = UserInput::new("...Or enter '*' to do them all, lmao (this will take a while)");
     return match input {
         Some(UserInput::Full(s)) => {
             if let Some(index) = weapon_name_search(&s, headless_csv) {
-                GunData::from_csv_line(headless_csv[index])
+                Some(GunData::from_csv_line(headless_csv[index]))
             } else {
                 let c = s.chars().next().unwrap();
-                GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)])
+                Some(GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)]))
             }
         },
         Some(UserInput::Single(c)) => {
-            GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)])
+            if c == '*' {
+                return None;
+            };
+            Some(GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)]))
         },
         _ => {
-            GunData::from_csv_line(headless_csv[weapon_list_select(None, headless_csv)])
+            Some(GunData::from_csv_line(headless_csv[weapon_list_select(None, headless_csv)]))
         }
     }
 }

@@ -1,23 +1,71 @@
-use crate::context_core::ModdingContext;
+use std::collections::HashMap;
+use std::time::Instant;
+
+use crate::context_core::{ModdingContext, WeaponType};
 use crate::mod_parsing::{LoadedMods, RivenMod};
-use crate::weapon_select;
 use crate::build_calc::{calculate_builds, calculate_riven_builds, get_highest_damage, SortingHelper};
 use crate::cli_inputs::UserInput;
+use crate::data::GUN_DATA;
 use crate::display::show_top_builds;
-use crate::weapon_select::{GunData, GunStats};
+use crate::weapon_select::{GunData, GunStats, weapon_select};
 
 pub fn cli_workflow_entry() {
-    let gun_data = weapon_select::weapon_select();
-    let modding_context = ModdingContext::interview_user(
-        gun_data.gun_type, gun_data.semi);
-    if modding_context.riven {
-        riven_input_loop(gun_data, modding_context)
+    if let Some(gun_data) = weapon_select() {
+        let modding_context = ModdingContext::interview_user(
+            gun_data.gun_type, gun_data.semi);
+        if modding_context.riven {
+            riven_input_loop(gun_data, modding_context);
+        } else {
+            let loaded_mods = LoadedMods::new(&modding_context);
+            let build_scores = calculate_builds(
+                &loaded_mods, &gun_data.gun_stats, &modding_context, None);
+            show_top_builds(&loaded_mods, &build_scores, 6);
+        };
     } else {
-        let loaded_mods = LoadedMods::new(&modding_context);
-        let build_scores = calculate_builds(
-            &loaded_mods, &gun_data.gun_stats, &modding_context, None);
-        show_top_builds(&loaded_mods, &build_scores, 6);
-    }
+        test_all_weapons();
+    };
+}
+
+fn test_all_weapons() {
+    let mut modding_context = ModdingContext::interview_user(
+        WeaponType::Riven, false);
+    let mut loaded_hashmap: HashMap<ModdingContext, LoadedMods> = HashMap::with_capacity(6);
+    let mut csv_lines= GUN_DATA.lines();
+    let mut gun_scores: Vec<(&str, &str, u32)> = Vec::with_capacity(539);
+    let start = Instant::now();
+    let mut i = 1u16;
+    csv_lines.next();
+    loop {
+        let gun_data = if let Some(line) = csv_lines.next() {
+            GunData::from_csv_line(line)
+        } else {
+            break;
+        };
+        modding_context.weapon_type = gun_data.gun_type;
+        modding_context.semi = gun_data.semi;
+        let loaded_mods = if let Some(result) = loaded_hashmap.get(&modding_context) {
+            result
+        } else {
+            let result = LoadedMods::new(&modding_context);
+            loaded_hashmap.insert(modding_context.clone(), result);
+            loaded_hashmap.get(&modding_context).unwrap()
+        };
+        let gun_score = get_highest_damage(
+            loaded_mods, &gun_data.gun_stats, &modding_context, None
+        );
+        if let Some(score) = gun_score {
+            gun_scores.push((gun_data.name, gun_data.fire_mode, score));
+            println!(
+                "{}; {} ({}/{}) {:?} elapsed",
+                gun_data.name, gun_data.fire_mode, i, gun_scores.capacity(), start.elapsed()
+            );
+            i+=1;
+        };
+    };
+    gun_scores.sort_by_key(|&(name, mode, damage)| u32::MAX - damage);
+    for (i, &(name, mode, damage)) in gun_scores.iter().enumerate() {
+        println!("{}. {}: {}; {}", i+1, damage, name, mode);
+    };
 }
 
 enum PromptChoice {

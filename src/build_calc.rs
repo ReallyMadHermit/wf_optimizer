@@ -129,7 +129,7 @@ fn calculate_sustained_damage(
 }
 
 #[derive(Clone)]
-pub struct GunModSums {
+pub struct GunModSums {  // include locking firerate flag
     pub damage: i16,
     pub ele_damage: i16,
     pub multishot: i16,

@@ -415,7 +415,7 @@ impl ModStatType {
             Self::StatusDamage => "Status Damage",
             Self::PunchThrough => "Punch Through",
             Self::AmmoEfficiency => "Ammo Efficiency",
-            Self::Headshot => "Weakpoint Damage",
+            Self::Headshot => "Headshot Damage",
             Self::Riven => "Riven"
         }
     }

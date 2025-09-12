@@ -318,6 +318,7 @@ impl LoadedMods {
         results
     }
 
+    // TODO: write this to allow multiple BADMATCH mods on a single line, filtration further down prevents dupes
     fn generate_illegal_pairs(modding_context: &ModdingContext) -> Option<Vec<(&'static str, &'static str)>> {
         let weapon_type = modding_context.weapon_type;
         let mut pairs: Vec<(&str, &str)> = Vec::with_capacity(4);
@@ -344,7 +345,7 @@ impl LoadedMods {
 
 }
 
-impl ModStatType {
+impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multishot and firerate instead of just excluding the mods
 
     fn from_str(string_slice: &str) -> Self {
         return match string_slice {

@@ -385,7 +385,7 @@ impl ModStatType {
             "E" => Self::Shock,
             "H" => Self::Heat,
             "FR" => Self::FireRate,
-            "MG" => Self::MagazineCapacity,
+            "MC" => Self::MagazineCapacity,
             "MS" => Self::Multishot,
             "T" => Self::Toxic,
             "RS" => Self::ReloadSpeed,

@@ -463,7 +463,6 @@ enum ModBehavior {
             "INC"  => Self::Include,
             "PAR"  => Self::Parallel,
             "!EXC" => Self::NotExclude,
-            "!INC" => Self::NotExclude,
             "!PAR" => Self::NotParallel,
             _      => Self::NothingSpecial
         }

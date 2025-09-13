@@ -2,7 +2,6 @@ use crate::build_calc::SortingHelper;
 use crate::combinatorics::BuildCombo;
 use crate::mod_parsing::LoadedMods;
 
-// TODO: make a better display function
 pub fn show_top_builds(loaded_mods: &LoadedMods, sorting_helpers: &Vec<SortingHelper>, count: usize) {
     for n in 0..count {
         let helper = sorting_helpers[n];
@@ -11,7 +10,7 @@ pub fn show_top_builds(loaded_mods: &LoadedMods, sorting_helpers: &Vec<SortingHe
     };
 }
 
-fn display_build(loaded_mods: &LoadedMods, build_combo: &BuildCombo, sorting_helper: SortingHelper) {  // TODO: show mod-weights
+fn display_build(loaded_mods: &LoadedMods, build_combo: &BuildCombo, sorting_helper: SortingHelper) {
     let arcane_name = if let Some(i) = build_combo.arcane {
         loaded_mods.get_name(i)
     } else {

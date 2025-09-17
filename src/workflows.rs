@@ -152,7 +152,7 @@ fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStat
     }
 }
 
-fn get_riven_score(builds: &Vec<SortingHelper>, reference_score: f32) -> i32 {
+fn get_riven_score(builds: &[SortingHelper], reference_score: f32) -> i32 {
     let damage = (u32::MAX - builds[0].inverse_damage) as f32;
     ((damage / reference_score -1.0) * 1000.0).round() as i32
 }

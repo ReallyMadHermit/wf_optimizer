@@ -38,12 +38,8 @@ fn test_all_weapons() {
     let start = Instant::now();
     let mut i = 1u16;
     csv_lines.next();
-    loop {
-        let gun_data = if let Some(line) = csv_lines.next() {
-            GunData::from_csv_line(line)
-        } else {
-            break;
-        };
+    for line in csv_lines {
+        let gun_data = GunData::from_csv_line(line);
         modding_context.weapon_type = gun_data.gun_type;
         modding_context.semi = gun_data.semi;
         let loaded_mods = if let Some(result) = loaded_hashmap.get(&modding_context) {
@@ -106,7 +102,7 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
                     riven_mod.println_stats();
                     riven_option = Some(riven_mod);
                     prompt_choice = PromptChoice::Parsed;
-                } else {
+                } else {  // todo: figure out what this was meant to be
 
                 }
             },

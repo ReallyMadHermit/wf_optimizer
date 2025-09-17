@@ -23,6 +23,7 @@ pub fn cli_workflow_entry() {
                 "Done! How many results do you want to see? Press enter to show 6.",
                 1, build_scores.len(), 6);
             show_top_builds(&loaded_mods, &build_scores, count);
+            end();
         };
     } else {
         test_all_weapons();
@@ -155,4 +156,8 @@ fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStat
 fn get_riven_score(builds: &[SortingHelper], reference_score: f32) -> i32 {
     let damage = (u32::MAX - builds[0].inverse_damage) as f32;
     ((damage / reference_score -1.0) * 1000.0).round() as i32
+}
+
+fn end() {
+    UserInput::new("You may now close the program, or press enter to do so.");
 }

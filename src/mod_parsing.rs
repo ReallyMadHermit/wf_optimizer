@@ -36,8 +36,8 @@ pub struct LoadedMods {
             };
         };
         let mut loaded_mods = LoadedMods::empty(size);
-        Self::parse_mods(&mut loaded_mods, &mod_range, mod_scores, false);
-        Self::parse_mods(&mut loaded_mods, &arcane_range, arcane_scores, true);
+        Self::parse_mods(&mut loaded_mods, mod_range, mod_scores, false);
+        Self::parse_mods(&mut loaded_mods, arcane_range, arcane_scores, true);
         loaded_mods.calculate_combinatorics();
         loaded_mods.filter_loaded_mods(modding_context);
         loaded_mods
@@ -48,7 +48,7 @@ pub struct LoadedMods {
     }
 
     pub fn get_name(&self, mod_id: u8) -> &str {
-        &self.mod_names[mod_id as usize]
+        self.mod_names[mod_id as usize]
     }
 
 }
@@ -113,7 +113,7 @@ pub struct RivenMod {
                 type_flag = false;
             };
         };
-        if stats.len() > 0 {
+        if !stats.is_empty() {
             Some(
                 Self {
                     stats
@@ -228,7 +228,7 @@ impl LoadedMods {
     fn should_include(csv_line: &str, modding_context: &ModdingContext) -> i8 {
         let split: Vec<&str> = csv_line.split(",").collect();
         if !WeaponType::is_compatible(modding_context.weapon_type, WeaponType::from_str(split[0])) { return -1 };
-        return Self::context_test(&split[BSI[0]..=BSI[1]], modding_context);
+        Self::context_test(&split[BSI[0]..=BSI[1]], modding_context)
     }
 
     fn context_test(behavior_slice: &[&str], modding_context: &ModdingContext) -> i8 {
@@ -279,7 +279,7 @@ impl LoadedMods {
         self.combinations.shrink_to_fit();
     }
 
-    fn contains_required_mods(combo: &[u8; 8], included_mods: &Vec<u8>) -> bool {
+    fn contains_required_mods(combo: &[u8; 8], included_mods: &[u8]) -> bool {
         let mut flag_array = [false; 64];
         for &i in combo {
             flag_array[i as usize] = true;
@@ -287,7 +287,7 @@ impl LoadedMods {
         included_mods.iter().all(|&i| flag_array[i as usize])
     }
 
-    fn contains_illegal_pair(combo: &[u8; 8], illegal_pairs: &Vec<(u8, u8)>) -> bool {
+    fn contains_illegal_pair(combo: &[u8; 8], illegal_pairs: &[(u8, u8)]) -> bool {
         let mut flag_array = [false; 64];
         for &i in combo {
             flag_array[i as usize] = true;
@@ -306,9 +306,9 @@ impl LoadedMods {
                 } else if name == name_b {
                     match_b = Some(i as u8);
                 };
-                if match_a != None && match_b != None {
-                    let a = match_a.unwrap();
-                    let b = match_b.unwrap();
+                if match_a.is_some() && match_b.is_some() {
+                    let a = Option::unwrap(match_a);
+                    let b = Option::unwrap(match_b);
                     let pair = (a.min(b), b.max(a));
                     if !results.contains(&pair) {
                         results.push(pair);
@@ -330,14 +330,14 @@ impl LoadedMods {
             if !WeaponType::is_compatible(weapon_type, mod_type) {
                 continue;
             };
-            if s[BADMATCH_INDEX] != "" {
+            if !s[BADMATCH_INDEX].is_empty() {
                 pairs.push((
                     s[1],
                     s[BADMATCH_INDEX]
                 ));
             };
         };
-        if pairs.len() > 0 {
+        if !pairs.is_empty() {
             pairs.shrink_to_fit();
             Some(pairs)
         } else {
@@ -350,7 +350,7 @@ impl LoadedMods {
 impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multishot and firerate instead of just excluding the mods
 
     fn from_str(string_slice: &str) -> Self {
-        return match string_slice {
+        match string_slice {
             "None" => Self::None,
             "Damage" => Self::Damage,
             "Heat" => Self::Heat,
@@ -376,7 +376,7 @@ impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multis
                 println!("{} not found! Using 'None'", string_slice);
                 Self::None
             }
-        };
+        }
     }
 
     fn from_riven_str(s: &str) -> Self {
@@ -397,7 +397,7 @@ impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multis
         }
     }
 
-    fn to_str(&self) -> &str {
+    fn to_str(&self) -> &'static str {
         match self {
             Self::None => "None",
             Self::Damage => "Damage",
@@ -437,17 +437,9 @@ impl ModData {
     fn from_split_slice(slice: &[&str]) -> Self {
         let mut mod_data = Self::empty();
         let stat_type_1 = ModStatType::from_str(slice[0]);
-        let stat_value_1: i16 = if let Ok(parsed) = slice[1].parse() {
-            parsed
-        } else {
-            0
-        };
+        let stat_value_1: i16 = slice[1].parse().unwrap_or_default();
         let stat_type_2 = ModStatType::from_str(slice[2]);
-        let stat_value_2: i16 = if let Ok(parsed) = slice[3].parse() {
-            parsed
-        } else {
-            0
-        };
+        let stat_value_2: i16 = slice[3].parse().unwrap_or_default();
         mod_data.push(stat_type_1, stat_value_1);
         mod_data.push(stat_type_2, stat_value_2);
         mod_data

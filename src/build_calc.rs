@@ -232,7 +232,7 @@ impl GunStats {
             hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
         };
         hit_sum *= self.multishot;
-        return hit_sum;
+        hit_sum
     }
 
     pub fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
@@ -297,5 +297,5 @@ fn apply_stat_sums(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
     } else if stat_sums.ammo_efficiency > 0 {
         modded_self.magazine = apply_ammo_efficiency(modded_self.magazine, stat_sums.ammo_efficiency);
     };
-    return modded_self;
+    modded_self
 }

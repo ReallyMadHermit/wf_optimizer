@@ -469,6 +469,7 @@ enum ModBehavior {
             "PAR"  => Self::Parallel,
             "!EXC" => Self::NotExclude,
             "!PAR" => Self::NotParallel,
+            "" => Self::NothingSpecial,
             _      => {
                 println!("ERR: no match for '{}' ModBehavior", mod_behavior_str);
                 Self::NothingSpecial

@@ -1,4 +1,5 @@
 // use std::time::Instant;
+// use std::mem::size_of;
 
 use crate::workflows::cli_workflow_entry;
 
@@ -13,5 +14,7 @@ mod display;
 mod workflows;
 
 fn main() {
+    // println!("{:?}", size_of::<Probable>());
+    // println!("{:?}", size_of::<ModData>());
     cli_workflow_entry()
 }

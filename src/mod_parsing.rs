@@ -43,8 +43,8 @@ pub struct LoadedMods {
         loaded_mods
     }
 
-    pub fn get_mod(&self, mod_id: u8) -> ModData {
-        self.mod_data[mod_id as usize]
+    pub fn get_data(&self, mod_id: u8) -> &[(ModStatType, i16)] {
+        self.mod_data[mod_id as usize].get()
     }
 
     pub fn get_name(&self, mod_id: u8) -> &str {
@@ -80,10 +80,12 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct ModData {
-    pub stat_type_1: ModStatType,
-    pub stat_type_2: ModStatType,
-    pub stat_value_1: i16,
-    pub stat_value_2: i16
+    stats: [(ModStatType, i16); 4],
+    count: u8
+} impl ModData {
+    pub fn get(&self) -> &[(ModStatType, i16)] {
+        &self.stats[0..self.count as usize]
+    }
 }
 
 pub struct RivenMod {
@@ -425,7 +427,15 @@ impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multis
 
 impl ModData {
 
+    fn empty() -> Self {
+        Self {
+            stats: [(ModStatType::None, 0); 4],
+            count: 0
+        }
+    }
+
     fn from_split_slice(slice: &[&str]) -> Self {
+        let mut mod_data = Self::empty();
         let stat_type_1 = ModStatType::from_str(slice[0]);
         let stat_value_1: i16 = if let Ok(parsed) = slice[1].parse() {
             parsed
@@ -438,12 +448,14 @@ impl ModData {
         } else {
             0
         };
-        Self {
-            stat_type_1,
-            stat_type_2,
-            stat_value_1,
-            stat_value_2
-        }
+        mod_data.push(stat_type_1, stat_value_1);
+        mod_data.push(stat_type_2, stat_value_2);
+        mod_data
+    }
+
+    fn push(&mut self, mod_stat_type: ModStatType, value: i16) {
+        self.stats[self.count as usize] = (mod_stat_type, value);
+        self.count += 1;
     }
 
 }

@@ -159,12 +159,6 @@ pub struct GunModSums {  // include locking firerate flag
         }
     }
 
-    pub fn from_mod_list(weapon_mods: &[u8], loaded_mods: &LoadedMods) -> Self {
-        let mut new_sums = GunModSums::new();
-        new_sums.add_many_mods(weapon_mods, loaded_mods);
-        return new_sums;
-    }
-
     pub fn from_riven(riven_mod: &RivenMod) -> Self {
         let mut new_sums = Self::new();
         for &(stat_type, stat_value) in &riven_mod.stats {
@@ -180,9 +174,10 @@ pub struct GunModSums {  // include locking firerate flag
     }
 
     fn add_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
-        let mod_data = loaded_mods.get_mod(mod_id);
-        self.apply_mod(mod_data.stat_type_1, mod_data.stat_value_1);
-        self.apply_mod(mod_data.stat_type_2, mod_data.stat_value_2);
+        let mod_data = loaded_mods.get_data(mod_id);
+        for &(stat, value) in mod_data {
+            self.apply_mod(stat, value)
+        };
     }
 
     fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {

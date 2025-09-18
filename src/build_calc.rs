@@ -8,11 +8,9 @@ pub fn get_highest_damage(
     modding_context: &ModdingContext,
     base_sums: Option<GunModSums>,
 ) -> Option<u32> {
-    if let Some(top) = calculate_builds(loaded_mods, base_gun_stats, modding_context, base_sums).first() {
-        Some(u32::MAX - top.inverse_damage)
-    } else {
-        None
-    }
+    calculate_builds(
+        loaded_mods, base_gun_stats, modding_context, base_sums
+    ).first().map(|top| u32::MAX - top.inverse_damage)
 }
 
 pub fn calculate_builds(

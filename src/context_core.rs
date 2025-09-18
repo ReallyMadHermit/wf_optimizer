@@ -70,12 +70,12 @@ impl DamageCriteria {
         let input = UserInput::looped_integer_prompt(
             "Please enter the numer corresponding with your preferred criteria.", 1, 3, 3
         );
-        return match input {
+        match input {
             1 => DamageCriteria::PerShot,
             2 => DamageCriteria::BurstDPS,
             3 => DamageCriteria::SustainedDPS,
             _ => DamageCriteria::SustainedDPS
-        };
+        }
     }
 
     pub fn str(&self) -> &str {

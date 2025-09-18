@@ -2,11 +2,11 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 use crate::context_core::{ModdingContext, WeaponType};
-use crate::mod_parsing::{LoadedMods, RivenMod};
-use crate::build_calc::{calculate_builds, calculate_riven_builds, get_highest_damage, SortingHelper};
+use crate::mod_parsing::{LoadedMods, ModData};
+use crate::build_calc::{calculate_builds, get_highest_damage, SortingHelper};
 use crate::cli_inputs::UserInput;
 use crate::data::GUN_DATA;
-use crate::display::show_top_builds;
+use crate::display::{show_top_builds, show_riven_key, print_riven_stats};
 use crate::weapon_select::{GunData, GunStats, weapon_select};
 
 pub fn cli_workflow_entry() {
@@ -32,7 +32,7 @@ pub fn cli_workflow_entry() {
 
 fn test_all_weapons() {
     let mut modding_context = ModdingContext::interview_user(
-        WeaponType::Riven, false);
+        WeaponType::All, false);
     let mut loaded_hashmap: HashMap<ModdingContext, LoadedMods> = HashMap::with_capacity(6);
     let mut csv_lines= GUN_DATA.lines();
     let mut gun_scores: Vec<(&str, &str, u32)> = Vec::with_capacity(539);
@@ -89,35 +89,36 @@ enum PromptChoice {
 }
 
 fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
-    let loaded_mods = LoadedMods::new(&modding_context);
+    let mut loaded_mods = LoadedMods::new(&modding_context);
+    let mut riven_option: Option<ModData> = None;
     let mut builds_option: Option<Vec<SortingHelper>> = None;
     let mut reference_option: Option<f32> = None;
-    let mut riven_option: Option<RivenMod> = None;
     let mut prompt_choice = PromptChoice::Neutral;
-    RivenMod::show_riven_key();
+    show_riven_key();
     loop {
         let input_option = UserInput::new(prompt_choice.str());
         match input_option {
             Some(UserInput::Full(s)) => {
-                if let Some(riven_mod) = RivenMod::from_str(&s) {
-                    riven_mod.println_stats();
+                if let Some(riven_mod) = ModData::from_riven_str(&s) {
+                    print_riven_stats(&riven_mod);
                     riven_option = Some(riven_mod);
                     prompt_choice = PromptChoice::Parsed;
-                } else {  // todo: figure out what this was meant to be
-
-                }
+                } else {
+                    println!("Well, that sure didn't parse... Try again?");
+                };
             },
             Some(UserInput::Digit(n)) => {
                 if let Some(builds) = &builds_option {
                     show_top_builds(&loaded_mods, builds, n)
                 } else {
-                    RivenMod::show_riven_key()
+                    show_riven_key()
                 }
             },
             _ => {
-                if let Some(riven) = &riven_option {
-                    let builds = calculate_riven_builds(
-                        &loaded_mods, &gun_data.gun_stats, &modding_context, riven);
+                if let Some(riven) = riven_option {
+                    loaded_mods.update_riven(riven);
+                    let builds = calculate_builds(
+                        &loaded_mods, &gun_data.gun_stats, &modding_context, None);
                     riven_option = None;
 
                     let reference_score = if let Some(reference_score) = reference_option {
@@ -133,7 +134,7 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
                     prompt_choice = PromptChoice::Results;
                     println!("Your riven score is: {}", riven_score);
                 } else {
-                    RivenMod::show_riven_key();
+                    show_riven_key();
                 };
             }
         };

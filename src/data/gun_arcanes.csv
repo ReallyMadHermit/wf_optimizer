@@ -1,8 +1,8 @@
 Type,Name,Type1,Value1,Type2,Value2,Kills?,Aiming?,Headshot?,Semi?,Acuity?,Prefer Amalgam?,Riven?,BADMATCH
-Riven,Deadhead,Damage,360,Headshot,30,!EXC,!EXC,!EXC,,,,,
-Riven,Deadhead(w/o kills),Headshot,30,None,0,EXC,,!EXC,,,,,
-Riven,Merciless,Damage,360,ReloadSpeed,30,!EXC,,,,,,,
-Riven,Merciless(w/o kills),ReloadSpeed,30,None,0,EXC,,,,,,,
+All,Deadhead,Damage,360,Headshot,30,!EXC,!EXC,!EXC,,,,,
+All,Deadhead(w/o kills),Headshot,30,None,0,EXC,,!EXC,,,,,
+All,Merciless,Damage,360,ReloadSpeed,30,!EXC,,,,,,,
+All,Merciless(w/o kills),ReloadSpeed,30,None,0,EXC,,,,,,,
 Primary,Primary Blight,CritDamage,144,Multishot,72,,,,,,,,
 Primary,Primary Crux,StatusChance,300,AmmoEfficiency,60,,,,,,,,
 Primary,Primary Frostbite,CritDamage,120,Multishot,90,,,,,,,,

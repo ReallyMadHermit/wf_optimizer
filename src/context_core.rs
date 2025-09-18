@@ -6,8 +6,8 @@ pub enum WeaponType {
     Shotgun,
     Pistol,
     Bow,
-    Riven,
-    Primary
+    All,
+    Primary,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
@@ -38,7 +38,7 @@ impl WeaponType {
             "Shotgun" => Self::Shotgun,
             "Pistol" => Self::Pistol,
             "Bow" => Self::Bow,
-            "Riven" => Self::Riven,
+            "All" => Self::All,
             "Primary" => Self::Primary,
             _ => {
                 println!("Weapon type '{}' not found! Using... Rifle!", s);
@@ -48,15 +48,13 @@ impl WeaponType {
     }
 
     pub fn is_compatible(gun_type: Self, mod_type: Self) -> bool {
-        match (gun_type, mod_type) {
-            (Self::Riven, _) => true,
-            (Self::Rifle, Self::Rifle | Self::Primary) => true,
-            (Self::Shotgun, Self::Shotgun | Self::Primary) => true,
-            (Self::Pistol, Self::Pistol) => true,
-            (Self::Bow, Self::Bow | Self::Rifle | Self::Primary) => true,
-            (_, Self::Riven) => true,
-            _ => false
-        }
+        matches!((gun_type, mod_type),
+            (Self::All, _) |
+            (Self::Rifle, Self::Rifle | Self::Primary) |
+            (Self::Shotgun, Self::Shotgun | Self::Primary) |
+            (Self::Pistol, Self::Pistol) |
+            (Self::Bow, Self::Bow | Self::Rifle | Self::Primary) |
+            (_, Self::All))
     }
 
 }
@@ -112,7 +110,7 @@ impl ModdingContext {
             WeaponType::Pistol => {
                 ("Use Amalgam Diffusion", false)
             },
-            WeaponType::Riven => {
+            WeaponType::All => {
                 ("Use amalgam mods?", false)
             },
             _ => {("YOU SHOULDN'T BE SEEING THIS! BUT YOU USE AMALGAM MODS!", true)}

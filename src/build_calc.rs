@@ -1,20 +1,6 @@
 use crate::context_core::{DamageCriteria, ModdingContext};
-use crate::mod_parsing::{LoadedMods, ModStatType, RivenMod};
+use crate::mod_parsing::{LoadedMods, ModStatType};
 use crate::weapon_select::GunStats;
-
-pub fn calculate_riven_builds(
-    loaded_mods: &LoadedMods,
-    base_gun_stats: &GunStats,
-    modding_context: &ModdingContext,
-    riven_mod: &RivenMod
-) -> Vec<SortingHelper> {
-    calculate_builds(
-        loaded_mods,
-        base_gun_stats,
-        modding_context,
-        Some(GunModSums::from_riven(riven_mod))
-    )
-}
 
 pub fn get_highest_damage(
     loaded_mods: &LoadedMods,
@@ -157,14 +143,6 @@ pub struct GunModSums {  // include locking firerate flag
             ammo_efficiency: 0,
             headshot: 1.0,
         }
-    }
-
-    pub fn from_riven(riven_mod: &RivenMod) -> Self {
-        let mut new_sums = Self::new();
-        for &(stat_type, stat_value) in &riven_mod.stats {
-            new_sums.apply_mod(stat_type, stat_value);
-        };
-        new_sums
     }
 
     fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {

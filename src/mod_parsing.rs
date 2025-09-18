@@ -14,7 +14,8 @@ pub struct LoadedMods {
     included_mods: Option<Vec<u8>>,
     pub combinations: Vec<BuildCombo>,
     pub mod_count: u8,
-    pub arcane_count: u8
+    pub arcane_count: u8,
+    riven_index: Option<u8>
 } impl LoadedMods {
 
     pub fn new(modding_context: &ModdingContext) -> Self {
@@ -41,6 +42,18 @@ pub struct LoadedMods {
         loaded_mods.calculate_combinatorics();
         loaded_mods.filter_loaded_mods(modding_context);
         loaded_mods
+    }
+
+    pub fn update_riven(&mut self, new_stats: ModData) -> bool {
+        match self.riven_index {
+            Some(i) => {
+                self.mod_data[i as usize] = new_stats;
+                true
+            }
+            None => {
+                false
+            }
+        }
     }
 
     pub fn get_data(&self, mod_id: u8) -> &[(ModStatType, i16)] {
@@ -76,6 +89,34 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     AmmoEfficiency,
     Headshot,
     Riven
+} impl ModStatType {
+
+    pub fn to_str(&self) -> &'static str {
+        match self {
+            Self::None => "None",
+            Self::Damage => "Damage",
+            Self::Heat => "Heat",
+            Self::Cold => "Cold",
+            Self::Toxic => "Toxic",
+            Self::Shock => "Electricity",
+            Self::Magnetic => "Magnetic",
+            Self::Radiation => "Radiation",
+            Self::Multishot => "Multi-Shot",
+            Self::CritChance => "Crit Chance",
+            Self::CritDamage => "Crit Damage",
+            Self::FireRate => "Fire-Rate",
+            Self::StatusChance => "Status Chance",
+            Self::ConditionOverload => "Condition Overload",
+            Self::MagazineCapacity => "Magazine Capacity",
+            Self::ReloadSpeed => "Reload Speed",
+            Self::StatusDamage => "Status Damage",
+            Self::PunchThrough => "Punch Through",
+            Self::AmmoEfficiency => "Ammo Efficiency",
+            Self::Headshot => "Headshot Damage",
+            Self::Riven => "Riven"
+        }
+    }
+
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -83,20 +124,16 @@ pub struct ModData {
     stats: [(ModStatType, i16); 4],
     count: u8
 } impl ModData {
+
     pub fn get(&self) -> &[(ModStatType, i16)] {
         &self.stats[0..self.count as usize]
     }
-}
 
-pub struct RivenMod {
-    pub stats: Vec<(ModStatType, i16)>
-} impl RivenMod {
-
-    pub fn from_str(input: &str) -> Option<Self> {
+    pub fn from_riven_str(input: &str) -> Option<Self> {
         let upper = input.to_ascii_uppercase();
+        let mut mod_data = Self::empty();
         let mut stat_type = ModStatType::None;
         let mut stat_value = 0i16;
-        let mut stats = Vec::with_capacity(4);
         let mut value_flag = false;
         let mut type_flag = false;
         for s in upper.split(" ") {
@@ -108,56 +145,16 @@ pub struct RivenMod {
                 type_flag = true;
             };
             if value_flag & type_flag {
-                stats.push((stat_type, stat_value));
+                mod_data.push(stat_type, stat_value);
                 value_flag = false;
                 type_flag = false;
             };
         };
-        if !stats.is_empty() {
-            Some(
-                Self {
-                    stats
-                }
-            )
+        if mod_data.count > 0 {
+            Some(mod_data)
         } else {
             None
         }
-    }
-
-    pub fn println_stats(&self) {
-        println!("Your riven stats are:");
-        for &(stat_type, stat_value) in &self.stats {
-            if stat_value > 0 {
-                println!("+{}% {}", stat_value, stat_type.to_str());
-            } else {
-                println!("-{}% {}", stat_value.abs(), stat_type.to_str());
-            };
-        };
-    }
-
-    pub fn show_riven_key() {
-        println!("Use the below stat-keys and a number for each value to describe your rolls:");
-        println!("D: Damage");
-        println!("MS: Multi-Shot");
-        println!("-");
-        println!("CC: CritChance");
-        println!("CD: Crit Damage");
-        println!("-");
-        println!("C: Cold");
-        println!("E: Electricity");
-        println!("H: Heat");
-        println!("T: Toxic");
-        println!("SC: Status Chance");
-        println!("-");
-        println!("FR: Fire-Rate");
-        println!("MC: Magazine Capacity");
-        println!("RS: Reload Speed");
-        println!("-");
-        println!("Some examples of valid combinations:");
-        println!("140 D 80 T -20 CC");
-        println!("200 C -80 FR");
-        println!("CC 140 CD 150 D -60");
-        println!("As long as you alternate between key and values, they can be in either order.");
     }
 
 }
@@ -172,7 +169,8 @@ impl LoadedMods {
             included_mods: None,
             combinations: Vec::new(),
             mod_count: 0,
-            arcane_count: 0
+            arcane_count: 0,
+            riven_index: None
         }
     }
 
@@ -219,6 +217,11 @@ impl LoadedMods {
             let split: Vec<&str> = line.split(",").collect();
             let data = ModData::from_split_slice(&split[MDSI[0]..=MDSI[1]]);
             let mod_id = loaded_mods.load_mod(split[1], data, arcane);
+            if let Some(&(t, _)) = data.stats.first() {
+                if t == ModStatType::Riven {
+                    loaded_mods.riven_index = Some(mod_id);
+                };
+            };
             if score > 0 {
                 loaded_mods.include_mod(mod_id)
             };
@@ -394,32 +397,6 @@ impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multis
             "RS" => Self::ReloadSpeed,
             "SC" => Self::StatusChance,
             _ => Self::None
-        }
-    }
-
-    fn to_str(&self) -> &'static str {
-        match self {
-            Self::None => "None",
-            Self::Damage => "Damage",
-            Self::Heat => "Heat",
-            Self::Cold => "Cold",
-            Self::Toxic => "Toxic",
-            Self::Shock => "Electricity",
-            Self::Magnetic => "Magnetic",
-            Self::Radiation => "Radiation",
-            Self::Multishot => "Multi-Shot",
-            Self::CritChance => "Crit Chance",
-            Self::CritDamage => "Crit Damage",
-            Self::FireRate => "Fire-Rate",
-            Self::StatusChance => "Status Chance",
-            Self::ConditionOverload => "Condition Overload",
-            Self::MagazineCapacity => "Magazine Capacity",
-            Self::ReloadSpeed => "Reload Speed",
-            Self::StatusDamage => "Status Damage",
-            Self::PunchThrough => "Punch Through",
-            Self::AmmoEfficiency => "Ammo Efficiency",
-            Self::Headshot => "Headshot Damage",
-            Self::Riven => "Riven"
         }
     }
 

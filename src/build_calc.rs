@@ -65,7 +65,7 @@ fn calculate_shot_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.calculate_shot_damage();
+        let shot_damage = modded_stats.shot_damage();
         builds.push(SortingHelper::new(shot_damage, index));
     };
     builds
@@ -84,8 +84,8 @@ fn calculate_burst_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.calculate_shot_damage();
-        let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
+        let shot_damage = modded_stats.shot_damage();
+        let burst_damage = modded_stats.burst_damage(shot_damage);
         builds.push(SortingHelper::new(burst_damage, index));
     };
     builds
@@ -104,9 +104,9 @@ fn calculate_sustained_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.calculate_shot_damage();
-        let burst_damage = modded_stats.calculate_burst_dps(shot_damage);
-        let sustained_damage = modded_stats.calculate_sustained_dps(burst_damage);
+        let shot_damage = modded_stats.shot_damage();
+        let burst_damage = modded_stats.burst_damage(shot_damage);
+        let sustained_damage = modded_stats.sustained_dps(burst_damage);
         builds.push(SortingHelper::new(sustained_damage, index));
     };
     builds
@@ -124,7 +124,9 @@ pub struct GunModSums {  // include locking firerate flag
     pub magazine: i16,
     pub reload: i16,
     pub ammo_efficiency: i16,
-    pub headshot: f32
+    pub headshot: f32,
+    pub acuity: bool,
+    pub cannonade: bool,
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -140,6 +142,8 @@ pub struct GunModSums {  // include locking firerate flag
             reload: 100,
             ammo_efficiency: 0,
             headshot: 1.0,
+            acuity: false,
+            cannonade: false
         }
     }
 
@@ -203,6 +207,23 @@ pub struct GunModSums {  // include locking firerate flag
                     self.headshot /= m;
                 };
             },
+            ModStatType::Acuity => {
+                // crit chance
+                self.crit_chance += stat_value;
+                // headshot
+                let eff = 100 + stat_value.abs();
+                let m = eff as f32 / 100.0;
+                self.acuity = stat_value > 0;
+                if self.acuity {
+                    self.headshot *= m;
+                } else {
+                    self.headshot /= m;
+                };
+            },
+            ModStatType::Cannonade => {
+                self.damage += stat_value;
+                self.cannonade = stat_value > 0;
+            },
             _ => {}
         };
     }
@@ -211,7 +232,7 @@ pub struct GunModSums {  // include locking firerate flag
 
 impl GunStats {
 
-    pub fn calculate_shot_damage(&self) -> f32 {
+    pub fn shot_damage(&self) -> f32 {
         let mut hit_sum = 0.0;
         for hit in &self.hit_stats {
             hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
@@ -220,7 +241,7 @@ impl GunStats {
         hit_sum
     }
 
-    pub fn calculate_burst_dps(&self, shot_damage: f32) -> f32 {
+    pub fn burst_damage(&self, shot_damage: f32) -> f32 {
         if self.magazine > 1.1 {
             self.fire_rate * shot_damage
         } else {
@@ -228,7 +249,7 @@ impl GunStats {
         }
     }
 
-    pub fn calculate_sustained_dps(&self, burst_dps: f32) -> f32 {
+    pub fn sustained_dps(&self, burst_dps: f32) -> f32 {
         if self.magazine > 1.1 {
             let mag_time = self.magazine / self.fire_rate;
             let firing_ratio = mag_time / (mag_time + self.reload);
@@ -261,8 +282,12 @@ fn apply_ammo_efficiency(mag_size: f32, ammo_efficiency: i16) -> f32 {
 
 fn apply_stat_sums(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
     let mut modded_self = gun_stats.clone();
-    modded_self.fire_rate = apply_stat_sum(gun_stats.fire_rate, stat_sums.fire_rate);
-    modded_self.multishot = apply_stat_sum(gun_stats.multishot, stat_sums.multishot);
+    if !stat_sums.cannonade {
+        modded_self.fire_rate = apply_stat_sum(gun_stats.fire_rate, stat_sums.fire_rate);
+    };
+    if !stat_sums.acuity {
+        modded_self.multishot = apply_stat_sum(gun_stats.multishot, stat_sums.multishot);
+    };
     modded_self.magazine = apply_stat_sum(gun_stats.magazine, stat_sums.magazine).round();
     modded_self.reload = apply_inverse_stat_sum(gun_stats.reload, stat_sums.reload);
     for i in 0..gun_stats.hit_stats.len() {

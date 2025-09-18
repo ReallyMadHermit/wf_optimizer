@@ -88,7 +88,9 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     PunchThrough,
     AmmoEfficiency,
     Headshot,
-    Riven
+    Riven,
+    Cannonade,
+    Acuity
 } impl ModStatType {
 
     pub fn to_str(&self) -> &'static str {
@@ -113,7 +115,9 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
             Self::PunchThrough => "Punch Through",
             Self::AmmoEfficiency => "Ammo Efficiency",
             Self::Headshot => "Headshot Damage",
-            Self::Riven => "Riven"
+            Self::Riven => "Riven",
+            Self::Cannonade => "Cannonade",
+            Self::Acuity => "Acuity"
         }
     }
 
@@ -375,6 +379,8 @@ impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multis
             "AmmoEfficiency" => Self::AmmoEfficiency,
             "Headshot" => Self::Headshot,
             "Riven" => Self::Riven,
+            "Connonade" => Self::Cannonade,
+            "Acuity" => Self::Acuity,
             _ => {
                 println!("{} not found! Using 'None'", string_slice);
                 Self::None

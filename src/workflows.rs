@@ -62,7 +62,7 @@ fn test_all_weapons() {
             i+=1;
         };
     };
-    gun_scores.sort_by_key(|&(name, mode, damage)| u32::MAX - damage);
+    gun_scores.sort_by_key(|&(_, _, damage)| u32::MAX - damage);
     for (i, &(name, mode, damage)) in gun_scores.iter().enumerate() {
         println!("{}. {}: {}; {}", i+1, damage, name, mode);
     };

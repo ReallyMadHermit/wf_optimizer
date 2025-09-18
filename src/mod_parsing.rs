@@ -354,7 +354,7 @@ impl LoadedMods {
 
 }
 
-impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multishot and firerate instead of just excluding the mods
+impl ModStatType {
 
     fn from_str(string_slice: &str) -> Self {
         match string_slice {

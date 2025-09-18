@@ -242,7 +242,7 @@ impl GunStats {
     }
 
     pub fn burst_damage(&self, shot_damage: f32) -> f32 {
-        if self.magazine > 1.1 {
+        if self.magazine > 1.1 {  // TODO: review how this affects bows
             self.fire_rate * shot_damage
         } else {
             shot_damage

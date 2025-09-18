@@ -1,5 +1,5 @@
 // use std::time::Instant;
-// use std::mem::size_of;
+use std::mem::size_of;
 
 use crate::workflows::cli_workflow_entry;
 
@@ -15,6 +15,12 @@ mod workflows;
 
 fn main() {
     // println!("{:?}", size_of::<Probable>());
-    // println!("{:?}", size_of::<ModData>());
+    struct_sizing();
     cli_workflow_entry()
+}
+
+fn struct_sizing() {
+    println!("Byte-Sizes");
+    println!("LoadedMods: {:?}", size_of::<mod_parsing::LoadedMods>());
+    println!("ModdingContext: {:?}", size_of::<context_core::ModdingContext>());
 }

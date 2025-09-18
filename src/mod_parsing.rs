@@ -8,11 +8,11 @@ const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 const BADMATCH_INDEX: usize = 13;
 
-pub struct LoadedMods {
-    mod_names: Vec<&'static str>,
-    mod_data: Vec<ModData>,
-    included_mods: Option<Vec<u8>>,
-    pub combinations: Vec<BuildCombo>,
+pub struct LoadedMods {  // todo: can this be... smaller? it's 104 bytes atm, very sinful
+    mod_names: Vec<&'static str>,  // TODO: Box<[&'static str]>
+    mod_data: Vec<ModData>,  // TODO: Box<[ModData]>
+    included_mods: Option<Vec<u8>>,  // TODO: array-ify this
+    pub combinations: Vec<BuildCombo>,  // TODO: Box<[Combinations]>
     pub mod_count: u8,
     pub arcane_count: u8,
     riven_index: Option<u8>
@@ -356,7 +356,7 @@ impl LoadedMods {
 
 impl ModStatType {
 
-    fn from_str(string_slice: &str) -> Self {
+    fn from_str(string_slice: &str) -> Self {  // TODO: make this return an option
         match string_slice {
             "None" => Self::None,
             "Damage" => Self::Damage,
@@ -412,12 +412,12 @@ impl ModData {
 
     fn empty() -> Self {
         Self {
-            stats: [(ModStatType::None, 0); 4],
+            stats: [(ModStatType::None, 0); 4],  // TODO make this use Option<ModStatType>
             count: 0
         }
     }
 
-    fn from_split_slice(slice: &[&str]) -> Self {
+    fn from_split_slice(slice: &[&str]) -> Self {  // TODO: return Option<Self> and expect Option<ModStatType>
         let mut mod_data = Self::empty();
         let stat_type_1 = ModStatType::from_str(slice[0]);
         let stat_value_1: i16 = slice[1].parse().unwrap_or_default();

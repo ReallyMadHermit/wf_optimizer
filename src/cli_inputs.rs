@@ -13,13 +13,7 @@ pub enum UserInput {
         } else if let Some(s) = input {
             return if s.len() > 1 {
                 Some(Self::Full(s))
-            } else {
-                if let Some(c) = s.chars().nth(0) {
-                    Some(Self::Single(c))
-                } else {
-                    None
-                }
-            };
+            } else { s.chars().nth(0).map(Self::Single) };
         };
         None
     }
@@ -72,7 +66,7 @@ pub enum UserInput {
         println!("{}", prompt);
         let _ = stdin().read_line(&mut buffer);
         buffer = String::from(buffer.trim());
-        if buffer.len() > 0 {
+        if !buffer.is_empty() {
             buffer.shrink_to_fit();
             Some(buffer)
         } else {
@@ -81,7 +75,7 @@ pub enum UserInput {
     }
 
     fn parse_integer(input: &Option<String>) -> Option<usize> {
-        Some(input.as_ref()?.parse().ok()?)
+        input.as_ref()?.parse().ok()
     }
 
 }

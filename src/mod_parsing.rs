@@ -379,7 +379,7 @@ impl ModStatType {  // TODO: re-add Acuity stat and cannonade to lock out multis
             "AmmoEfficiency" => Self::AmmoEfficiency,
             "Headshot" => Self::Headshot,
             "Riven" => Self::Riven,
-            "Connonade" => Self::Cannonade,
+            "Cannonade" => Self::Cannonade,
             "Acuity" => Self::Acuity,
             _ => {
                 println!("{} not found! Using 'None'", string_slice);

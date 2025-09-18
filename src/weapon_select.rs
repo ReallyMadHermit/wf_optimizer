@@ -71,7 +71,7 @@ pub fn weapon_select() -> Option<GunData> {
     println!("Enter the weapon's name (it's case sensitive, (out of spite,) of course)");
     println!("Leave blank, or fuck up the input to choose from a list:");
     let input = UserInput::new("...Or enter '*' to do them all, lmao (this will take a while)");
-    return match input {
+    match input {
         Some(UserInput::Full(s)) => {
             if let Some(index) = weapon_name_search(&s, headless_csv) {
                 Some(GunData::from_csv_line(headless_csv[index]))
@@ -101,7 +101,7 @@ fn weapon_name_search(input_string: &str, headless_csv: &[&str]) -> Option<usize
     };
     if results.len() > 1 {
        Some(weapon_list_select(Some(results), headless_csv))
-    } else if results.len() > 0 {
+    } else if !results.is_empty() {
         Some(results[0])
     } else {
         None
@@ -111,9 +111,9 @@ fn weapon_name_search(input_string: &str, headless_csv: &[&str]) -> Option<usize
 fn weapon_first_letter_search(letter: char, headless_csv: &[&str]) -> usize {
     let mut results: Vec<usize> = Vec::with_capacity(36);
     for (index, &line) in headless_csv.iter().enumerate() {
-        if letter.to_ascii_lowercase() ==
-            line.split(",")
-                .collect::<Vec<&str>>()[1].chars().next().unwrap().to_ascii_lowercase() {
+        if letter.eq_ignore_ascii_case(
+            &line.split(",").collect::<Vec<&str>>()[1].chars().next().unwrap()
+        ) {
             results.push(index)
         };
     };

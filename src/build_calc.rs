@@ -156,6 +156,13 @@ pub struct GunModSums {  // include locking firerate flag
         };
     }
 
+    fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
+        let mod_data = loaded_mods.get_data(mod_id);
+        for &(stat, value) in mod_data {
+            self.apply_mod(stat, -value)
+        };
+    }
+
     fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {
         match stat_type {
             ModStatType::Damage => {
@@ -188,10 +195,12 @@ pub struct GunModSums {  // include locking firerate flag
                 self.reload += stat_value;
             },
             ModStatType::Headshot => {
+                let eff = 100 + stat_value.abs();
+                let m = eff as f32 / 100.0;
                 if stat_value > 0 {
-                    let eff = 100 + stat_value;
-                    let m = eff as f32 / 100.0;
                     self.headshot *= m;
+                } else {
+                    self.headshot /= m;
                 };
             },
             _ => {}

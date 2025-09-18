@@ -35,7 +35,7 @@ fn test_all_weapons() {
         WeaponType::All, false);
     let mut loaded_hashmap: HashMap<ModdingContext, LoadedMods> = HashMap::with_capacity(6);
     let mut csv_lines= GUN_DATA.lines();
-    let mut gun_scores: Vec<(&str, &str, u32)> = Vec::with_capacity(539);
+    let mut gun_scores: Vec<(&str, &str, u32)> = Vec::with_capacity(540);
     let start = Instant::now();
     let mut i = 1u16;
     csv_lines.next();

@@ -1,3 +1,4 @@
+use crate::combinatorics::BuildCombo;
 use crate::context_core::{DamageCriteria, ModdingContext};
 use crate::mod_parsing::{LoadedMods, ModStatType};
 use crate::weapon_select::GunStats;
@@ -64,7 +65,7 @@ fn calculate_shot_damage(
         if let Some(a) = build_combo.arcane {
             mod_sums.add_mod(a, loaded_mods);
         };
-        let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
+        let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
         let shot_damage = modded_stats.shot_damage();
         builds.push(SortingHelper::new(shot_damage, index));
     };
@@ -83,7 +84,7 @@ fn calculate_burst_damage(
         if let Some(a) = build_combo.arcane {
             mod_sums.add_mod(a, loaded_mods);
         };
-        let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
+        let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
         let shot_damage = modded_stats.shot_damage();
         let burst_damage = modded_stats.burst_damage(shot_damage);
         builds.push(SortingHelper::new(burst_damage, index));
@@ -103,7 +104,7 @@ fn calculate_sustained_damage(
         if let Some(a) = build_combo.arcane {
             mod_sums.add_mod(a, loaded_mods);
         };
-        let modded_stats = apply_stat_sums(base_gun_stats, &mod_sums);
+        let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
         let shot_damage = modded_stats.shot_damage();
         let burst_damage = modded_stats.burst_damage(shot_damage);
         let sustained_damage = modded_stats.sustained_dps(burst_damage);
@@ -112,8 +113,71 @@ fn calculate_sustained_damage(
     builds
 }
 
+#[derive(PartialOrd, PartialEq)]
+pub struct ModScores {
+    pub arcane: Option<i16>,
+    pub mod_scores: [(i16, u8); 8]  // (riven score, mod id)
+} impl ModScores {
+    pub fn new(
+        loaded_mods: &LoadedMods,
+        base_gun_stats: &GunStats,
+        build_combo: BuildCombo,
+        damage_criteria: DamageCriteria,
+        base_sums: &GunModSums
+    ) -> Self {
+        let mut full_sums = base_sums.clone();
+        full_sums.apply_build_combo(build_combo, loaded_mods);
+        let full_damage = calculate_single_build(base_gun_stats, &full_sums, damage_criteria);
+
+        let mut mod_scores = [(0, 0); 8];
+        for (i, &mod_id) in build_combo.mod_combo.iter().enumerate() {
+            let mut lesser_sums = full_sums.clone();
+            lesser_sums.remove_mod(mod_id, loaded_mods);
+            let lesser_damage = calculate_single_build(base_gun_stats, &lesser_sums, damage_criteria);
+            mod_scores[i] = (i16::MAX - ((full_damage / lesser_damage - 1.0) * 1000.0).round() as i16, mod_id);
+        };
+
+        mod_scores.sort_by_key(|&(score, _)| score);
+        for i in 0..8usize {
+            mod_scores[i].0 = i16::MAX - mod_scores[i].0;
+        };
+
+        let arcane = if let Some(a) = build_combo.arcane {
+            let mut lesser_sums = full_sums.clone();
+            lesser_sums.remove_mod(a, loaded_mods);
+            let lesser_damage = calculate_single_build(base_gun_stats, &lesser_sums, damage_criteria);
+            Some(((full_damage / lesser_damage - 1.0) * 1000.0).round() as i16)
+        } else {
+            None
+        };
+
+        Self {
+            arcane,
+            mod_scores
+        }
+
+    }
+}
+
+fn calculate_single_build(
+    base_gun_stats: &GunStats,
+    mod_sums: &GunModSums,
+    damage_criteria: DamageCriteria
+) -> f32 {
+    let stats = apply_mod_sum(base_gun_stats, mod_sums);
+    let damage = stats.shot_damage();
+    if damage_criteria == DamageCriteria::PerShot {
+        return damage;
+    };
+    let burst = stats.burst_damage(damage);
+    if damage_criteria == DamageCriteria::BurstDPS {
+        return burst;
+    };
+    stats.sustained_dps(burst)
+}
+
 #[derive(Clone)]
-pub struct GunModSums {  // include locking firerate flag
+pub struct GunModSums {
     pub damage: i16,
     pub ele_damage: i16,
     pub multishot: i16,
@@ -145,6 +209,19 @@ pub struct GunModSums {  // include locking firerate flag
             acuity: false,
             cannonade: false
         }
+    }
+
+    pub fn from_build_combo(build_combo: BuildCombo, loaded_mods: &LoadedMods) -> Self {
+        let mut sums = Self::new();
+        sums.apply_build_combo(build_combo, loaded_mods);
+        sums
+    }
+
+    fn apply_build_combo(&mut self, build_combo: BuildCombo, loaded_mods: &LoadedMods) {
+        if let Some(a) = build_combo.arcane {
+            self.add_mod(a, loaded_mods);
+        };
+        self.add_many_mods(&build_combo.mod_combo, loaded_mods);
     }
 
     fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
@@ -280,7 +357,7 @@ fn apply_ammo_efficiency(mag_size: f32, ammo_efficiency: i16) -> f32 {
     mag_size / eff_factor
 }
 
-fn apply_stat_sums(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
+fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
     let mut modded_self = gun_stats.clone();
     if !stat_sums.cannonade {
         modded_self.fire_rate = apply_stat_sum(gun_stats.fire_rate, stat_sums.fire_rate);

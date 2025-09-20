@@ -1,16 +1,76 @@
-use crate::build_calc::SortingHelper;
+use crate::build_calc::{SortingHelper, ModScores, GunModSums};
 use crate::combinatorics::BuildCombo;
+use crate::context_core::DamageCriteria;
 use crate::mod_parsing::{LoadedMods, ModData};
+use crate::weapon_select::GunStats;
 
-pub fn show_top_builds(loaded_mods: &LoadedMods, sorting_helpers: &Vec<SortingHelper>, count: usize) {
-    for n in 0..count {
-        let helper = sorting_helpers[n];
-        let combo = &loaded_mods.combinations[helper.index as usize];
-        display_build(&loaded_mods, combo, helper);
+pub fn show_top_builds(
+    loaded_mods: &LoadedMods,
+    sorting_helpers: &[SortingHelper],
+    count: usize
+) {
+    for &helper in sorting_helpers[0..count].iter() {
+        let combo = loaded_mods.combinations[helper.index as usize];
+        display_build(loaded_mods, combo, helper);
     };
 }
 
-fn display_build(loaded_mods: &LoadedMods, build_combo: &BuildCombo, sorting_helper: SortingHelper) {
+pub fn show_top_builds_scored(
+    loaded_mods: &LoadedMods,
+    sorting_helpers: &[SortingHelper],
+    gun_stats: &GunStats,
+    damage_criteria: DamageCriteria,
+    count: usize,
+    base_sums: Option<GunModSums>
+) {
+    let sums = match base_sums {
+        Some(s) => {
+            s
+        },
+        None => {
+            GunModSums::new()
+        }
+    };
+    println!("The format is as follows:\nDamage\nArcane\nMod, Mod, Mod, etc...\
+        \nThe (numbers) otherwise are a mod-score, higher is more impactful.\n");
+    for &helper in sorting_helpers[0..count].iter() {
+        let build_combo = loaded_mods.combinations[helper.index as usize];
+        let arcane_name = if let Some(i) = build_combo.arcane {
+            loaded_mods.get_name(i)
+        } else {
+            "No Arcane"
+        };
+        let mod_scores = ModScores::new(
+            loaded_mods, gun_stats, build_combo, damage_criteria, &sums
+        );
+        let arcane_score = mod_scores.arcane.unwrap_or_default();
+        let scores = mod_scores.mod_scores;
+        println!(
+            "{}\n{} ({})\n{} ({}), {} ({}),\n{} ({}), {} ({}),\n{} ({}), {} ({}),\n{} ({}), {} ({})",
+            helper.damage(),
+            arcane_name,
+            arcane_score,
+            loaded_mods.get_name(scores[0].1),
+            scores[0].0,
+            loaded_mods.get_name(scores[1].1),
+            scores[1].0,
+            loaded_mods.get_name(scores[2].1),
+            scores[2].0,
+            loaded_mods.get_name(scores[3].1),
+            scores[3].0,
+            loaded_mods.get_name(scores[4].1),
+            scores[4].0,
+            loaded_mods.get_name(scores[5].1),
+            scores[5].0,
+            loaded_mods.get_name(scores[6].1),
+            scores[6].0,
+            loaded_mods.get_name(scores[7].1),
+            scores[7].0,
+        )
+    }
+}
+
+fn display_build(loaded_mods: &LoadedMods, build_combo: BuildCombo, sorting_helper: SortingHelper) {
     let arcane_name = if let Some(i) = build_combo.arcane {
         loaded_mods.get_name(i)
     } else {

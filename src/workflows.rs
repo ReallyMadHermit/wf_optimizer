@@ -6,7 +6,7 @@ use crate::mod_parsing::{LoadedMods, ModData};
 use crate::build_calc::{calculate_builds, get_highest_damage, SortingHelper};
 use crate::cli_inputs::UserInput;
 use crate::data::GUN_DATA;
-use crate::display::{show_top_builds, show_riven_key, print_riven_stats};
+use crate::display::{show_top_builds, show_riven_key, print_riven_stats, show_top_builds_scored};
 use crate::weapon_select::{GunData, GunStats, weapon_select};
 
 pub fn cli_workflow_entry() {
@@ -22,7 +22,15 @@ pub fn cli_workflow_entry() {
             let count = UserInput::looped_integer_prompt(
                 "Done! How many results do you want to see? Press enter to show 6.",
                 1, build_scores.len(), 6);
-            show_top_builds(&loaded_mods, &build_scores, count);
+            // show_top_builds(&loaded_mods, &build_scores, count);
+            show_top_builds_scored(
+                &loaded_mods,
+                &build_scores,
+                &gun_data.gun_stats,
+                modding_context.damage_criteria,
+                count,
+                None
+            );
             end();
         };
     } else {
@@ -109,7 +117,15 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
             },
             Some(UserInput::Digit(n)) => {
                 if let Some(builds) = &builds_option {
-                    show_top_builds(&loaded_mods, builds, n)
+                    // show_top_builds(&loaded_mods, builds, n)
+                    show_top_builds_scored(
+                        &loaded_mods,
+                        builds,
+                        &gun_data.gun_stats,
+                        modding_context.damage_criteria,
+                        n,
+                        None
+                    );
                 } else {
                     show_riven_key()
                 }

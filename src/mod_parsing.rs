@@ -412,7 +412,7 @@ impl ModData {
 
     fn empty() -> Self {
         Self {
-            stats: [(ModStatType::None, 0); 4],  // TODO make this use Option<ModStatType>
+            stats: [(ModStatType::None, 0); 4],
             count: 0
         }
     }

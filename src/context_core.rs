@@ -18,7 +18,7 @@ pub enum DamageCriteria {
 }
 
 #[derive(Clone, Eq, PartialEq, Hash)]
-pub struct ModdingContext {  // TODO: add buffs to context
+pub struct ModdingContext {  // TODO: add buffs & banes to context
     pub weapon_type: WeaponType,
     pub damage_criteria: DamageCriteria,
     pub kills: bool,

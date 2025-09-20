@@ -15,7 +15,7 @@ mod workflows;
 
 fn main() {
     // println!("{:?}", size_of::<Probable>());
-    struct_sizing();
+    // struct_sizing();
     cli_workflow_entry()
 }
 

@@ -1,5 +1,5 @@
 use crate::data::GUN_DATA;
-use crate::context_core::{WeaponType, ModdingContext};
+use crate::context_core::{WeaponType};
 use crate::cli_inputs::UserInput;
 
 pub struct GunData {  // TODO: restructure to include other fire modes

@@ -211,12 +211,6 @@ pub struct GunModSums {
         }
     }
 
-    pub fn from_build_combo(build_combo: BuildCombo, loaded_mods: &LoadedMods) -> Self {
-        let mut sums = Self::new();
-        sums.apply_build_combo(build_combo, loaded_mods);
-        sums
-    }
-
     fn apply_build_combo(&mut self, build_combo: BuildCombo, loaded_mods: &LoadedMods) {
         if let Some(a) = build_combo.arcane {
             self.add_mod(a, loaded_mods);

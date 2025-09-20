@@ -1,19 +1,7 @@
 use crate::build_calc::{SortingHelper, ModScores, GunModSums};
-use crate::combinatorics::BuildCombo;
 use crate::context_core::DamageCriteria;
 use crate::mod_parsing::{LoadedMods, ModData};
 use crate::weapon_select::GunStats;
-
-pub fn show_top_builds(
-    loaded_mods: &LoadedMods,
-    sorting_helpers: &[SortingHelper],
-    count: usize
-) {
-    for &helper in sorting_helpers[0..count].iter() {
-        let combo = loaded_mods.combinations[helper.index as usize];
-        display_build(loaded_mods, combo, helper);
-    };
-}
 
 pub fn show_top_builds_scored(
     loaded_mods: &LoadedMods,
@@ -68,31 +56,6 @@ pub fn show_top_builds_scored(
             scores[7].0,
         )
     }
-}
-
-fn display_build(loaded_mods: &LoadedMods, build_combo: BuildCombo, sorting_helper: SortingHelper) {
-    let arcane_name = if let Some(i) = build_combo.arcane {
-        loaded_mods.get_name(i)
-    } else {
-        "No Arcane"
-    };
-    let mut mod_names = [""; 8];
-    for (index, &mod_id) in build_combo.mod_combo.iter().enumerate() {
-        mod_names[index] = loaded_mods.get_name(mod_id);
-    };
-    println!(
-        "{}\n{}\n{}, {}, {}, {},\n{}, {}, {}, {}",
-        sorting_helper.damage(),
-        arcane_name,
-        mod_names[0],
-        mod_names[1],
-        mod_names[2],
-        mod_names[3],
-        mod_names[4],
-        mod_names[5],
-        mod_names[6],
-        mod_names[7],
-    );
 }
 
 pub fn print_riven_stats(mod_data: &ModData) {

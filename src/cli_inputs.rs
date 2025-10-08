@@ -6,7 +6,7 @@ pub enum UserInput {
     Digit(usize)
 } impl UserInput {
 
-    pub fn new(prompt: &str) -> Option<UserInput> {
+    pub fn new(prompt: &str) -> Option<Self> {
         let input = Self::cli_input(prompt);
         if let Some(integer) = Self::parse_integer(&input) {
             return Some(Self::Digit(integer));
@@ -59,6 +59,32 @@ pub enum UserInput {
             };
         };
         default_value
+    }
+
+    pub fn f32_loop(prompt: &str) -> f32 {
+        loop {
+            let r = Self::f32(prompt);
+            if let Some(f) = r {
+                return f;
+            } else {
+                continue;
+            };
+        }
+    }
+
+    pub fn f32(prompt: &str) -> Option<f32> {
+        let i = Self::new(prompt);
+        match i {
+            Some(UserInput::Full(s)) => {
+                let r = s.parse::<f32>();
+                if let Ok(f) = r {
+                    Some(f)
+                } else {
+                    return None
+                }
+            },
+            _ => None
+        }
     }
 
     fn cli_input(prompt: &str) -> Option<String> {

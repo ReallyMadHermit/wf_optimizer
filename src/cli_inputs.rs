@@ -1,5 +1,7 @@
 use std::io::stdin;
 
+const LOOP_MAX_TRIES: usize = 5;
+
 pub enum UserInput {
     Full(String),
     Single(char),
@@ -38,7 +40,7 @@ pub enum UserInput {
     }
 
     pub fn looped_integer_prompt(prompt: &str, min: usize, max: usize, default_value: usize) -> usize {
-        for _ in 0..5 {
+        loop {
             let input = UserInput::new(prompt);
             let response = if let Some(ui) = input {
                 ui
@@ -58,7 +60,6 @@ pub enum UserInput {
                 }
             };
         };
-        default_value
     }
 
     pub fn f32_loop(prompt: &str) -> f32 {

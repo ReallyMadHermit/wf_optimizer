@@ -113,7 +113,7 @@ fn calculate_sustained_damage(
     builds
 }
 
-#[derive(PartialOrd, PartialEq)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
 pub struct ModScores {
     pub arcane: Option<i16>,
     pub mod_scores: [(i16, u8); 8]  // (riven score, mod id)

@@ -1,3 +1,4 @@
+use std::time::Instant;
 use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};
@@ -19,6 +20,10 @@ pub struct LoadedMods {  // todo: can this be... smaller? it's 104 bytes atm, ve
 } impl LoadedMods {
 
     pub fn new(modding_context: &ModdingContext) -> Self {
+        let mut start = Instant::now();
+        if modding_context.debug_numbers {
+            print!("Parsing mods...")
+        };
         let mod_lines: Vec<&'static str> = GUN_MODS.lines().collect();
         let arcane_lines: Vec<&'static str> = GUN_ARCANES.lines().collect();
         let mod_range = &mod_lines[1..];
@@ -39,8 +44,24 @@ pub struct LoadedMods {  // todo: can this be... smaller? it's 104 bytes atm, ve
         let mut loaded_mods = LoadedMods::empty(size);
         Self::parse_mods(&mut loaded_mods, mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, arcane_range, arcane_scores, true);
-        loaded_mods.calculate_combinatorics();
+        if modding_context.debug_numbers {
+            let d = start.elapsed();
+            println!(" Done! {:?}", d);
+            print!("Calculating Combinations...");
+            start = Instant::now();
+        };
+        loaded_mods.calculate_combinatorics(modding_context.debug_numbers);
+        if modding_context.debug_numbers {
+            let d = start.elapsed();
+            println!(" Done! {} Combinations in {:?}", loaded_mods.combinations.len(), d);
+            print!("Filtering Combinations...");
+            start = Instant::now();
+        };
         loaded_mods.filter_loaded_mods(modding_context);
+        if modding_context.debug_numbers {
+            let d = start.elapsed();
+            println!(" Done! {} remaining {:?}", loaded_mods.combinations.len(), d);
+        }
         loaded_mods
     }
 
@@ -178,8 +199,8 @@ impl LoadedMods {
         }
     }
 
-    fn calculate_combinatorics(&mut self) {
-        self.combinations = generate_combinations(self.mod_count, self.arcane_count);
+    fn calculate_combinatorics(&mut self, show_numbers: bool) {
+        self.combinations = generate_combinations(self.mod_count, self.arcane_count, show_numbers);
     }
 
     fn len(&self) -> usize {

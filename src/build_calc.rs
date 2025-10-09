@@ -1,3 +1,4 @@
+use std::time::Instant;
 use crate::combinatorics::BuildCombo;
 use crate::context_core::{DamageCriteria, ModdingContext};
 use crate::mod_parsing::{LoadedMods, ModStatType};
@@ -25,12 +26,26 @@ pub fn calculate_builds(
     } else {
         GunModSums::new()
     };
+    if modding_context.debug_numbers {
+        print!("Calculating damage...");
+    };
+    let mut start = Instant::now();
     let mut results = match modding_context.damage_criteria {
         DamageCriteria::PerShot => calculate_shot_damage(loaded_mods, base_gun_stats, sums),
         DamageCriteria::BurstDPS => {calculate_burst_damage(loaded_mods, base_gun_stats, sums)},
         DamageCriteria::SustainedDPS => {calculate_sustained_damage(loaded_mods, base_gun_stats, sums)}
     };
+    if modding_context.debug_numbers {
+        let d = start.elapsed();
+        println!(" Done! {:?}", d);
+        print!("Sorting results...");
+        start = Instant::now();
+    };
     results.sort_by_key(|build| build.inverse_damage);
+    if modding_context.debug_numbers {
+        let d = start.elapsed();
+        println!(" Done! {:?}", d);
+    }
     results
 }
 

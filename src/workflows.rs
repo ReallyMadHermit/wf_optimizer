@@ -14,15 +14,19 @@ pub fn cli_workflow_entry() {  // TODO: incorporate debug_numbers and timers
         let modding_context = ModdingContext::interview_user(
             gun_data.gun_type, gun_data.semi);
         if modding_context.debug_numbers {
-            println!("GunData Printing...");
+            println!("Printing GunData...");
             gun_data.print();
         };
         if modding_context.riven {
             riven_input_loop(gun_data, modding_context);
         } else {
+            let start_total = Instant::now();
             let loaded_mods = LoadedMods::new(&modding_context);
             let build_scores = calculate_builds(
                 &loaded_mods, &gun_data.gun_stats, &modding_context, None);
+            if modding_context.debug_numbers {
+                println!("Total calc time: {:?}", start_total.elapsed());
+            };
             let count = UserInput::looped_integer_prompt(
                 "Done! How many results do you want to see? Press enter to show 6.",
                 1, build_scores.len(), 6);
@@ -164,8 +168,17 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {  // TO
 fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStats) -> f32 {  // TODO: incorporate debug_numbers and timers
     let mut reference_context = modding_context.clone();
     reference_context.riven = false;
+    reference_context.debug_numbers = false;
+    let start = Instant::now();
+    if modding_context.debug_numbers {
+        print!("Generating reference score...");
+    };
     let reference_mods = LoadedMods::new(&reference_context);
-    let score = get_highest_damage(&reference_mods, gun_data, &modding_context, None);
+    let score = get_highest_damage(&reference_mods, gun_data, &reference_context, None);
+    if modding_context.debug_numbers {
+        let d = start.elapsed();
+        println!(" Done! {:?}", d);
+    };
     if let Some(i) = score {
         i as f32
     } else {

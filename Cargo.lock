@@ -4,4 +4,4 @@ version = 4
 
 [[package]]
 name = "warframe_optimizer"
-version = "0.2.5"
+version = "0.2.6"

@@ -9,7 +9,7 @@ use crate::data::GUN_DATA;
 use crate::display::{show_riven_key, print_riven_stats, show_top_builds_scored};
 use crate::weapon_select::{GunData, GunStats, weapon_select};
 
-pub fn cli_workflow_entry() {
+pub fn cli_workflow_entry() {  // TODO: incorporate debug_numbers and timers
     if let Some(gun_data) = weapon_select() {
         let modding_context = ModdingContext::interview_user(
             gun_data.gun_type, gun_data.semi);
@@ -100,7 +100,7 @@ enum PromptChoice {
     }
 }
 
-fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
+fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {  // TODO: incorporate debug_numbers and timers
     let mut loaded_mods = LoadedMods::new(&modding_context);
     let mut riven_option: Option<ModData> = None;
     let mut builds_option: Option<Vec<SortingHelper>> = None;
@@ -161,7 +161,7 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
     };
 }
 
-fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStats) -> f32 {
+fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStats) -> f32 {  // TODO: incorporate debug_numbers and timers
     let mut reference_context = modding_context.clone();
     reference_context.riven = false;
     let reference_mods = LoadedMods::new(&reference_context);

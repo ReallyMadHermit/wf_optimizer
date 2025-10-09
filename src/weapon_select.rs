@@ -200,7 +200,7 @@ fn custom_weapon_input() -> GunData {
     );
     println!("Okay! HitStats time, let's start with the 'impact' damage instance.");
     let hit_stat_1 = {
-        let damage = UserInput::looped_integer_prompt(
+        let damage = UserInput::looped_integer_prompt(  // TODO: make this use "total damage" per the arsenal, div by MS
             "How much damage does each projectile deal, on hit? (not counting secondary, radial damage)",
             0, 100000, 1
         ) as f32;
@@ -222,13 +222,13 @@ fn custom_weapon_input() -> GunData {
             "How much damage does the secondary instance deal",
             0, 100000, 1
         ) as f32;
-        let crit_chance = UserInput::f32_loop(
+        let crit_chance = UserInput::f32_loop(  // TODO: use last hit stat as default?
             "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc"
         );
-        let crit_damage = UserInput::f32_loop(
+        let crit_damage = UserInput::f32_loop(  // TODO: use last hit stat as default?
             "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x"
         );
-        let status = UserInput::f32_loop(
+        let status = UserInput::f32_loop(  // TODO: use last hit stat as default?
             "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc"
         );
         HitStats {

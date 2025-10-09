@@ -39,6 +39,7 @@ pub enum UserInput {
         prefer_yes
     }
 
+    // TODO: write the min, max, and default sizes as Option<> values, tedious to always specific
     pub fn looped_integer_prompt(prompt: &str, min: usize, max: usize, default_value: usize) -> usize {
         loop {
             let input = UserInput::new(prompt);
@@ -62,7 +63,7 @@ pub enum UserInput {
         };
     }
 
-    pub fn f32_loop(prompt: &str) -> f32 {
+    pub fn f32_loop(prompt: &str) -> f32 {  // TODO: include a default Option<>
         loop {
             let r = Self::f32(prompt);
             if let Some(f) = r {
@@ -73,7 +74,7 @@ pub enum UserInput {
         }
     }
 
-    pub fn f32(prompt: &str) -> Option<f32> {
+    pub fn f32(prompt: &str) -> Option<f32> {  // TODO: this freaks if given a whole number without a decimal
         let i = Self::new(prompt);
         match i {
             Some(UserInput::Full(s)) => {

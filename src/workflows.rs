@@ -13,6 +13,10 @@ pub fn cli_workflow_entry() {
     if let Some(gun_data) = weapon_select() {
         let modding_context = ModdingContext::interview_user(
             gun_data.gun_type, gun_data.semi);
+        if modding_context.debug_numbers {
+            println!("GunData Printing...");
+            gun_data.print();
+        };
         if modding_context.riven {
             riven_input_loop(gun_data, modding_context);
         } else {

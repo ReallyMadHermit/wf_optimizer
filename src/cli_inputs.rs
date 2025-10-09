@@ -38,12 +38,10 @@ pub enum UserInput {
         };
         prefer_yes
     }
-
-    // TODO: write the min, max, and default sizes as Option<> values, tedious to always specific
+    
     pub fn looped_integer_prompt(prompt: &str, min: usize, max: usize, default_value: usize) -> usize {
         loop {
-            let input = UserInput::new(prompt);
-            let response = if let Some(ui) = input {
+            let response = if let Some(ui) = UserInput::new(prompt) {
                 ui
             } else {
                 return default_value;
@@ -55,6 +53,24 @@ pub enum UserInput {
                     } else {
                         println!("That number exceeds the index boundary! Try again...")
                     };
+                },
+                _ => {
+                    println!("That's not a number! Try again...");
+                }
+            };
+        };
+    }
+
+    pub fn looped_integer_prompt_simple(prompt: &str) -> usize {
+        loop {
+            let response = if let Some(ui) = UserInput::new(prompt) {
+                ui
+            } else {
+                continue;
+            };
+            match response {
+                UserInput::Digit(d) => {
+                    return d;
                 },
                 _ => {
                     println!("That's not a number! Try again...");

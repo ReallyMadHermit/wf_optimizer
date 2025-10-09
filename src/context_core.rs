@@ -58,6 +58,16 @@ impl WeaponType {
             (_, Self::All))
     }
 
+    pub fn str(&self) -> &'static str {
+        match self {
+            Self::Rifle => "Rifle",
+            Self::Shotgun => "Shotgun",
+            Self::Pistol => "Pistol",
+            Self::Bow => "Bow",
+            _ => "idk"
+        }
+    }
+
 }
 
 impl DamageCriteria {

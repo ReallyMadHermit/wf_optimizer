@@ -22,7 +22,7 @@ pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildComb
     let mut combinations: Vec<BuildCombo> = Vec::with_capacity(size);
     let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
     for _ in 0..combination_count {
-        live_array[7] = live_array[7] + 1;
+        live_array[7] += 1;
         if live_array[7] == index_count {
             array_flipper(&mut live_array);
         };

@@ -59,6 +59,30 @@ impl GunData {
         }
     }
 
+    pub fn print(&self) {
+        println!("Name: {}", self.name);
+        println!("Fire Mode: {}", self.fire_mode);
+        println!("Gun Type: {}", self.gun_type.str());
+        println!("Semi: {}",self.semi);
+        println!("Gun Stats...");
+        println!("  Fire Rate: {}", self.gun_stats.fire_rate);
+        println!("  Multishot: {}", self.gun_stats.multishot);
+        println!("  Magazine: {}", self.gun_stats.magazine);
+        println!("  Reload: {}", self.gun_stats.reload);
+        println!("  Hit Stats 1:");
+        println!("    Damage: {}", self.gun_stats.hit_stats[0].damage);
+        println!("    Crit-Chance: {}", self.gun_stats.hit_stats[0].crit_chance);
+        println!("    Crit-Damage: {}", self.gun_stats.hit_stats[0].crit_damage);
+        println!("    Status: {}", self.gun_stats.hit_stats[0].status);
+        if self.gun_stats.hit_stats[1].damage > 0.0 {
+            println!("  Hit Stats 2:");
+            println!("    Damage: {}", self.gun_stats.hit_stats[1].damage);
+            println!("    Crit-Chance: {}", self.gun_stats.hit_stats[1].crit_chance);
+            println!("    Crit-Damage: {}", self.gun_stats.hit_stats[1].crit_damage);
+            println!("    Status: {}", self.gun_stats.hit_stats[1].status);
+        };
+    }
+
     fn parse_bool(s: &str) -> bool {
         s == "TRUE"
     }
@@ -68,28 +92,33 @@ impl GunData {
 pub fn weapon_select() -> Option<GunData> {
     let full_csv: Vec<&str> = GUN_DATA.lines().collect();
     let headless_csv = &full_csv[1..];
-    println!("Enter the weapon's name (it's case sensitive, (out of spite,) of course)");
-    println!("Leave blank, or fuck up the input to choose from a list:");
-    let input = UserInput::new("...Or enter '*' to do them all, lmao (this will take a while)");
-    match input {
-        Some(UserInput::Full(s)) => {
-            if let Some(index) = weapon_name_search(&s, headless_csv) {
-                Some(GunData::from_csv_line(headless_csv[index]))
-            } else {
-                let c = s.chars().next().unwrap();
-                Some(GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)]))
+    loop {
+        println!("Enter a weapon's name (it's case sensitive, (out of spite,) of course)");
+        println!("Leave blank to enter a weapon's stats manually, for kit guns and incarnon weapons");
+        let input = UserInput::new("...Or enter '*' to do them all, lmao (this will take a while)");
+        match input {
+            Some(UserInput::Full(s)) => {
+                return if let Some(index) = weapon_name_search(&s, headless_csv) {
+                    Some(GunData::from_csv_line(headless_csv[index]))
+                } else {
+                    let c = s.chars().next().unwrap();
+                    Some(GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)]))
+                };
+            },
+            Some(UserInput::Single(c)) => {
+                if c == '*' {
+                    return None;
+                };
+            },
+            None => {
+                return Some(custom_weapon_input());
+            },
+            _ => {
+                println!("what? try again");
             }
-        },
-        Some(UserInput::Single(c)) => {
-            if c == '*' {
-                return None;
-            };
-            Some(GunData::from_csv_line(headless_csv[weapon_first_letter_search(c, headless_csv)]))
-        },
-        _ => {
-            Some(GunData::from_csv_line(headless_csv[weapon_list_select(None, headless_csv)]))
-        }
-    }
+        };
+    };
+
 }
 
 fn weapon_name_search(input_string: &str, headless_csv: &[&str]) -> Option<usize> {
@@ -138,5 +167,89 @@ fn weapon_list_select(options: Option<Vec<usize>>, headless_csv: &[&str]) -> usi
     } else {
         let l = headless_csv.len();
         weapon_list_select(Some((0..l).collect::<Vec<usize>>()), headless_csv)
+    }
+}
+
+fn custom_weapon_input() -> GunData {
+    println!("A custom weapon, huh?! Okay well this is gonna be a lot of inputs, read carefully...");
+    let semi = UserInput::yes_no_prompt("Is the weapon eligible for Cannonade mods", false);
+    let type_integer = UserInput::looped_integer_prompt(
+        "Is it a Rifle, Shotgun, or Pistol?\n1. Rifle*\n2. Shotgun\n3. Pistol\n4. Bow",
+        1, 3, 1
+    );
+    let gun_type = match type_integer {
+        1 => WeaponType::Rifle,
+        2 => WeaponType::Shotgun,
+        3 => WeaponType::Pistol,
+        4 => WeaponType::Bow,
+        _ => WeaponType::Rifle
+    };
+    let fire_rate = UserInput::f32_loop(
+        "What's the weapon's fire rate, in rounds-per-second?"
+    );
+    let multishot = UserInput::looped_integer_prompt(
+        "What's the weapon's base projectile count? (defaults to 1)",
+        1, 1000, 1
+    ) as f32;
+    let magazine = UserInput::looped_integer_prompt(
+        "How many rounds are in the weapon's magazine?",
+        0, 1000, 0
+    ) as f32;
+    let reload = UserInput::f32_loop(
+        "How long does it take to reload, in seconds?"
+    );
+    println!("Okay! HitStats time, let's start with the 'impact' damage instance.");
+    let hit_stat_1 = {
+        let damage = UserInput::looped_integer_prompt(
+            "How much damage does each projectile deal, on hit? (not counting secondary, radial damage)",
+            0, 100000, 1
+        ) as f32;
+        let crit_chance = UserInput::f32_loop(
+            "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc"
+        );
+        let crit_damage = UserInput::f32_loop(
+            "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x"
+        );
+        let status = UserInput::f32_loop(
+            "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc"
+        );
+        HitStats {
+            damage, crit_chance, crit_damage, status
+        }
+    };
+    let hit_stat_2 = if UserInput::yes_no_prompt("Is there a second damage instance? Like, a radial after the impact?", false) {
+        let damage = UserInput::looped_integer_prompt(
+            "How much damage does the secondary instance deal",
+            0, 100000, 1
+        ) as f32;
+        let crit_chance = UserInput::f32_loop(
+            "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc"
+        );
+        let crit_damage = UserInput::f32_loop(
+            "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x"
+        );
+        let status = UserInput::f32_loop(
+            "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc"
+        );
+        HitStats {
+            damage, crit_chance, crit_damage, status
+        }
+    } else {
+        HitStats {
+            damage: 0.0,
+            crit_chance: 0.0,
+            crit_damage: 0.0,
+            status: 0.0
+        }
+    };
+    let hit_stats = [hit_stat_1, hit_stat_2];
+    GunData {
+        name: "Custom Gun",
+        fire_mode: "Some Fire Mode",
+        gun_type,
+        semi,
+        gun_stats: GunStats {
+            fire_rate, multishot, magazine, reload, hit_stats
+        }
     }
 }

@@ -74,16 +74,15 @@ pub enum UserInput {
         }
     }
 
-    pub fn f32(prompt: &str) -> Option<f32> {  // TODO: this freaks if given a whole number without a decimal
+    pub fn f32(prompt: &str) -> Option<f32> {
         let i = Self::new(prompt);
         match i {
             Some(UserInput::Full(s)) => {
                 let r = s.parse::<f32>();
-                if let Ok(f) = r {
-                    Some(f)
-                } else {
-                    return None
-                }
+                r.ok()
+            },
+            Some(UserInput::Digit(e)) => {
+                Some(e as f32)
             },
             _ => None
         }

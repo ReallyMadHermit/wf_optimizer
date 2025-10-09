@@ -63,13 +63,13 @@ pub enum UserInput {
         };
     }
 
-    pub fn f32_loop(prompt: &str) -> f32 {  // TODO: include a default Option<>
+    pub fn f32_loop(prompt: &str, default: Option<f32>) -> f32 {
         loop {
             let r = Self::f32(prompt);
             if let Some(f) = r {
                 return f;
-            } else {
-                continue;
+            } else if let Some (d) = default {
+                return d;
             };
         }
     }

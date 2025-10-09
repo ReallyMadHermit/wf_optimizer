@@ -185,7 +185,8 @@ fn custom_weapon_input() -> GunData {
         _ => WeaponType::Rifle
     };
     let fire_rate = UserInput::f32_loop(
-        "What's the weapon's fire rate, in rounds-per-second?"
+        "What's the weapon's fire rate, in rounds-per-second?",
+        None
     );
     let multishot = UserInput::looped_integer_prompt(
         "What's the weapon's base projectile count? (defaults to 1)",
@@ -196,7 +197,8 @@ fn custom_weapon_input() -> GunData {
         0, 1000, 0
     ) as f32;
     let reload = UserInput::f32_loop(
-        "How long does it take to reload, in seconds?"
+        "How long does it take to reload, in seconds?",
+        Some(0.0)
     );
     println!("Okay! HitStats time, let's start with the 'impact' damage instance.");
     let hit_stat_1 = {
@@ -205,13 +207,16 @@ fn custom_weapon_input() -> GunData {
             0, 100000, 1
         ) as f32;
         let crit_chance = UserInput::f32_loop(
-            "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc"
+            "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc",
+            None
         );
         let crit_damage = UserInput::f32_loop(
-            "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x"
+            "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x",
+            None
         );
         let status = UserInput::f32_loop(
-            "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc"
+            "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc",
+            None
         );
         HitStats {
             damage, crit_chance, crit_damage, status
@@ -222,14 +227,17 @@ fn custom_weapon_input() -> GunData {
             "How much damage does the secondary instance deal",
             0, 100000, 1
         ) as f32;
-        let crit_chance = UserInput::f32_loop(  // TODO: use last hit stat as default?
-            "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc"
+        let crit_chance = UserInput::f32_loop(
+            "What's the crit chance? Press enter to use the same crit chance as above.",
+            Some(hit_stat_1.crit_chance)
         );
-        let crit_damage = UserInput::f32_loop(  // TODO: use last hit stat as default?
-            "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x"
+        let crit_damage = UserInput::f32_loop(
+            "What's the crit damage? Press enter to use the same crit damage as above.",
+            Some(hit_stat_1.crit_damage)
         );
-        let status = UserInput::f32_loop(  // TODO: use last hit stat as default?
-            "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc"
+        let status = UserInput::f32_loop(
+            "What's the status chance? Press enter to use the same status chance as above.",
+            Some(hit_stat_1.status)
         );
         HitStats {
             damage, crit_chance, crit_damage, status

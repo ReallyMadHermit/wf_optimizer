@@ -14,7 +14,7 @@ pub fn generate_combinations(index_count: u8, arcane_count: u8, show_numbers: bo
         index_count as usize,
         8
     );
-    let size = if arcane_count > 0 {  // TODO: incorporate debug_numbers and timers
+    let size = if arcane_count > 0 {
         combination_count * arcane_count as usize
     } else {
         combination_count

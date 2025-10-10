@@ -2,7 +2,7 @@ use crate::data::GUN_DATA;
 use crate::context_core::{WeaponType};
 use crate::cli_inputs::UserInput;
 
-pub struct GunData {  // TODO: restructure to include other fire modes
+pub struct GunData {
     pub name: &'static str,
     pub fire_mode: &'static str,
     pub gun_type: WeaponType,
@@ -201,33 +201,28 @@ fn custom_weapon_input() -> GunData {
     );
     println!("Okay! HitStats time, let's start with the 'impact' damage instance.");
     let hit_stat_1 = {
-        let damage_message = if multishot > 1 {
-            "How much damage does each projectile deal, on hit? Don't trust the 'total' in arsenal"
-        } else {
-            "What's the total damage for the impact, not counting radial damage?"
-        };
         let damage = UserInput::looped_integer_prompt_simple(
-            "How much damage does each projectile deal, on hit?",
+            "How much damage does each projectile deal, on impact?",
         ) as f32;
         let crit_chance = UserInput::f32_loop(
-            "What's the crit chance? Enter it like 0.36 for 36%, 0.5 for 50%, etc",
+            "What's the crit chance? Enter it as 36 for 36%, 50 for 50%, etc",
             None
-        );
+        ) / 10.0;
         let crit_damage = UserInput::f32_loop(
             "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x",
             None
         );
         let status = UserInput::f32_loop(
-            "What's the status chance? Enter it the same as crit chance, 0.3 for 30%, 0.45 for 45%, etc",
+            "What's the status chance? Enter it the same as crit chance, 30 for 30%, 45 for 45%, etc",
             None
-        );
+        ) / 10.0;
         HitStats {
             damage, crit_chance, crit_damage, status
         }
     };
     let hit_stat_2 = if UserInput::yes_no_prompt("Is there a second damage instance? Like, a radial after the impact?", false) {
         let damage = UserInput::looped_integer_prompt_simple(
-            "How much damage does the secondary instance deal",
+            "How much damage per-projectile?",
         ) as f32;
         let crit_chance = UserInput::f32_loop(
             "What's the crit chance? Press enter to use the same crit chance as above.",

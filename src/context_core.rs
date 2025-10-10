@@ -107,7 +107,7 @@ impl ModdingContext {
         let kills = UserInput::yes_no_prompt("Use kill-reliant benefits", true);
         let aiming = UserInput::yes_no_prompt("Use aiming-reliant benefits", true);
         let headshot = UserInput::yes_no_prompt("Hitting headshots often", false);
-        let acuity = if headshot && gun_type != Shotgun {  // TODO: write a method for can_use_acuity in WeaponType
+        let acuity = if headshot && gun_type != Shotgun {
             UserInput::yes_no_prompt("Use acuity mods", false)
         } else {
             false

@@ -2,6 +2,8 @@ use crate::data::GUN_DATA;
 use crate::context_core::{WeaponType};
 use crate::cli_inputs::UserInput;
 
+const PERCENT_DIV: f32 = 100.0;
+
 pub struct GunData {
     pub name: &'static str,
     pub fire_mode: &'static str,
@@ -207,7 +209,7 @@ fn custom_weapon_input() -> GunData {
         let crit_chance = UserInput::f32_loop(
             "What's the crit chance? Enter it as 36 for 36%, 50 for 50%, etc",
             None
-        ) / 10.0;
+        ) / PERCENT_DIV;
         let crit_damage = UserInput::f32_loop(
             "What's the crit damage? Enter it like 2.5 for 2.5x, or 3.0 for 3x",
             None
@@ -215,7 +217,7 @@ fn custom_weapon_input() -> GunData {
         let status = UserInput::f32_loop(
             "What's the status chance? Enter it the same as crit chance, 30 for 30%, 45 for 45%, etc",
             None
-        ) / 10.0;
+        ) / PERCENT_DIV;
         HitStats {
             damage, crit_chance, crit_damage, status
         }
@@ -226,16 +228,16 @@ fn custom_weapon_input() -> GunData {
         ) as f32;
         let crit_chance = UserInput::f32_loop(
             "What's the crit chance? Press enter to use the same crit chance as above.",
-            Some(hit_stat_1.crit_chance)
-        );
+            Some(hit_stat_1.crit_chance * 100.0)
+        ) / PERCENT_DIV;
         let crit_damage = UserInput::f32_loop(
             "What's the crit damage? Press enter to use the same crit damage as above.",
             Some(hit_stat_1.crit_damage)
         );
         let status = UserInput::f32_loop(
             "What's the status chance? Press enter to use the same status chance as above.",
-            Some(hit_stat_1.status)
-        );
+            Some(hit_stat_1.status * 100.0)
+        ) / PERCENT_DIV;
         HitStats {
             damage, crit_chance, crit_damage, status
         }

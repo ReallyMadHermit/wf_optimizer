@@ -1,8 +1,3 @@
-// use std::time::Instant;
-use std::mem::size_of;
-
-use crate::workflows::cli_workflow_entry;
-
 mod data;
 mod combinatorics;
 mod cli_inputs;
@@ -16,5 +11,5 @@ mod workflows;
 fn main() {
     // println!("{:?}", size_of::<Probable>());
     // struct_sizing();
-    cli_workflow_entry();
+    workflows::cli_workflow_entry();
 }

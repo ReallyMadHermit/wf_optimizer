@@ -27,10 +27,10 @@ pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildComb
             array_flipper(&mut live_array);
         };
         if arcane_count < 1 {
-            combinations.push(BuildCombo::new(live_array.clone(), None));
+            combinations.push(BuildCombo::new(live_array, None));
         } else {
             for a in 0..arcane_count {
-                combinations.push(BuildCombo::new(live_array.clone(), Some(index_count + a)));
+                combinations.push(BuildCombo::new(live_array, Some(index_count + a)));
             };
         };
     };

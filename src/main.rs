@@ -18,9 +18,3 @@ fn main() {
     // struct_sizing();
     cli_workflow_entry();
 }
-
-fn struct_sizing() {
-    println!("Byte-Sizes");
-    println!("LoadedMods: {:?}", size_of::<mod_parsing::LoadedMods>());
-    println!("ModdingContext: {:?}", size_of::<context_core::ModdingContext>());
-}

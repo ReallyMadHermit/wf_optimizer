@@ -50,7 +50,7 @@ pub struct LoadedMods {  // todo: can this be... smaller? it's 104 bytes atm, ve
             print!("Calculating Combinations...");
             start = Instant::now();
         };
-        loaded_mods.calculate_combinatorics(modding_context.debug_numbers);
+        loaded_mods.calculate_combinatorics();
         if modding_context.debug_numbers {
             let d = start.elapsed();
             println!(" Done! {} Combinations in {:?}", loaded_mods.combinations.len(), d);
@@ -199,8 +199,8 @@ impl LoadedMods {
         }
     }
 
-    fn calculate_combinatorics(&mut self, show_numbers: bool) {
-        self.combinations = generate_combinations(self.mod_count, self.arcane_count, show_numbers);
+    fn calculate_combinatorics(&mut self) {
+        self.combinations = generate_combinations(self.mod_count, self.arcane_count);
     }
 
     fn len(&self) -> usize {

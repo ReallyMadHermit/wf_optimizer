@@ -90,14 +90,6 @@ impl DamageCriteria {
         }
     }
 
-    pub fn str(&self) -> &str {
-        match self {
-            Self::PerShot => "Per-shot damage",
-            Self::BurstDPS => "Burst DPS",
-            Self::SustainedDPS => "Sustained DPS"
-        }
-    }
-
 }
 
 impl ModdingContext {

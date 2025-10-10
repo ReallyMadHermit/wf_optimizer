@@ -1,7 +1,5 @@
 use std::io::stdin;
 
-const LOOP_MAX_TRIES: usize = 5;
-
 pub enum UserInput {
     Full(String),
     Single(char),

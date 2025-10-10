@@ -539,23 +539,3 @@ Pistol,Zylok Prime,Normal Attack,FALSE,210,60,12,1.8,1.2,1,0,210,0.12,2.4,0.36,0
 Pistol,Zymos,Homing Spore Contact & Explosion,TRUE,51,40,17,1.33,3.2,6,0,23,0.05,2.3,0.3,333,0.05,2.3,0.3
 Pistol,Zymos,Normal Attack & Headshot Explosion,TRUE,51,40,17,1.33,3.2,1,0,23,0.05,2.3,0.3,953,0.05,2.3,0.5
 Pistol,Zymos,Normal Attack & Radial,TRUE,51,40,17,1.33,3.2,1,0,23,0.05,2.3,0.3,61,0.05,2.3,0.3
-Rifle,Artax,Normal Attack,FALSE,0,0,100,16.67,1.5,1,0,5,0.02,1.5,0.35,0,0,0,0
-Pistol,Burst Laser,Normal Attack,FALSE,0,0,15,1.5,0.01,1,0,20,0.15,2,0.1,0,0,0,0
-Pistol,Burst Laser Prime,Normal Attack,FALSE,0,0,15,1.5,0.01,1,0,25,0.2,2.3,0.15,0,0,0,0
-Rifle,Cryotra,Direct Hit & Cold Field,MAYBE,0,0,3,0.66,5,1,0,10,0.1,1.75,0.1,20,0.1,1.75,0.3
-Rifle,Deth Machine Rifle,Normal Attack,FALSE,0,0,100,8.33,2,1,0,15,0.05,2,0.01,0,0,0,0
-Rifle,Deth Machine Rifle Prime,Normal Attack,FALSE,0,0,100,10,2,1,0,20,0.1,2,0.04,0,0,0,0
-Rifle,Helstrum,Normal Attack,FALSE,0,0,80,0.25,2,1,0,9,0.05,1.5,0.3,0,0,0,0
-Rifle,Helstrum,Explosion,FALSE,0,0,80,0.25,2,1,0,30,0.05,1.5,0.3,0,0,0,0
-Rifle,Laser Rifle,Normal Attack,FALSE,0,0,20,5,1.2,1,0,45,0.17,1.75,0.075,0,0,0,0
-Rifle,Multron,Projectile Impact & Radial,FALSE,0,0,3,2.5,3,1,0,10,0.15,2,0.22,100,0.15,2,0.22
-Rifle,Prime Laser Rifle,Normal Attack,FALSE,0,0,20,5,1.2,1,0,55,0.2,2,0.1,0,0,0,0
-Pistol,Prisma Burst Laser,Normal Attack,FALSE,0,0,15,1.5,0.01,1,0,22,0.18,2.15,0.1,0,0,0,0
-Rifle,Stinger,Normal Attack & Embed,MAYBE,0,0,4,3.33,1.2,1,0,15,0.025,1.5,0.2,15,0.025,1.5,0.2
-Shotgun,Sweeper,Normal Attack,FALSE,0,0,10,1,2.3,6,0,35,0.1,1.75,0.045,0,0,0,0
-Shotgun,Sweeper Prime,Normal Attack,FALSE,0,0,20,1,2,6,0,45,0.1,2.25,0.05,0,0,0,0
-Rifle,Tazicor,Normal Attack,FALSE,0,0,40,12,2,1,0,5,0.05,1.5,0.25,0,0,0,0
-Rifle,Verglas,Normal Attack,FALSE,0,0,80,12,2.2,1,0,26,0.08,2,0.34,0,0,0,0
-Rifle,Verglas Prime,Normal Attack,FALSE,0,0,80,12,1.6,1,0,32,0.14,2.2,0.36,0,0,0,0
-Rifle,Vulcax,Impact & Radial,FALSE,0,0,1,0.33,3,1,2,500,0.2,2.5,0.1,100,0.2,2.5,0.2
-Rifle,Vulklok,Normal Attack,FALSE,0,0,10,0.15,2,1,1.5,175,0.35,2.5,0.25,0,0,0,0

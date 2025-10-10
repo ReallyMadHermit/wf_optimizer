@@ -67,21 +67,21 @@ impl GunData {
         println!("Gun Type: {}", self.gun_type.str());
         println!("Semi: {}",self.semi);
         println!("Gun Stats...");
-        println!("  Fire Rate: {}", self.gun_stats.fire_rate);
+        println!("  Fire Rate: {}/s", self.gun_stats.fire_rate);
         println!("  Multishot: {}", self.gun_stats.multishot);
         println!("  Magazine: {}", self.gun_stats.magazine);
-        println!("  Reload: {}", self.gun_stats.reload);
+        println!("  Reload: {}s", self.gun_stats.reload);
         println!("  Hit Stats 1:");
         println!("    Damage: {}", self.gun_stats.hit_stats[0].damage);
-        println!("    Crit-Chance: {}", self.gun_stats.hit_stats[0].crit_chance);
+        println!("    Crit-Chance: {}%", self.gun_stats.hit_stats[0].crit_chance * PERCENT_DIV);
         println!("    Crit-Damage: {}", self.gun_stats.hit_stats[0].crit_damage);
-        println!("    Status: {}", self.gun_stats.hit_stats[0].status);
+        println!("    Status-Chance: {}%", self.gun_stats.hit_stats[0].status * PERCENT_DIV);
         if self.gun_stats.hit_stats[1].damage > 0.0 {
             println!("  Hit Stats 2:");
             println!("    Damage: {}", self.gun_stats.hit_stats[1].damage);
-            println!("    Crit-Chance: {}", self.gun_stats.hit_stats[1].crit_chance);
+            println!("    Crit-Chance: {}%", self.gun_stats.hit_stats[1].crit_chance * PERCENT_DIV);
             println!("    Crit-Damage: {}", self.gun_stats.hit_stats[1].crit_damage);
-            println!("    Status: {}", self.gun_stats.hit_stats[1].status);
+            println!("    Status-Chance: {}%", self.gun_stats.hit_stats[1].status * PERCENT_DIV);
         };
     }
 

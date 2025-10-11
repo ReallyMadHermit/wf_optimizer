@@ -1,5 +1,5 @@
 use crate::build_calc::{SortingHelper, ModScores, GunModSums};
-use crate::context_core::DamageCriteria;
+use crate::context_core::{DamageCriteria, ModdingContext};
 use crate::mod_parsing::{LoadedMods, ModData};
 use crate::weapon_select::GunStats;
 
@@ -7,17 +7,14 @@ pub fn show_top_builds_scored(
     loaded_mods: &LoadedMods,
     sorting_helpers: &[SortingHelper],
     gun_stats: &GunStats,
-    damage_criteria: DamageCriteria,
+    modding_context: &ModdingContext,
     count: usize,
     base_sums: Option<GunModSums>
 ) {
-    let sums = match base_sums {
-        Some(s) => {
-            s
-        },
-        None => {
-            GunModSums::new()
-        }
+    let sums = if let Some(sums) = base_sums {
+        sums
+    } else {
+        GunModSums::from_conditions(modding_context.conditions)
     };
     println!("The format is as follows:\nDamage\nArcane\nMod, Mod, Mod, etc...\
         \nThe (numbers) otherwise are a mod-score, higher is more impactful.\n");
@@ -29,7 +26,7 @@ pub fn show_top_builds_scored(
             "No Arcane"
         };
         let mod_scores = ModScores::new(
-            loaded_mods, gun_stats, build_combo, damage_criteria, &sums
+            loaded_mods, gun_stats, build_combo, modding_context.damage_criteria, &sums
         );
         let arcane_score = mod_scores.arcane.unwrap_or_default();
         let scores = mod_scores.mod_scores;

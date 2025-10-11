@@ -35,7 +35,7 @@ pub fn cli_workflow_entry() {
                 &loaded_mods,
                 &build_scores,
                 &gun_data.gun_stats,
-                modding_context.damage_criteria,
+                &modding_context,
                 count,
                 None
             );
@@ -130,7 +130,7 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
                         &loaded_mods,
                         builds,
                         &gun_data.gun_stats,
-                        modding_context.damage_criteria,
+                        &modding_context,
                         n,
                         None
                     );

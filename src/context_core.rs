@@ -29,6 +29,7 @@ pub struct ModdingContext {  // TODO: add buffs & banes to context
     pub prefer_amalgam: bool,
     pub riven: bool,
     pub debug_numbers: bool,
+    pub conditions: u8
 }
 
 impl WeaponType {
@@ -119,8 +120,13 @@ impl ModdingContext {
             _ => {("YOU SHOULDN'T BE SEEING THIS! BUT DO YOU WANT TO USE AMALGAM MODS!", true)}
         };
         let prefer_amalgam = UserInput::yes_no_prompt(amalgam_prompt, default_bool);
-        let riven = UserInput::yes_no_prompt("Use Riven mod", false);
         let debug_numbers = UserInput::yes_no_prompt("show fumky debungk numbgers??", false);
+        let conditions = if kills {
+            UserInput::looped_integer_prompt("For the sake of Gun-CO, how many statuses does the enemy have? (leave blank for 0)", 0, 14, 0) as u8
+        } else {
+            0
+        };
+        let riven = UserInput::yes_no_prompt("Use Riven mod", false);
         ModdingContext {
             weapon_type: gun_type,
             damage_criteria: damage,
@@ -131,7 +137,8 @@ impl ModdingContext {
             acuity,
             riven,
             prefer_amalgam,
-            debug_numbers
+            debug_numbers,
+            conditions
         }
     }
 

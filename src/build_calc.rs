@@ -1,3 +1,4 @@
+use std::os::linux::raw::stat;
 use std::time::Instant;
 use crate::combinatorics::BuildCombo;
 use crate::context_core::{DamageCriteria, ModdingContext};
@@ -24,7 +25,7 @@ pub fn calculate_builds(
     let sums = if let Some(sums) = base_sums {
         sums
     } else {
-        GunModSums::new()
+        GunModSums::from_conditions(modding_context.conditions)
     };
     if modding_context.debug_numbers {
         print!("Calculating damage...");
@@ -206,6 +207,8 @@ pub struct GunModSums {
     pub headshot: f32,
     pub acuity: bool,
     pub cannonade: bool,
+    pub conditions: u8,
+    pub overload: i16
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -222,8 +225,16 @@ pub struct GunModSums {
             ammo_efficiency: 0,
             headshot: 1.0,
             acuity: false,
-            cannonade: false
+            cannonade: false,
+            conditions: 0,
+            overload: 0
         }
+    }
+    
+    pub fn from_conditions(conditions: u8) -> Self {
+        let mut sums = Self::new();
+        sums.conditions = conditions;
+        sums
     }
 
     fn apply_build_combo(&mut self, build_combo: BuildCombo, loaded_mods: &LoadedMods) {
@@ -310,6 +321,9 @@ pub struct GunModSums {
                 self.damage += stat_value;
                 self.cannonade = stat_value > 0;
             },
+            ModStatType::ConditionOverload => {
+                self.overload += stat_value;
+            },
             _ => {}
         };
     }
@@ -378,15 +392,17 @@ fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
     modded_self.reload = apply_inverse_stat_sum(gun_stats.reload, stat_sums.reload);
     for i in 0..gun_stats.hit_stats.len() {
         let modded_hit = &mut modded_self.hit_stats[i];
-        let base_hit = &gun_stats.hit_stats[i];
-        modded_hit.damage = apply_stat_sum(base_hit.damage, stat_sums.damage);
-        modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
-        if i == 0 {
+        let damage_sum = if i == 0 {
             modded_hit.damage *= stat_sums.headshot;
+            stat_sums.damage + stat_sums.overload * stat_sums.conditions as i16
+        } else {
+            stat_sums.damage
         };
-        modded_hit.crit_chance = apply_stat_sum(base_hit.crit_chance, stat_sums.crit_chance);
-        modded_hit.crit_damage = apply_stat_sum(base_hit.crit_damage, stat_sums.crit_damage);
-        modded_hit.status = apply_stat_sum(base_hit.status, stat_sums.status);
+        modded_hit.damage = apply_stat_sum(modded_hit.damage, damage_sum);
+        modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
+        modded_hit.crit_chance = apply_stat_sum(modded_hit.crit_chance, stat_sums.crit_chance);
+        modded_hit.crit_damage = apply_stat_sum(modded_hit.crit_damage, stat_sums.crit_damage);
+        modded_hit.status = apply_stat_sum(modded_hit.status, stat_sums.status);
     };
     if stat_sums.ammo_efficiency >= 100 {
         modded_self.reload = 0.0;

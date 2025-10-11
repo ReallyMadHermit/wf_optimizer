@@ -1,5 +1,5 @@
 use crate::build_calc::{SortingHelper, ModScores, GunModSums};
-use crate::context_core::{DamageCriteria, ModdingContext};
+use crate::context_core::ModdingContext;
 use crate::mod_parsing::{LoadedMods, ModData};
 use crate::weapon_select::GunStats;
 

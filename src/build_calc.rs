@@ -341,20 +341,20 @@ impl GunStats {
     }
 
     pub fn burst_damage(&self, shot_damage: f32) -> f32 {
-        if self.magazine > 1.1 {  // TODO: review how this affects bows
+        if self.magazine != 1.0 {
             self.fire_rate * shot_damage
         } else {
-            shot_damage
+            shot_damage / self.reload
         }
     }
 
     pub fn sustained_dps(&self, burst_dps: f32) -> f32 {
-        if self.magazine > 1.1 {
+        if self.magazine > 1.0 {
             let mag_time = self.magazine / self.fire_rate;
             let firing_ratio = mag_time / (mag_time + self.reload);
             firing_ratio * burst_dps
         } else {
-            burst_dps / self.reload
+            burst_dps
         }
     }
 

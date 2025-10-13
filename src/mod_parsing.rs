@@ -9,11 +9,11 @@ const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
 const BADMATCH_INDEX: usize = 13;
 
-pub struct LoadedMods {  // todo: can this be... smaller? it's 104 bytes atm, very sinful
-    mod_names: Vec<&'static str>,  // TODO: Box<[&'static str]>
-    mod_data: Vec<ModData>,  // TODO: Box<[ModData]>
+pub struct LoadedMods {
+    mod_names: Vec<&'static str>,
+    mod_data: Vec<ModData>,
     included_mods: Option<Vec<u8>>,  // TODO: array-ify this
-    pub combinations: Vec<BuildCombo>,  // TODO: Box<[Combinations]>
+    pub combinations: Vec<BuildCombo>,
     pub mod_count: u8,
     pub arcane_count: u8,
     riven_index: Option<u8>

@@ -1,6 +1,6 @@
 use std::time::Instant;
 use crate::combinatorics::BuildCombo;
-use crate::context_core::{DamageCriteria, ModdingContext};
+use crate::context_core::{DamageCriteria, ModdingContext, WeaponType};
 use crate::mod_parsing::{LoadedMods, ModStatType};
 use crate::weapon_select::GunStats;
 
@@ -341,7 +341,7 @@ impl GunStats {
     }
 
     pub fn burst_damage(&self, shot_damage: f32) -> f32 {
-        if self.magazine != 1.0 {
+        if self.magazine != 1.0 || self.gun_type == WeaponType::Bow {
             self.fire_rate * shot_damage
         } else {
             shot_damage / self.reload
@@ -349,7 +349,7 @@ impl GunStats {
     }
 
     pub fn sustained_dps(&self, burst_dps: f32) -> f32 {
-        if self.magazine > 1.0 {
+        if self.magazine > 1.0 || self.gun_type == WeaponType::Bow {
             let mag_time = self.magazine / self.fire_rate;
             let firing_ratio = mag_time / (mag_time + self.reload);
             firing_ratio * burst_dps
@@ -358,6 +358,14 @@ impl GunStats {
         }
     }
 
+}
+
+fn apply_bow_fire_rate(base_stat: f32, mod_sum: i16) -> f32 {
+    if mod_sum == 100 {
+        return base_stat;
+    };
+    let bow_sum = (mod_sum - 100) * 2 + 100;
+    base_stat * (bow_sum as f32 / 100.0)
 }
 
 fn apply_stat_sum(base_stat: f32, mod_sum: i16) -> f32 {
@@ -381,7 +389,12 @@ fn apply_ammo_efficiency(mag_size: f32, ammo_efficiency: i16) -> f32 {
 
 fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
     let mut modded_self = gun_stats.clone();
-    if !stat_sums.cannonade {
+    // if !stat_sums.cannonade {
+    //     modded_self.fire_rate = apply_stat_sum(gun_stats.fire_rate, stat_sums.fire_rate);
+    // };
+    if gun_stats.gun_type == WeaponType::Bow {
+        modded_self.fire_rate = apply_bow_fire_rate(gun_stats.fire_rate, stat_sums.fire_rate);
+    } else if !stat_sums.cannonade {
         modded_self.fire_rate = apply_stat_sum(gun_stats.fire_rate, stat_sums.fire_rate);
     };
     if !stat_sums.acuity {

@@ -389,9 +389,6 @@ fn apply_ammo_efficiency(mag_size: f32, ammo_efficiency: i16) -> f32 {
 
 fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
     let mut modded_self = gun_stats.clone();
-    // if !stat_sums.cannonade {
-    //     modded_self.fire_rate = apply_stat_sum(gun_stats.fire_rate, stat_sums.fire_rate);
-    // };
     if gun_stats.gun_type == WeaponType::Bow {
         modded_self.fire_rate = apply_bow_fire_rate(gun_stats.fire_rate, stat_sums.fire_rate);
     } else if !stat_sums.cannonade {

@@ -12,7 +12,7 @@ const BADMATCH_INDEX: usize = 13;
 pub struct LoadedMods {
     mod_names: Vec<&'static str>,
     mod_data: Vec<ModData>,
-    included_mods: Option<Vec<u8>>,  // TODO: array-ify this
+    included_mods: Option<[Option<u8>; 4]>,  // TODO: array-ify this
     pub combinations: Vec<BuildCombo>,
     pub mod_count: u8,
     pub arcane_count: u8,
@@ -225,11 +225,24 @@ impl LoadedMods {
 
     fn include_mod(&mut self, mod_id: u8) {
         match &mut self.included_mods {
-            Some(ref mut vec) => vec.push(mod_id),
+            Some(ref mut a) => {
+                for i in 0..5usize {
+                    if i > 3 {
+                        println!("Oops! The program will now panic--bye!");
+                    };
+                    match a[i] {
+                        Some(_) => continue,
+                        None => {
+                            a[i] = Some(mod_id);
+                            break;
+                        }
+                    };
+                };
+            },
             None => {
-                let mut vec = Vec::with_capacity(3);
-                vec.push(mod_id);
-                self.included_mods = Some(vec);
+                let mut array = [None; 4];
+                array[0] = Some(mod_id);
+                self.included_mods = Some(array);
             }
         }
     }
@@ -307,12 +320,22 @@ impl LoadedMods {
         self.combinations.shrink_to_fit();
     }
 
-    fn contains_required_mods(combo: &[u8; 8], included_mods: &[u8]) -> bool {
+    fn contains_required_mods(combo: &[u8; 8], included_mods: &[Option<u8>; 4]) -> bool {
         let mut flag_array = [false; 64];
         for &i in combo {
             flag_array[i as usize] = true;
         };
-        included_mods.iter().all(|&i| flag_array[i as usize])
+        for m in included_mods {
+            match m {
+                Some(i) => {
+                    if !flag_array[*i as usize] {
+                        return false;
+                    };
+                },
+                None => break
+            };
+        };
+        true
     }
 
     fn contains_illegal_pair(combo: &[u8; 8], illegal_pairs: &[(u8, u8)]) -> bool {

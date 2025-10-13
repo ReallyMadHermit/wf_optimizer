@@ -12,7 +12,7 @@ const BADMATCH_INDEX: usize = 13;
 pub struct LoadedMods {
     mod_names: Vec<&'static str>,
     mod_data: Vec<ModData>,
-    included_mods: Option<[Option<u8>; 4]>,  // TODO: array-ify this
+    included_mods: Option<[Option<u8>; 4]>,
     pub combinations: Vec<BuildCombo>,
     pub mod_count: u8,
     pub arcane_count: u8,

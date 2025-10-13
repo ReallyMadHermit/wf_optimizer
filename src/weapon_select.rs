@@ -7,13 +7,13 @@ const PERCENT_DIV: f32 = 100.0;
 pub struct GunData {
     pub name: &'static str,
     pub fire_mode: &'static str,
-    pub gun_type: WeaponType,
     pub semi: bool,
     pub gun_stats: GunStats,
 }
 
 #[derive(Clone)]
 pub struct GunStats {
+    pub gun_type: WeaponType,
     pub fire_rate: f32,
     pub multishot: f32,
     pub magazine: f32,
@@ -36,9 +36,9 @@ impl GunData {
         GunData {
             name: split[1],
             fire_mode: split[2],
-            gun_type: WeaponType::from_str(split[0]),
             semi: Self::parse_bool(split[3]),
             gun_stats: GunStats {
+                gun_type: WeaponType::from_str(split[0]),
                 fire_rate: split[7].parse().unwrap(),
                 multishot: split[9].parse().unwrap(),
                 magazine: split[6].parse().unwrap(),
@@ -64,7 +64,7 @@ impl GunData {
     pub fn print(&self) {
         println!("Name: {}", self.name);
         println!("Fire Mode: {}", self.fire_mode);
-        println!("Gun Type: {}", self.gun_type.str());
+        println!("Gun Type: {}", self.gun_stats.gun_type.str());
         println!("Semi: {}",self.semi);
         println!("Gun Stats...");
         println!("  Fire Rate: {}/s", self.gun_stats.fire_rate);
@@ -253,10 +253,9 @@ fn custom_weapon_input() -> GunData {
     GunData {
         name: "Custom Gun",
         fire_mode: "Some Fire Mode",
-        gun_type,
         semi,
         gun_stats: GunStats {
-            fire_rate, multishot: multishot as f32, magazine, reload, hit_stats
+            gun_type, fire_rate, multishot: multishot as f32, magazine, reload, hit_stats
         }
     }
 }

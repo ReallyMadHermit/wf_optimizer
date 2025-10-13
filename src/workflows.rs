@@ -12,7 +12,7 @@ use crate::weapon_select::{GunData, GunStats, weapon_select};
 pub fn cli_workflow_entry() {
     if let Some(gun_data) = weapon_select() {
         let modding_context = ModdingContext::interview_user(
-            gun_data.gun_type, gun_data.semi);
+            gun_data.gun_stats.gun_type, gun_data.semi);
         if modding_context.debug_numbers {
             println!("Printing GunData...");
             gun_data.print();
@@ -57,7 +57,7 @@ fn test_all_weapons() {
     csv_lines.next();
     for line in csv_lines {
         let gun_data = GunData::from_csv_line(line);
-        modding_context.weapon_type = gun_data.gun_type;
+        modding_context.weapon_type = gun_data.gun_stats.gun_type;
         modding_context.semi = gun_data.semi;
         let loaded_mods = if let Some(result) = loaded_hashmap.get(&modding_context) {
             result

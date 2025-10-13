@@ -400,7 +400,7 @@ impl LoadedMods {
 
 impl ModStatType {
 
-    fn from_str(string_slice: &str) -> Self {  // TODO: make this return an option
+    fn from_str(string_slice: &str) -> Self {
         match string_slice {
             "None" => Self::None,
             "Damage" => Self::Damage,
@@ -461,7 +461,7 @@ impl ModData {
         }
     }
 
-    fn from_split_slice(slice: &[&str]) -> Self {  // TODO: return Option<Self> and expect Option<ModStatType>
+    fn from_split_slice(slice: &[&str]) -> Self {
         let mut mod_data = Self::empty();
         let stat_type_1 = ModStatType::from_str(slice[0]);
         let stat_value_1: i16 = slice[1].parse().unwrap_or_default();

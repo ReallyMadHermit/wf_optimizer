@@ -46,8 +46,8 @@ pub struct LoadedMods {
         Self::parse_mods(&mut loaded_mods, arcane_range, arcane_scores, true);
         if modding_context.debug_numbers {
             let d = start.elapsed();
-            println!(" Done! {:?}", d);
-            print!("Calculating Combinations...");
+            println!(" Done! Loaded {} mods in {:?}", loaded_mods.mod_data.len(), d);
+            print!("Calculating Combinatorics...");
             start = Instant::now();
         };
         loaded_mods.calculate_combinatorics();

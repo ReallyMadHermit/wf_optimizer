@@ -81,7 +81,7 @@ fn calculate_shot_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage();
+        let shot_damage = modded_stats.shot_damage(mod_sums.empowered);
         builds.push(SortingHelper::new(shot_damage, index));
     };
     builds
@@ -100,7 +100,7 @@ fn calculate_burst_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage();
+        let shot_damage = modded_stats.shot_damage(mod_sums.empowered);
         let burst_damage = modded_stats.burst_damage(shot_damage);
         builds.push(SortingHelper::new(burst_damage, index));
     };
@@ -120,7 +120,7 @@ fn calculate_sustained_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage();
+        let shot_damage = modded_stats.shot_damage(mod_sums.empowered);
         let burst_damage = modded_stats.burst_damage(shot_damage);
         let sustained_damage = modded_stats.sustained_dps(burst_damage);
         builds.push(SortingHelper::new(sustained_damage, index));
@@ -180,7 +180,7 @@ fn calculate_single_build(
     damage_criteria: DamageCriteria
 ) -> f32 {
     let stats = apply_mod_sum(base_gun_stats, mod_sums);
-    let damage = stats.shot_damage();
+    let damage = stats.shot_damage(mod_sums.empowered);
     if damage_criteria == DamageCriteria::PerShot {
         return damage;
     };
@@ -207,7 +207,8 @@ pub struct GunModSums {
     pub acuity: bool,
     pub cannonade: bool,
     pub conditions: u8,
-    pub overload: i16
+    pub overload: i16,
+    pub empowered: i16
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -226,7 +227,8 @@ pub struct GunModSums {
             acuity: false,
             cannonade: false,
             conditions: 0,
-            overload: 0
+            overload: 0,
+            empowered: 0
         }
     }
     
@@ -323,6 +325,9 @@ pub struct GunModSums {
             ModStatType::ConditionOverload => {
                 self.overload += stat_value;
             },
+            ModStatType::Empowered => {
+                self.empowered += stat_value;
+            },
             _ => {}
         };
     }
@@ -331,10 +336,16 @@ pub struct GunModSums {
 
 impl GunStats {
 
-    pub fn shot_damage(&self) -> f32 {
+    pub fn shot_damage(&self, empowered: i16) -> f32 {
         let mut hit_sum = 0.0;
         for hit in &self.hit_stats {
-            hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)))
+            if hit.damage <= 0.0 {
+                continue;
+            };
+            hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)));
+            if empowered > 0 {
+                hit_sum += hit.status * empowered as f32;
+            };
         };
         hit_sum *= self.multishot;
         hit_sum

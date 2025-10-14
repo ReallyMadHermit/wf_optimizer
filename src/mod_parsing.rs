@@ -111,7 +111,8 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     Headshot,
     Riven,
     Cannonade,
-    Acuity
+    Acuity,
+    Empowered
 } impl ModStatType {
 
     pub fn to_str(&self) -> &'static str {
@@ -138,7 +139,8 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
             Self::Headshot => "Headshot Damage",
             Self::Riven => "Riven",
             Self::Cannonade => "Cannonade",
-            Self::Acuity => "Acuity"
+            Self::Acuity => "Acuity",
+            Self::Empowered => "Empowered"
         }
     }
 
@@ -425,6 +427,7 @@ impl ModStatType {
             "Riven" => Self::Riven,
             "Cannonade" => Self::Cannonade,
             "Acuity" => Self::Acuity,
+            "Empowered" => Self::Empowered,
             _ => {
                 println!("{} not found! Using 'None'", string_slice);
                 Self::None

@@ -18,7 +18,7 @@ pub struct GunStats {
     pub multishot: f32,
     pub magazine: f32,
     pub reload: f32,
-    pub hit_stats: [HitStats; 2]  // TODO: update to [Option<HitStats>; 2]
+    pub hit_stats: [HitStats; 2]
 }
 
 #[derive(Copy, Clone)]

@@ -81,7 +81,7 @@ fn calculate_shot_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage(mod_sums.empowered);
+        let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
         builds.push(SortingHelper::new(shot_damage, index));
     };
     builds
@@ -100,7 +100,7 @@ fn calculate_burst_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage(mod_sums.empowered);
+        let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
         let burst_damage = modded_stats.burst_damage(shot_damage);
         builds.push(SortingHelper::new(burst_damage, index));
     };
@@ -120,7 +120,7 @@ fn calculate_sustained_damage(
             mod_sums.add_mod(a, loaded_mods);
         };
         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage(mod_sums.empowered);
+        let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
         let burst_damage = modded_stats.burst_damage(shot_damage);
         let sustained_damage = modded_stats.sustained_dps(burst_damage);
         builds.push(SortingHelper::new(sustained_damage, index));
@@ -180,7 +180,7 @@ fn calculate_single_build(
     damage_criteria: DamageCriteria
 ) -> f32 {
     let stats = apply_mod_sum(base_gun_stats, mod_sums);
-    let damage = stats.shot_damage(mod_sums.empowered);
+    let damage = stats.shot_damage(mod_sums.empowered, mod_sums.bane);
     if damage_criteria == DamageCriteria::PerShot {
         return damage;
     };
@@ -341,7 +341,7 @@ pub struct GunModSums {
 
 impl GunStats {
 
-    pub fn shot_damage(&self, empowered: i16) -> f32 {
+    pub fn shot_damage(&self, empowered: i16, bane: i16) -> f32 {
         let mut hit_sum = 0.0;
         for hit in &self.hit_stats {
             if hit.damage <= 0.0 {
@@ -349,7 +349,8 @@ impl GunStats {
             };
             hit_sum += hit.damage * (1.0 + (hit.crit_chance * (hit.crit_damage - 1.0)));
             if empowered > 0 {
-                hit_sum += hit.status * empowered as f32;
+                let bane_eff = apply_stat_sum(1.0, bane);
+                hit_sum += hit.status * (bane_eff * empowered as f32);
             };
         };
         hit_sum *= self.multishot;
@@ -425,7 +426,6 @@ fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
         };
         modded_hit.damage = apply_stat_sum(modded_hit.damage, damage_sum);
         modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
-        modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.bane);
         modded_hit.crit_chance = apply_stat_sum(modded_hit.crit_chance, stat_sums.crit_chance);
         modded_hit.crit_damage = apply_stat_sum(modded_hit.crit_damage, stat_sums.crit_damage);
         modded_hit.status = apply_stat_sum(modded_hit.status, stat_sums.status);

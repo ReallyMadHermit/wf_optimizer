@@ -3,7 +3,7 @@ use crate::combinatorics::{generate_combinations, BuildCombo};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};
 
-const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 12];
+const BEHAVIOR_SLICE_INDICES: [usize;2] = [6, 15];
 const BSI: [usize;2] = BEHAVIOR_SLICE_INDICES;
 const MOD_DATA_SLICE_INDICES: [usize;2] = [2, 5];
 const MDSI: [usize;2] = MOD_DATA_SLICE_INDICES;
@@ -112,7 +112,8 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
     Riven,
     Cannonade,
     Acuity,
-    Empowered
+    Empowered,
+    Bane
 } impl ModStatType {
 
     pub fn to_str(&self) -> &'static str {
@@ -140,7 +141,8 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
             Self::Riven => "Riven",
             Self::Cannonade => "Cannonade",
             Self::Acuity => "Acuity",
-            Self::Empowered => "Empowered"
+            Self::Empowered => "Empowered",
+            Self::Bane => "Bane"
         }
     }
 
@@ -283,6 +285,8 @@ impl LoadedMods {
         let acuity_behavior = ModBehavior::from_str(behavior_slice[4]);
         let amalgam_behavior = ModBehavior::from_str(behavior_slice[5]);
         let riven_behavior = ModBehavior::from_str(behavior_slice[6]);
+        let bane_behavior = ModBehavior::from_str(behavior_slice[8]);
+        let prime_bane_behavior = ModBehavior::from_str(behavior_slice[9]);
         for (behavior, truth) in [
             (kills_behavior, modding_context.kills),
             (aiming_behavior, modding_context.aiming),
@@ -290,7 +294,9 @@ impl LoadedMods {
             (semi_behavior, modding_context.semi),
             (acuity_behavior, modding_context.acuity),
             (amalgam_behavior, modding_context.prefer_amalgam),
-            (riven_behavior, modding_context.riven)
+            (riven_behavior, modding_context.riven),
+            (bane_behavior, modding_context.bane),
+            (prime_bane_behavior, modding_context.prime_bane)
         ] {
             match (truth, behavior) {
                 (_, ModBehavior::NothingSpecial) => continue,
@@ -428,6 +434,7 @@ impl ModStatType {
             "Cannonade" => Self::Cannonade,
             "Acuity" => Self::Acuity,
             "Empowered" => Self::Empowered,
+            "Bane" => Self::Bane,
             _ => {
                 println!("{} not found! Using 'None'", string_slice);
                 Self::None

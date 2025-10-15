@@ -208,7 +208,8 @@ pub struct GunModSums {
     pub cannonade: bool,
     pub conditions: u8,
     pub overload: i16,
-    pub empowered: i16
+    pub empowered: i16,
+    pub bane: i16
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -228,7 +229,8 @@ pub struct GunModSums {
             cannonade: false,
             conditions: 0,
             overload: 0,
-            empowered: 0
+            empowered: 0,
+            bane: 100
         }
     }
     
@@ -328,6 +330,9 @@ pub struct GunModSums {
             ModStatType::Empowered => {
                 self.empowered += stat_value;
             },
+            ModStatType::Bane => {
+                self.bane += stat_value;
+            },
             _ => {}
         };
     }
@@ -420,6 +425,7 @@ fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
         };
         modded_hit.damage = apply_stat_sum(modded_hit.damage, damage_sum);
         modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
+        modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.bane);
         modded_hit.crit_chance = apply_stat_sum(modded_hit.crit_chance, stat_sums.crit_chance);
         modded_hit.crit_damage = apply_stat_sum(modded_hit.crit_damage, stat_sums.crit_damage);
         modded_hit.status = apply_stat_sum(modded_hit.status, stat_sums.status);

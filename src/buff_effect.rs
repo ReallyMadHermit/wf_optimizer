@@ -30,7 +30,7 @@ pub fn establish_buff_effects() -> GunModSums {
 }
 
 fn buff_readback(buffs: &[(ModStatType, i16)]) {
-    println!("Your buffs are:");
+    println!("\nYour buffs are:");
     for &(stat, value) in buffs {
         match stat {
             ModStatType::FinalCritDamage => {

@@ -3,27 +3,33 @@ use std::time::Instant;
 
 use crate::context_core::{ModdingContext, WeaponType};
 use crate::mod_parsing::{LoadedMods, ModData};
-use crate::build_calc::{calculate_builds, get_highest_damage, SortingHelper};
+use crate::build_calc::{calculate_builds, get_highest_damage, GunModSums, SortingHelper};
 use crate::cli_inputs::UserInput;
 use crate::data::GUN_DATA;
 use crate::display::{show_riven_key, print_riven_stats, show_top_builds_scored};
 use crate::weapon_select::{GunData, GunStats, weapon_select};
+use crate::buff_effect::establish_buff_effects;
 
 pub fn cli_workflow_entry() {
     if let Some(gun_data) = weapon_select() {
         let modding_context = ModdingContext::interview_user(
             gun_data.gun_stats.gun_type, gun_data.semi);
+        let buff_sums = if modding_context.buffs {
+            Some(establish_buff_effects())
+        } else {
+            None
+        };
         if modding_context.debug_numbers {
             println!("Printing GunData...");
             gun_data.print();
         };
         if modding_context.riven {
-            riven_input_loop(gun_data, modding_context);
+            riven_input_loop(gun_data, modding_context, buff_sums);
         } else {
             let start_total = Instant::now();
             let loaded_mods = LoadedMods::new(&modding_context);
             let build_scores = calculate_builds(
-                &loaded_mods, &gun_data.gun_stats, &modding_context, None);
+                &loaded_mods, &gun_data.gun_stats, &modding_context, buff_sums);
             if modding_context.debug_numbers {
                 println!("Total calc time: {:?}", start_total.elapsed());
             };
@@ -37,7 +43,7 @@ pub fn cli_workflow_entry() {
                 &gun_data.gun_stats,
                 &modding_context,
                 count,
-                None
+                buff_sums
             );
             end();
         };
@@ -104,7 +110,7 @@ enum PromptChoice {
     }
 }
 
-fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
+fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext, buff_sums: Option<GunModSums>) {
     let mut loaded_mods = LoadedMods::new(&modding_context);
     let mut riven_option: Option<ModData> = None;
     let mut builds_option: Option<Vec<SortingHelper>> = None;
@@ -132,7 +138,7 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
                         &gun_data.gun_stats,
                         &modding_context,
                         n,
-                        None
+                        buff_sums
                     );
                 } else {
                     show_riven_key()
@@ -142,13 +148,13 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
                 if let Some(riven) = riven_option {
                     loaded_mods.update_riven(riven);
                     let builds = calculate_builds(
-                        &loaded_mods, &gun_data.gun_stats, &modding_context, None);
+                        &loaded_mods, &gun_data.gun_stats, &modding_context, buff_sums);
                     riven_option = None;
 
                     let reference_score = if let Some(reference_score) = reference_option {
                         reference_score
                     } else {
-                        let score = generate_reference_score(&modding_context, &gun_data.gun_stats);
+                        let score = generate_reference_score(&modding_context, &gun_data.gun_stats, buff_sums);
                         reference_option = Some(score);
                         score
                     };
@@ -165,7 +171,7 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext) {
     };
 }
 
-fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStats) -> f32 {
+fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStats, base_sums: Option<GunModSums>) -> f32 {
     let mut reference_context = modding_context.clone();
     reference_context.riven = false;
     reference_context.debug_numbers = false;
@@ -174,7 +180,7 @@ fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStat
         print!("Generating reference score...");
     };
     let reference_mods = LoadedMods::new(&reference_context);
-    let score = get_highest_damage(&reference_mods, gun_data, &reference_context, None);
+    let score = get_highest_damage(&reference_mods, gun_data, &reference_context, base_sums);
     if modding_context.debug_numbers {
         let d = start.elapsed();
         println!(" Done! {:?}", d);

@@ -191,7 +191,7 @@ fn calculate_single_build(
     stats.sustained_dps(burst)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct GunModSums {
     pub damage: i16,
     pub ele_damage: i16,
@@ -209,7 +209,9 @@ pub struct GunModSums {
     pub conditions: u8,
     pub overload: i16,
     pub empowered: i16,
-    pub bane: i16
+    pub bane: i16,
+    pub flat_crit_chance: i16,
+    pub final_crit_mod: i16
 } impl GunModSums {
 
     pub fn new() -> Self {
@@ -230,7 +232,9 @@ pub struct GunModSums {
             conditions: 0,
             overload: 0,
             empowered: 0,
-            bane: 100
+            bane: 100,
+            flat_crit_chance: 0,
+            final_crit_mod: 0
         }
     }
     
@@ -267,16 +271,17 @@ pub struct GunModSums {
         };
     }
 
-    fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {
+    pub fn apply_mod(&mut self, stat_type: ModStatType, stat_value: i16) {
         match stat_type {
             ModStatType::Damage => {
                 self.damage += stat_value;
             },
             ModStatType::Cold | ModStatType::Toxic |
             ModStatType::Heat | ModStatType::Shock |
-            ModStatType::Radiation | ModStatType::Magnetic => {
+            ModStatType::Radiation | ModStatType::Magnetic
+            | ModStatType::Elemental => {
                 self.ele_damage += stat_value;
-            },
+            }
             ModStatType::StatusChance => {
                 self.status += stat_value;
             }
@@ -288,6 +293,12 @@ pub struct GunModSums {
             },
             ModStatType::CritDamage => {
                 self.crit_damage += stat_value;
+            },
+            ModStatType::FlatCritChance => {
+                self.flat_crit_chance += stat_value;
+            },
+            ModStatType::FinalCritDamage => {
+                self.final_crit_mod += stat_value;
             },
             ModStatType::FireRate => {
                 self.fire_rate += stat_value;
@@ -427,7 +438,9 @@ fn apply_mod_sum(gun_stats: &GunStats, stat_sums: &GunModSums) -> GunStats {
         modded_hit.damage = apply_stat_sum(modded_hit.damage, damage_sum);
         modded_hit.damage = apply_stat_sum(modded_hit.damage, stat_sums.ele_damage);
         modded_hit.crit_chance = apply_stat_sum(modded_hit.crit_chance, stat_sums.crit_chance);
+        modded_hit.crit_chance += stat_sums.flat_crit_chance as f32 / 100.0;
         modded_hit.crit_damage = apply_stat_sum(modded_hit.crit_damage, stat_sums.crit_damage);
+        modded_hit.crit_damage += stat_sums.final_crit_mod as f32 / 100.0;
         modded_hit.status = apply_stat_sum(modded_hit.status, stat_sums.status);
     };
     if stat_sums.ammo_efficiency >= 100 {

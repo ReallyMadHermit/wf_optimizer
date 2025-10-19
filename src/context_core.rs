@@ -31,6 +31,7 @@ pub struct ModdingContext {  // TODO: add buffs & banes to context
     pub debug_numbers: bool,
     pub bane: bool,
     pub prime_bane: bool,
+    pub buffs: bool,
     pub conditions: u8
 }
 
@@ -134,6 +135,7 @@ impl ModdingContext {
         } else {
             0
         };
+        let buffs = UserInput::yes_no_prompt("Account for external buffs", false);
         let riven = UserInput::yes_no_prompt("Use Riven mod", false);
         ModdingContext {
             weapon_type: gun_type,
@@ -148,6 +150,7 @@ impl ModdingContext {
             debug_numbers,
             bane,
             prime_bane,
+            buffs,
             conditions
         }
     }

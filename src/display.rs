@@ -71,7 +71,7 @@ pub fn show_riven_key() {
     println!("D: Damage");
     println!("MS: Multi-Shot");
     println!("-");
-    println!("CC: CritChance");
+    println!("CC: Crit Chance");
     println!("CD: Crit Damage");
     println!("-");
     println!("C: Cold");
@@ -88,5 +88,5 @@ pub fn show_riven_key() {
     println!("140 D 80 T -20 CC");
     println!("200 C -80 FR");
     println!("CC 140 CD 150 D -60");
-    println!("As long as you alternate between key and values, they can be in either order.");
+    println!("As long as keys and values are entered in pairs, they can be in either order.");
 }

@@ -5,12 +5,9 @@ mod mod_parsing;
 mod weapon_select;
 mod context_core;
 mod build_calc;
-mod display;
-mod workflows;
 mod buff_effect;
+mod tui;
 
 fn main() {
-    // println!("{:?}", size_of::<Probable>());
-    // struct_sizing();
-    workflows::cli_workflow_entry();
+    let r = tui::weapon_search::weapon_search_tui();
 }

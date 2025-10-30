@@ -1,12 +1,11 @@
 use ratatui::{
-    crossterm::event::{self, Event, KeyCode, KeyEventKind},
+    crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind},
     layout::{Constraint, Layout, Position},
-    style::{Color, Modifier, Style, Stylize},
+    style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, List, ListItem, Paragraph},
-    DefaultTerminal, Frame,
+    Frame,
 };
-use ratatui::crossterm::event::{KeyEvent, MouseEvent, MouseEventKind};
 
 use ratatui::layout::Rect;
 

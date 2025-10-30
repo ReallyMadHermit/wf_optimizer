@@ -6,11 +6,12 @@ use ratatui::{
     widgets::{Block, List, ListItem, Paragraph},
     Frame,
 };
+use crate::weapon_select::GunData;
 
 const BUFFER_LENGTH: usize = 15;
 const SELECTION_START: u16 = 5;
 
-pub fn weapon_search_tui() -> Option<&'static str> {
+pub fn weapon_search_tui() -> Option<GunData> {
     let mut app = WeaponSearchApp::new();
     let mut terminal = ratatui::init();
     while app.running {
@@ -35,9 +36,6 @@ pub fn weapon_search_tui() -> Option<&'static str> {
         }
     };
     ratatui::restore();
-    if let Some(s) = app.returning {
-        println!("{s}");
-    }
     app.returning
 }
 
@@ -50,7 +48,7 @@ struct WeaponSearchApp {
     mouse: (u16, u16),
     redraw: bool,
     running: bool,
-    returning: Option<&'static str>
+    returning: Option<GunData>
 } impl WeaponSearchApp {
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
@@ -82,7 +80,8 @@ struct WeaponSearchApp {
     fn handle_click(&mut self) {
         let adjusted_index = self.mouse.0 - SELECTION_START;
         let weapon_index = self.results[adjusted_index as usize];
-        self.returning = Some(self.weapon_names()[weapon_index as usize].0);
+        self.returning = Some(GunData::from_index(weapon_index as usize));
+        // self.returning = Some(self.weapon_names()[weapon_index as usize].0);
         self.running = false;
     }
 

@@ -1,13 +1,11 @@
 use ratatui::{
     crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind},
-    layout::{Constraint, Layout, Position},
+    layout::{Constraint, Layout, Position, Rect},
     style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, List, ListItem, Paragraph},
     Frame,
 };
-
-use ratatui::layout::Rect;
 
 const BUFFER_LENGTH: usize = 15;
 const SELECTION_START: u16 = 5;

@@ -31,6 +31,11 @@ pub struct HitStats {
 
 impl GunData {
 
+    pub fn from_index(row: usize) -> Self {  // assumes index w/o header
+        let rows = Vec::from_iter(GUN_DATA.lines());
+        Self::from_csv_line(rows[row+1])
+    }
+
     pub fn from_csv_line(line: &'static str) -> Self {
         let split: Vec<&'static str> = line.split(",").collect();
         GunData {

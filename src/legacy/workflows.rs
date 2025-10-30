@@ -6,7 +6,7 @@ use crate::mod_parsing::{LoadedMods, ModData};
 use crate::build_calc::{calculate_builds, get_highest_damage, GunModSums, SortingHelper};
 use crate::cli_inputs::UserInput;
 use crate::data::GUN_DATA;
-use crate::display::{show_riven_key, print_riven_stats, show_top_builds_scored};
+use crate::legacy::display::{show_riven_key, print_riven_stats, show_top_builds_scored};
 use crate::weapon_select::{GunData, GunStats, weapon_select};
 use crate::buff_effect::establish_buff_effects;
 

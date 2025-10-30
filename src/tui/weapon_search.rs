@@ -1,4 +1,3 @@
-use std::io::stdout;
 use ratatui::{
     crossterm::event::{self, Event, KeyCode, KeyEventKind},
     layout::{Constraint, Layout, Position},

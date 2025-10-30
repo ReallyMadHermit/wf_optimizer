@@ -7,15 +7,14 @@ use ratatui::{
     widgets::{Block, List, ListItem, Paragraph},
     DefaultTerminal, Frame,
 };
-use ratatui::crossterm::cursor::SetCursorStyle;
-use ratatui::crossterm::event::KeyEvent;
-use ratatui::crossterm::ExecutableCommand;
+use ratatui::crossterm::event::{KeyEvent, MouseEvent, MouseEventKind};
+
 use ratatui::layout::Rect;
 
 const BUFFER_LENGTH: usize = 15;
+const SELECTION_START: u16 = 5;
 
-pub fn weapon_search_tui() -> Option<u16> {
-    _ = stdout().execute(SetCursorStyle::BlinkingUnderScore);
+pub fn weapon_search_tui() -> Option<&'static str> {
     let mut app = WeaponSearchApp::new();
     let mut terminal = ratatui::init();
     while app.running {
@@ -24,15 +23,25 @@ pub fn weapon_search_tui() -> Option<u16> {
             app.redraw = false;
         }
         let event = event::read();
-        if let Ok(Event::Key(key_event)) = event {
-            app.handle_key_event(key_event);
-        } else if let Ok(Event::Mouse(mouse)) = event {
-
-        } else if let Ok(Event::Resize(w, h)) = event {
-            app.redraw = true;
+        if let Ok(event) = event {
+            match event {
+                Event::Key(key_event) => {
+                    app.handle_key_event(key_event);
+                },
+                Event::Mouse(mouse_event) => {
+                    app.handle_mouse_event(mouse_event);
+                },
+                Event::Resize(_, _) => {
+                    app.redraw = true;
+                },
+                _ => {}
+            }
         }
     };
     ratatui::restore();
+    if let Some(s) = app.returning {
+        println!("{s}");
+    }
     app.returning
 }
 
@@ -40,12 +49,12 @@ struct WeaponSearchApp {
     weapon_names_vec: Vec<(&'static str, &'static str)>,
     string_buffer: String,
     results: Vec<u16>,
-    scroll: u16,
     display: u16,
     cursor: u16,
+    mouse: (u16, u16),
     redraw: bool,
     running: bool,
-    returning: Option<u16>
+    returning: Option<&'static str>
 } impl WeaponSearchApp {
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
@@ -60,6 +69,25 @@ struct WeaponSearchApp {
             }
             _=> {}
         }
+    }
+
+    fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
+        let pos = (mouse_event.row, mouse_event.column);
+        if pos != self.mouse {
+            self.mouse = pos;
+            self.redraw = true;
+        }
+        let clicked = matches!(mouse_event.kind, MouseEventKind::Down(_));
+        if clicked && self.clicked_result().is_some() {
+            self.handle_click();
+        }
+    }
+
+    fn handle_click(&mut self) {
+        let adjusted_index = self.mouse.0 - SELECTION_START;
+        let weapon_index = self.results[adjusted_index as usize];
+        self.returning = Some(self.weapon_names()[weapon_index as usize].0);
+        self.running = false;
     }
 
     fn draw(&mut self, frame: &mut Frame) {
@@ -101,11 +129,19 @@ struct WeaponSearchApp {
     }
 
     fn draw_results(&self, frame: &mut Frame, area: Rect) {
+        let in_results = self.mouse.0 >= SELECTION_START;
         let mut line_items: Vec<ListItem> = Vec::with_capacity(self.display as usize);
         for i in 0..self.display {
-            let name_index = self.results[(i + self.scroll) as usize];
+            let name_index = self.results[i as usize];
             let (name, attack) = self.weapon_names()[name_index as usize];
-            let content = Line::from(Span::raw(format!("{name}; {attack}")));
+
+            let style = if in_results && i + SELECTION_START == self.mouse.0 {
+                Style::default().reversed()
+            } else {
+                Style::default()
+            };
+
+            let content = Line::from(Span::styled(format!("{name}; {attack}"), style));
             let list_item = ListItem::new(content);
             line_items.push(list_item);
         };
@@ -124,9 +160,9 @@ struct WeaponSearchApp {
             weapon_names_vec,
             string_buffer: String::with_capacity(BUFFER_LENGTH),
             results: Vec::from_iter(0..(cap-1) as u16),
-            scroll: 0,
             display: 0,
             cursor: 0,
+            mouse: (0, 0),
             redraw: true,
             running: true,
             returning: None
@@ -156,7 +192,6 @@ struct WeaponSearchApp {
             self.string_buffer.clear();
             self.cursor = 0;
         };
-        self.scroll = 0;
         self.redraw = true;
     }
 
@@ -170,13 +205,12 @@ struct WeaponSearchApp {
         );
     }
 
-    fn scroll_up(&mut self) {
-        self.scroll = self.scroll.saturating_sub(crate::tui::SCROLL_AMOUNT);
-    }
-
-    fn scroll_down(&mut self) {
-        let cap = (self.results.len() as u16).saturating_sub(self.display);
-        self.scroll = self.scroll.saturating_add(crate::tui::SCROLL_AMOUNT).clamp(0, cap);
+    fn clicked_result(&self) -> Option<u16> {
+        if self.mouse.0 >= SELECTION_START && (self.mouse.0 - SELECTION_START) < self.display {
+            Some(self.mouse.0 - SELECTION_START)
+        } else {
+            None
+        }
     }
 
 }

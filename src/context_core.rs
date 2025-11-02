@@ -19,7 +19,7 @@ pub enum DamageCriteria {
 
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct ModdingContext {  // TODO: add buffs & banes to context
-    pub weapon_type: Option<WeaponType>,
+    pub weapon_type: WeaponType,
     pub damage_criteria: DamageCriteria,
     pub kills: bool,
     pub aiming: bool,
@@ -49,14 +49,6 @@ impl WeaponType {
                 println!("Weapon type '{}' not found! Using... Rifle!", s);
                 Self::Rifle
             }
-        }
-    }
-
-    pub fn compatibility_test(gun_type: Option<Self>, mod_type: Self) -> bool {
-        if let Some(g) = gun_type {
-            Self::is_compatible(g, mod_type)
-        } else {
-            false
         }
     }
 
@@ -146,7 +138,7 @@ impl ModdingContext {
         let buffs = UserInput::yes_no_prompt("Account for external buffs", false);
         let riven = UserInput::yes_no_prompt("Use Riven mod", false);
         ModdingContext {
-            weapon_type: Some(gun_type),
+            weapon_type: gun_type,
             damage_criteria: damage,
             kills,
             semi,

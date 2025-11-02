@@ -278,7 +278,7 @@ impl LoadedMods {
 
     fn should_include(csv_line: &str, modding_context: &ModdingContext) -> i8 {
         let split: Vec<&str> = csv_line.split(",").collect();
-        if !WeaponType::is_compatible(modding_context.weapon_type, WeaponType::from_str(split[0])) { return -1 };
+        if !WeaponType::compatibility_test(modding_context.weapon_type, WeaponType::from_str(split[0])) { return -1 };
         Self::context_test(&split[BSI[0]..=BSI[1]], modding_context)
     }
 
@@ -392,7 +392,7 @@ impl LoadedMods {
         for &row in &GUN_MODS.lines().collect::<Vec<&str>>()[1..] {
             let s: Vec<&str> = row.split(",").collect();
             let mod_type = WeaponType::from_str(s[0]);
-            if !WeaponType::is_compatible(weapon_type, mod_type) {
+            if !WeaponType::compatibility_test(weapon_type, mod_type) {
                 continue;
             };
             if !s[BADMATCH_INDEX].is_empty() {

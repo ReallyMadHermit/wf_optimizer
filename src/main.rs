@@ -14,6 +14,7 @@ mod build_calc;
 mod buff_effect;
 mod tui;
 mod legacy;
+mod memory;
 
 fn main() {
     _ = stdout().execute(SetCursorStyle::BlinkingUnderScore);

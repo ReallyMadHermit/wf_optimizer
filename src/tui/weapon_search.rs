@@ -8,8 +8,8 @@ use ratatui::{
 };
 use crate::weapon_select::GunData;
 
-const BUFFER_LENGTH: usize = 15;
-const SELECTION_START: u16 = 5;
+const BUFFER_LENGTH: usize = 15;  // for the input String the user types into
+const SELECTION_START: u16 = 5;  // for what row that results start on in the search
 
 pub fn weapon_search_tui() -> Option<GunData> {
     let mut app = WeaponSearchApp::new();

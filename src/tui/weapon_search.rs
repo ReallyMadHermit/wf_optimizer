@@ -45,7 +45,7 @@ struct WeaponSearchApp {
     results: Vec<u16>,
     display: u16,
     cursor: u16,
-    mouse: (u16, u16),
+    mouse: (u16, u16),  // TODO: "row" is used as x and "column" is never used lmao, that's silly
     redraw: bool,
     running: bool,
     returning: Option<GunData>

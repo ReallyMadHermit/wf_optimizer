@@ -11,8 +11,8 @@ use crate::weapon_select::GunData;
 const BUFFER_LENGTH: usize = 15;  // for the input String the user types into
 const SELECTION_START: u16 = 5;  // for what row that results start on in the search
 
-pub fn weapon_search_tui() -> Option<GunData> {
-    let mut app = WeaponSearchApp::new();
+pub fn weapon_search_tui(current_selection: Option<GunData>) -> Option<GunData> {
+    let mut app = WeaponSearchApp::new(current_selection);
     let mut terminal = ratatui::init();
     while app.running {
         if app.redraw {
@@ -148,7 +148,7 @@ struct WeaponSearchApp {
         frame.render_widget(list, area);
     }
 
-    fn new() -> Self {
+    fn new(current_selection: Option<GunData>) -> Self {
         let weapon_names_vec = get_weapon_names();
         let cap = weapon_names_vec.len();
         Self {
@@ -160,7 +160,7 @@ struct WeaponSearchApp {
             mouse: (0, 0),
             redraw: true,
             running: true,
-            returning: None
+            returning: current_selection
         }
     }
 

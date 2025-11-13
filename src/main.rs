@@ -20,11 +20,12 @@ fn main() {
     _ = stdout().execute(SetCursorStyle::BlinkingUnderScore);
     _ = stdout().execute(EnableMouseCapture);
     _ = terminal::enable_raw_mode();
-    let r = tui::weapon_search::weapon_search_tui();
+    let r = tui::weapon_search::weapon_search_tui(None);
+    tui::context_menu::context_menu_tui();
 
     _ = stdout().execute(DisableMouseCapture);
     _ = terminal::disable_raw_mode();
-    if let Some(g) = r {
-        println!("{}, {}", g.name, g.fire_mode);
-    }
+    // if let Some(g) = r {
+    //     println!("{}, {}", g.name, g.fire_mode);
+    // }
 }

@@ -72,6 +72,15 @@ impl WeaponType {
         }
     }
 
+    pub fn amalgam(&self) -> &'static str {
+        match self {
+            Self::Rifle | Self::Bow => "Use Amalgam Serration",
+            Self::Shotgun => "Use Amalgam Shotgun Barrage",
+            Self::Pistol => "Use Amalgam Barrel Diffusion",
+            _ => "Use Amalgam mod"
+        }
+    }
+
 }
 
 impl DamageCriteria {
@@ -90,6 +99,14 @@ impl DamageCriteria {
             2 => DamageCriteria::BurstDPS,
             3 => DamageCriteria::SustainedDPS,
             _ => DamageCriteria::SustainedDPS
+        }
+    }
+
+    pub fn str(&self) -> &str {
+        match self {
+            Self::PerShot => "Per-Shot Damage",
+            Self::BurstDPS => "Burst DPS",
+            Self::SustainedDPS => "Sustained DPS"
         }
     }
 

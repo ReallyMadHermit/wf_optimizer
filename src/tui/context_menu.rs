@@ -1,11 +1,4 @@
-use ratatui::{
-    crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind},
-    layout::{Constraint, Layout, Position, Rect},
-    style::{Style, Stylize},
-    text::{Line, Span, Text},
-    widgets::{Block, List, ListItem, Paragraph},
-    Frame,
-};
+use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
 use ratatui::layout::Constraint::{Fill, Length, Percentage, Min};
 use crate::context_core::{DamageCriteria, ModdingContext};
 use crate::weapon_select::GunData;
@@ -13,12 +6,28 @@ use crate::weapon_select::GunData;
 
 const NUMBER_BUFFER_LENGTH: usize = 6;
 const DISPLAY_STRING_LENGTH: usize = 64;
-const LABEL_LENGTH: usize = 20;
+const LABEL_LENGTH: usize = 18;
 const OPTIONS_OFFSET: usize = 2;
+const NUMBERS: [&str; 14] = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13"
+];
 
 
-pub fn context_menu_tui() {
-    let mut app = ContextMenuApp::new();
+pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<GunData>) {
+    let mut app = ContextMenuApp::new(selected_weapon);
     let mut terminal = ratatui::init();
     while app.running {
         if app.redraw {
@@ -43,9 +52,9 @@ struct ContextMenuApp {
     redraw: bool
 } impl ContextMenuApp {
 
-    fn new() -> Self {
+    fn new(selected_weapon: Option<GunData>) -> Self {
         Self {
-            weapon_selection: None,
+            weapon_selection: selected_weapon,
             damage_criteria: DamageCriteria::default(),
             has_kills: true,
             ads: true,
@@ -60,15 +69,18 @@ struct ContextMenuApp {
 
     fn draw(&mut self, frame: &mut Frame) {
         let vertical_layout = Layout::vertical([
-            Min(2),
-            Length(11),
+            Length(2),
+            Length(FieldType::COUNT as u16 + 2),
             Length(3)
-        ]).split(frame.area());
-        let buttons_layout = Layout::horizontal([
-            Fill(1),
-            Percentage(20)
-        ]).split(vertical_layout[1]);
-        self.draw_instructions(frame, vertical_layout[0]);
+        ]);
+        let [help_area, field_area, buttons_area] = vertical_layout.areas(frame.area());
+        // ]).split(frame.area());
+        // let buttons_layout = Layout::horizontal([
+        //     Fill(1),
+        //     Percentage(20)
+        // ]).split(vertical_layout[1]);
+        self.draw_instructions(frame, help_area);
+        self.draw_fields(frame, field_area);
     }
 
     fn draw_instructions(&mut self, frame: &mut Frame, area: Rect) {
@@ -87,8 +99,77 @@ struct ContextMenuApp {
                 top_line,
                 bottom_line
             ]
-        ).style(Style::default());
+        );
         frame.render_widget(list, area);
+    }
+
+    fn draw_fields(&mut self, frame: &mut Frame, area: Rect) {
+        let mut fields = Vec::with_capacity(FieldType::COUNT);
+        for field_type in FieldType::FIELDS {
+            let mut field_string = field_type.get_label();
+            self.push_field_content(field_type, &mut field_string);
+            let line = ListItem::new(field_string);
+            fields.push(line);
+        };
+        frame.render_widget(List::new(fields).block(Block::bordered().title("Settings")), area);
+    }
+
+    fn push_field_content(&self, field_type: FieldType, field_string: &mut String) {
+        fn bool_str(bool: bool) -> &'static str {
+            if bool {
+                "Yes"
+            } else {
+                "No"
+            }
+        }
+        match field_type {
+            FieldType::SelectedWeapon => {
+                if let Some(gun_data) = &self.weapon_selection {
+                    field_string.push_str(gun_data.name);
+                    field_string.push_str("; ");
+                    field_string.push_str(gun_data.fire_mode);
+                } else {
+                    field_string.push_str("None selected.");
+                }
+            },
+            FieldType::DamageCriteria => {
+                field_string.push_str(self.damage_criteria.str());
+            },
+            FieldType::HasKills => {
+                field_string.push_str(bool_str(self.has_kills));
+            },
+            FieldType::ADS => {
+                field_string.push_str(bool_str(self.ads));
+            },
+            FieldType::Acuity => {
+                field_string.push_str(bool_str(self.acuity));
+            },
+            FieldType::Amalgam => {
+                let s = if self.amalgam {
+                    if let Some(gun_data) = &self.weapon_selection {
+                        gun_data.gun_stats.gun_type.amalgam()
+                    } else {
+                        "Use Amalgam mod"
+                    }
+                } else {
+                    "Don't use Amalgam mod"
+                };
+                field_string.push_str(s);
+            },
+            FieldType::BaneMods => {
+                let s =match self.bane {
+                    1 => "Use Bane mod",
+                    2 => "Use Primed Bane mod",
+                    _ => "Don't use Bane mods"
+                };
+                field_string.push_str(s);
+            },
+            FieldType::StatusCount => {
+                field_string.push_str(NUMBERS[self.status_count as usize]);
+            },
+            FieldType::AppliedBuffs => {},
+            FieldType::RivenStats => {}
+        }
     }
 
 }
@@ -105,11 +186,10 @@ enum FieldType {
     BaneMods,
     StatusCount,
     AppliedBuffs,
-    RivenStats,
-    FunkyNumbers
+    RivenStats
 } impl FieldType {
 
-    const COUNT: usize = 11;
+    const COUNT: usize = 10;
     const MAX: usize = Self::COUNT + OPTIONS_OFFSET;
     const FIELDS: [Self; Self::COUNT] = [
         Self::SelectedWeapon,
@@ -121,8 +201,7 @@ enum FieldType {
         Self::BaneMods,
         Self::StatusCount,
         Self::AppliedBuffs,
-        Self::RivenStats,
-        Self::FunkyNumbers
+        Self::RivenStats
     ];
 
     fn get_type(row: u16) -> Option<Self> {
@@ -145,8 +224,7 @@ enum FieldType {
             Self::BaneMods => "Use Bane Mod",
             Self::StatusCount => "Status Effects",
             Self::AppliedBuffs => "Applied Buffs",
-            Self::RivenStats => "Riven Mod",
-            Self::FunkyNumbers => "fUmkYdbUnknUmbgErs"
+            Self::RivenStats => "Riven Mod"
         };
         let mut buffer = String::with_capacity(DISPLAY_STRING_LENGTH);
         buffer.push_str(base_text);

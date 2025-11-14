@@ -1,19 +1,11 @@
-use ratatui::{
-    crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind},
-    layout::{Constraint, Layout, Position, Rect},
-    style::{Style, Stylize},
-    text::{Line, Span, Text},
-    widgets::{Block, List, ListItem, Paragraph},
-    Frame,
-};
+use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
 use crate::weapon_select::GunData;
 
 const BUFFER_LENGTH: usize = 15;  // for the input String the user types into
 const SELECTION_START: u16 = 5;  // for what row that results start on in the search
 
-pub fn weapon_search_tui(current_selection: Option<GunData>) -> Option<GunData> {
+pub fn weapon_search_tui(terminal: &mut DefaultTerminal, current_selection: Option<GunData>) -> Option<GunData> {
     let mut app = WeaponSearchApp::new(current_selection);
-    let mut terminal = ratatui::init();
     while app.running {
         if app.redraw {
             terminal.draw(|frame| app.draw(frame)).unwrap();
@@ -35,7 +27,6 @@ pub fn weapon_search_tui(current_selection: Option<GunData>) -> Option<GunData> 
             }
         }
     };
-    ratatui::restore();
     app.returning
 }
 

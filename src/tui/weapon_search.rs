@@ -1,4 +1,5 @@
 use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
+use ratatui::crossterm::event::MouseButton;
 use crate::weapon_select::GunData;
 
 const BUFFER_LENGTH: usize = 15;  // for the input String the user types into
@@ -6,11 +7,8 @@ const SELECTION_START: u16 = 5;  // for what row that results start on in the se
 
 pub fn weapon_search_tui(terminal: &mut DefaultTerminal, current_selection: Option<GunData>) -> Option<GunData> {
     let mut app = WeaponSearchApp::new(current_selection);
+    terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
-        if app.redraw {
-            terminal.draw(|frame| app.draw(frame)).unwrap();
-            app.redraw = false;
-        }
         let event = event::read();
         if let Ok(event) = event {
             match event {
@@ -26,7 +24,11 @@ pub fn weapon_search_tui(terminal: &mut DefaultTerminal, current_selection: Opti
                 _ => {}
             }
         }
-    };
+        if app.redraw {
+            terminal.draw(|frame| app.draw(frame)).unwrap();
+            app.redraw = false;
+        }
+    }
     app.returning
 }
 
@@ -49,9 +51,9 @@ struct WeaponSearchApp {
         match key_event.code {
             KeyCode::Char(char) => self.enter_char(char),
             KeyCode::Backspace => self.back_space(),
-            KeyCode::Esc => {
-                self.running = false;
-            }
+            // KeyCode::Esc => {
+            //     self.running = false;
+            // }
             _=> {}
         }
     }
@@ -63,16 +65,21 @@ struct WeaponSearchApp {
             self.redraw = true;
         }
         let clicked = matches!(mouse_event.kind, MouseEventKind::Down(_));
-        if clicked && self.clicked_result().is_some() {
-            self.handle_click();
+        if let MouseEventKind::Down(button) = mouse_event.kind {
+            self.handle_click(button);
         }
+        // if clicked && self.clicked_result().is_some() {
+        //     self.handle_click();
+        // }
     }
 
-    fn handle_click(&mut self) {
-        let adjusted_index = self.mouse.0 - SELECTION_START;
-        let weapon_index = self.results[adjusted_index as usize];
-        self.returning = Some(GunData::from_index(weapon_index as usize));
-        // self.returning = Some(self.weapon_names()[weapon_index as usize].0);
+    fn handle_click(&mut self, button: MouseButton) {
+        if button == MouseButton::Left {
+            let adjusted_index = self.mouse.0 - SELECTION_START;
+            let weapon_index = self.results[adjusted_index as usize];
+            self.returning = Some(GunData::from_index(weapon_index as usize));
+            // self.returning = Some(self.weapon_names()[weapon_index as usize].0);
+        }
         self.running = false;
     }
 
@@ -99,8 +106,8 @@ struct WeaponSearchApp {
             " and ".into(),
             "clicking".bold(),
             " the desired result. ".into(),
-            "Esc".bold(),
-            " to quit.".into()
+            "Right Click".bold(),
+            " to go back.".into()
         ];
         let text = Text::from(Line::from(msg)).patch_style(Style::default());
         let help_message = Paragraph::new(text);

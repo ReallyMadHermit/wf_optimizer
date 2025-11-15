@@ -74,13 +74,17 @@ struct WeaponSearchApp {
     }
 
     fn handle_click(&mut self, button: MouseButton) {
-        if button == MouseButton::Left {
+        if button == MouseButton::Left && (
+            SELECTION_START..SELECTION_START + self.display
+        ).contains(&self.mouse.0) {
             let adjusted_index = self.mouse.0 - SELECTION_START;
             let weapon_index = self.results[adjusted_index as usize];
             self.returning = Some(GunData::from_index(weapon_index as usize));
             // self.returning = Some(self.weapon_names()[weapon_index as usize].0);
+            self.running = false;
+        } else if button != MouseButton::Left {
+            self.running = false;
         }
-        self.running = false;
     }
 
     fn draw(&mut self, frame: &mut Frame) {

@@ -1,13 +1,16 @@
 use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
+use ratatui::crossterm::event::MouseButton;
 use ratatui::layout::Constraint::{Fill, Length, Percentage, Min};
 use crate::context_core::{DamageCriteria, ModdingContext};
+use crate::mod_parsing::ModStatType;
 use crate::weapon_select::GunData;
+use crate::tui::weapon_search::weapon_search_tui;
 
-
-const NUMBER_BUFFER_LENGTH: usize = 6;
+const RIVEN_CAPACITY: usize = 4;
+const BUFF_CAPACITY: usize = 5;
 const DISPLAY_STRING_LENGTH: usize = 64;
 const LABEL_LENGTH: usize = 18;
-const OPTIONS_OFFSET: usize = 2;
+const OPTIONS_OFFSET: u16 = 3;
 const NUMBERS: [&str; 14] = [
     "0",
     "1",
@@ -28,20 +31,51 @@ const NUMBERS: [&str; 14] = [
 
 pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<GunData>) {
     let mut app = ContextMenuApp::new(selected_weapon);
-    let mut terminal = ratatui::init();
     while app.running {
+        let event = event::read();
+        if let Ok(event) = event {
+            match event {
+                Event::Mouse(mouse_event) => {
+                    app.handle_mouse_event(mouse_event);
+                },
+                Event::Resize(_, _) => {
+                    app.redraw = true;
+                },
+                _ => {}
+            }
+        }
+        if let Some(go_to) = app.go_to {
+            match go_to {
+                GoToTerm::WeaponSelect => {
+                    app.hovered_row = 0;
+                    let new_selection = weapon_search_tui(terminal, app.weapon_selection);
+                    app.weapon_selection = new_selection;
+                },
+                GoToTerm::BuffStats => {},
+                GoToTerm::RivenStats => {}
+            }
+            app.go_to = None;
+        }
         if app.redraw {
-            _ = terminal.draw(|frame| app.draw(frame));
+            _ = terminal.draw(|frame| app.draw(frame)).unwrap();
             app.redraw = false;
         }
     }
-    ratatui::restore();
+}
+
+
+#[derive(Copy, Clone, Eq, PartialEq)]
+enum GoToTerm {
+    WeaponSelect,
+    BuffStats,
+    RivenStats
 }
 
 
 struct ContextMenuApp {
     weapon_selection: Option<GunData>,
     damage_criteria: DamageCriteria,
+    hovered_row: u16,
     has_kills: bool,
     ads: bool,
     acuity: bool,
@@ -49,13 +83,143 @@ struct ContextMenuApp {
     bane: u8,
     status_count: u8,
     running: bool,
-    redraw: bool
+    redraw: bool,
+    go_to: Option<GoToTerm>,
+    buff_stats: Vec<(ModStatType, i16)>,
+    riven_stats: Vec<(ModStatType, i16)>,
 } impl ContextMenuApp {
+
+    fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
+        // update mouse_row
+        let row = mouse_event.row;
+        if row != self.hovered_row {
+            self.hovered_row = row;
+            self.redraw = true;
+        }
+        // fetch hovered field
+        let field = if let Some(field) = FieldType::get_type(row) {
+            field
+        } else {
+            return;
+        };
+        // check for clicking
+        let clicked: i8 = if let MouseEventKind::Down(button) = mouse_event.kind {
+            if button == MouseButton::Left {
+                1
+            } else {
+                -1
+            }
+        } else {
+            0
+        };
+        // interpret click
+        if clicked != 0 {
+            self.click(field, clicked > 0);
+            self.redraw = true;
+        }
+    }
+
+    fn click(&mut self, field: FieldType, left: bool) {
+        match field {
+            FieldType::SelectedWeapon => {
+                if left {
+                    self.go_to = Some(GoToTerm::WeaponSelect);
+                } else {
+                    self.weapon_selection = None;
+                };
+            },
+            FieldType::DamageCriteria => {
+                if left {
+                    match self.damage_criteria {
+                        DamageCriteria::PerShot => {
+                            self.damage_criteria = DamageCriteria::BurstDPS;
+                        },
+                        DamageCriteria::BurstDPS => {
+                            self.damage_criteria = DamageCriteria::SustainedDPS;
+                        },
+                        DamageCriteria::SustainedDPS => {
+                            self.damage_criteria = DamageCriteria::PerShot;
+                        }
+                    }
+                } else {
+                    self.damage_criteria = DamageCriteria::SustainedDPS;
+                }
+            },
+            FieldType::HasKills => {
+                if left {
+                    self.has_kills = !self.has_kills;
+                } else {
+                    self.has_kills = true;
+                }
+            },
+            FieldType::ADS => {
+                if left {
+                    self.ads = !self.ads;
+                } else {
+                    self.ads = true;
+                }
+            },
+            FieldType::Acuity => {
+                if left {
+                    self.acuity = !self.acuity;
+                } else {
+                    self.acuity = false;
+                }
+            },
+            FieldType::Amalgam => {
+                if left {
+                    self.amalgam = !self.amalgam;
+                } else {
+                    self.amalgam = false;
+                }
+            },
+            FieldType::BaneMods => {
+                if left {
+                    self.bane +=1;
+                    if self.bane >= 3 {
+                        self.bane = 0;
+                    }
+                } else {
+                    self.bane = 0;
+                }
+            },
+            FieldType::StatusCount => {
+                if left {
+                    self.status_count += 1;
+                    if self.status_count > 13 {
+                        self.status_count = 0;
+                    }
+                } else if self.status_count == 0 {
+                    self.status_count = 13;
+                } else {
+                    self.status_count -= 1;
+                }
+            },
+            FieldType::AppliedBuffs => {},
+            FieldType::RivenStats => {}
+        }
+    }
+
+    // fn click(&mut self, field: FieldType, left: bool) {
+    //     match field {
+    //         FieldType::SelectedWeapon => { self.go_to_weapon_select = true; },
+    //         FieldType::DamageCriteria => {},
+    //         FieldType::HasKills => {},
+    //         FieldType::ADS => {},
+    //         FieldType::Acuity => {},
+    //         FieldType::Amalgam => {},
+    //         FieldType::BaneMods => {},
+    //         FieldType::StatusCount => {},
+    //         FieldType::AppliedBuffs => {},
+    //         FieldType::RivenStats => {}
+    //     }
+    // }
 
     fn new(selected_weapon: Option<GunData>) -> Self {
         Self {
             weapon_selection: selected_weapon,
             damage_criteria: DamageCriteria::default(),
+            hovered_row: 0,
             has_kills: true,
             ads: true,
             acuity: false,
@@ -63,14 +227,17 @@ struct ContextMenuApp {
             bane: 0,
             status_count: 0,
             running: true,
-            redraw: true
+            redraw: true,
+            go_to: None,
+            buff_stats: Vec::with_capacity(BUFF_CAPACITY),
+            riven_stats: Vec::with_capacity(RIVEN_CAPACITY)
         }
     }
 
     fn draw(&mut self, frame: &mut Frame) {
         let vertical_layout = Layout::vertical([
             Length(2),
-            Length(FieldType::COUNT as u16 + 2),
+            Min(FieldType::COUNT as u16 + 2),
             Length(3)
         ]);
         let [help_area, field_area, buttons_area] = vertical_layout.areas(frame.area());
@@ -108,10 +275,24 @@ struct ContextMenuApp {
         for field_type in FieldType::FIELDS {
             let mut field_string = field_type.get_label();
             self.push_field_content(field_type, &mut field_string);
-            let line = ListItem::new(field_string);
+            let content = Line::from(Span::styled(field_string, self.get_row_style(field_type)));
+            let line = ListItem::new(content);
+            // let line = ListItem::new(field_string).style(self.get_row_style(field_type));
             fields.push(line);
         };
         frame.render_widget(List::new(fields).block(Block::bordered().title("Settings")), area);
+    }
+
+    fn get_row_style(&self, rendered_field: FieldType) -> Style {
+        if let Some(field) = FieldType::get_type(self.hovered_row) {
+            if rendered_field == field {
+                Style::default().reversed()
+            } else {
+                Style::default()
+            }
+        } else {
+            Style::default()
+        }
     }
 
     fn push_field_content(&self, field_type: FieldType, field_string: &mut String) {
@@ -129,7 +310,7 @@ struct ContextMenuApp {
                     field_string.push_str("; ");
                     field_string.push_str(gun_data.fire_mode);
                 } else {
-                    field_string.push_str("None selected.");
+                    field_string.push_str("None selected; click to edit.");
                 }
             },
             FieldType::DamageCriteria => {
@@ -167,8 +348,20 @@ struct ContextMenuApp {
             FieldType::StatusCount => {
                 field_string.push_str(NUMBERS[self.status_count as usize]);
             },
-            FieldType::AppliedBuffs => {},
-            FieldType::RivenStats => {}
+            FieldType::AppliedBuffs => {
+                if self.buff_stats.is_empty() {
+                    field_string.push_str("None; click to edit");
+                } else {
+                    field_string.push_str("PLACE HOLDERRRR");
+                }
+            },
+            FieldType::RivenStats => {
+                if self.riven_stats.is_empty() {
+                    field_string.push_str("None; click to edit");
+                } else {
+                    field_string.push_str("PLACE HOLDERRRR");
+                }
+            }
         }
     }
 
@@ -190,7 +383,7 @@ enum FieldType {
 } impl FieldType {
 
     const COUNT: usize = 10;
-    const MAX: usize = Self::COUNT + OPTIONS_OFFSET;
+    const MAX: u16 =  OPTIONS_OFFSET + Self::COUNT as u16;
     const FIELDS: [Self; Self::COUNT] = [
         Self::SelectedWeapon,
         Self::DamageCriteria,
@@ -205,9 +398,9 @@ enum FieldType {
     ];
 
     fn get_type(row: u16) -> Option<Self> {
-        let n = row as usize;
+        let n = row;
         if (OPTIONS_OFFSET..Self::MAX).contains(&n) {
-            Some(Self::FIELDS[n-OPTIONS_OFFSET])
+            Some(Self::FIELDS[(n-OPTIONS_OFFSET) as usize])
         } else {
             None
         }

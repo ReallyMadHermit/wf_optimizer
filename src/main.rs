@@ -22,7 +22,7 @@ fn main() {
     _ = terminal::enable_raw_mode();
     
     let mut terminal = ratatui::init();
-    let gun_data = tui::weapon_search::weapon_search_tui(&mut terminal, None);
+    let gun_data = tui::weapon_search_menu::weapon_search_tui(&mut terminal, None);
     tui::context_menu::context_menu_tui(&mut terminal, gun_data);
     
     ratatui::restore();

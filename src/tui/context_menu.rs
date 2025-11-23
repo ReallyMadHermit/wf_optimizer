@@ -2,12 +2,11 @@ use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, M
 use ratatui::crossterm::event::MouseButton;
 use ratatui::layout::Constraint::{Fill, Length, Percentage, Min};
 use crate::context_core::{DamageCriteria, ModdingContext};
-use crate::mod_parsing::ModStatType;
+use crate::tui::stat_screen::StatFields;
 use crate::weapon_select::GunData;
-use crate::tui::weapon_search::weapon_search_tui;
+use crate::tui::weapon_search_menu::weapon_search_tui;
+use crate::tui::stat_screen::stat_screen_tui;
 
-const RIVEN_CAPACITY: usize = 4;
-const BUFF_CAPACITY: usize = 5;
 const DISPLAY_STRING_LENGTH: usize = 64;
 const LABEL_LENGTH: usize = 18;
 const OPTIONS_OFFSET: u16 = 3;
@@ -31,6 +30,7 @@ const NUMBERS: [&str; 14] = [
 
 pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<GunData>) {
     let mut app = ContextMenuApp::new(selected_weapon);
+    _ = terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
         let event = event::read();
         if let Ok(event) = event {
@@ -45,14 +45,20 @@ pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<
             }
         }
         if let Some(go_to) = app.go_to {
+            app.hovered_row = 0;
             match go_to {
                 GoToTerm::WeaponSelect => {
-                    app.hovered_row = 0;
                     let new_selection = weapon_search_tui(terminal, app.weapon_selection);
                     app.weapon_selection = new_selection;
                 },
-                GoToTerm::BuffStats => {},
-                GoToTerm::RivenStats => {}
+                GoToTerm::BuffStats => {
+                    let new_buffs = stat_screen_tui(terminal, app.buff_stats, false);
+                    app.buff_stats = new_buffs;
+                },
+                GoToTerm::RivenStats => {
+                    let new_riven = stat_screen_tui(terminal, app.riven_stats, true);
+                    app.riven_stats = new_riven;
+                }
             }
             app.go_to = None;
         }
@@ -85,8 +91,8 @@ struct ContextMenuApp {
     running: bool,
     redraw: bool,
     go_to: Option<GoToTerm>,
-    buff_stats: Vec<(ModStatType, i16)>,
-    riven_stats: Vec<(ModStatType, i16)>,
+    buff_stats: Option<StatFields>,
+    riven_stats: Option<StatFields>,
 } impl ContextMenuApp {
 
     fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
@@ -195,8 +201,20 @@ struct ContextMenuApp {
                     self.status_count -= 1;
                 }
             },
-            FieldType::AppliedBuffs => {},
-            FieldType::RivenStats => {}
+            FieldType::AppliedBuffs => {
+                if left {
+                    self.go_to = Some(GoToTerm::BuffStats);
+                } else {
+                    self.buff_stats = None;
+                };
+            },
+            FieldType::RivenStats => {
+                if left {
+                    self.go_to = Some(GoToTerm::RivenStats);
+                } else {
+                    self.riven_stats = None;
+                };
+            }
         }
     }
 
@@ -227,10 +245,10 @@ struct ContextMenuApp {
             bane: 0,
             status_count: 0,
             running: true,
-            redraw: true,
+            redraw: false,
             go_to: None,
-            buff_stats: Vec::with_capacity(BUFF_CAPACITY),
-            riven_stats: Vec::with_capacity(RIVEN_CAPACITY)
+            buff_stats: None,
+            riven_stats: None
         }
     }
 
@@ -349,14 +367,14 @@ struct ContextMenuApp {
                 field_string.push_str(NUMBERS[self.status_count as usize]);
             },
             FieldType::AppliedBuffs => {
-                if self.buff_stats.is_empty() {
+                if self.buff_stats.is_none() {
                     field_string.push_str("None; click to edit");
                 } else {
                     field_string.push_str("PLACE HOLDERRRR");
                 }
             },
             FieldType::RivenStats => {
-                if self.riven_stats.is_empty() {
+                if self.riven_stats.is_none() {
                     field_string.push_str("None; click to edit");
                 } else {
                     field_string.push_str("PLACE HOLDERRRR");

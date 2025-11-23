@@ -160,7 +160,7 @@ struct WeaponSearchApp {
             display: 0,
             cursor: 0,
             mouse: (0, 0),
-            redraw: true,
+            redraw: false,
             running: true,
             returning: current_selection
         }

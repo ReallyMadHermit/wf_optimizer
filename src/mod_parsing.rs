@@ -152,6 +152,13 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
         }
     }
 
+    pub fn stat_prefix(&self) -> &'static str {
+        match self {
+            Self::FinalCritDamage => "x ",
+            _ => "% "
+        }
+    }
+
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]

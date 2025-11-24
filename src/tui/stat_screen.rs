@@ -54,7 +54,7 @@ pub fn stat_screen_tui(
                     
                 },
                 Event::Mouse(mouse_event) => {
-                    // app.handle_mouse_event(mouse_event);
+                    app.handle_mouse_event(mouse_event);
                 },
                 Event::Resize(_, _) => {
                     app.redraw = true;
@@ -79,12 +79,48 @@ pub fn stat_screen_tui(
 struct StatScreenApp {
     stat_fields: StatFields,
     buffer: String,
-    hovered_row: i16,
+    hovered_row: u16,
     selected_field: Option<ModStatType>,
     running: bool,
     redraw: bool,
     riven: bool
 } impl StatScreenApp {
+
+    fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
+        let row = mouse_event.row;
+        if row != self.hovered_row {
+            self.hovered_row = row;
+            self.redraw = true;
+        }
+        let clicked: i8 = if let MouseEventKind::Down(button) = mouse_event.kind {
+            if button == MouseButton::Left {
+                1
+            } else {
+                -1
+            }
+        } else {
+            0
+        };
+        if clicked != 0 {
+            self.click(clicked > 0);
+            self.redraw = true;
+        }
+    }
+
+    fn click(&mut self, left: bool) {
+        let field_id = if self.hovered_row >= 2 {
+            self.hovered_row - 2
+        } else {
+            return;
+        };
+        if field_id < self.stat_fields.len as u16 {
+            if left {
+                self.selected_field = Some(self.stat_fields.get()[field_id as usize].unwrap().0);
+            } else {
+                self.selected_field = None;
+            }
+        }
+    }
 
     fn draw(&mut self, frame: &mut Frame) {
         let area_size = self.stat_fields.len + 2;

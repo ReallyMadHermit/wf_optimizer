@@ -161,6 +161,12 @@ pub enum ModStatType {  // TODO: represent pistol arcanes (somehow)
 
 }
 
+impl Default for ModStatType {
+    fn default() -> Self {
+        Self::None
+    }
+}
+
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct ModData {
     stats: [(ModStatType, i16); 4],

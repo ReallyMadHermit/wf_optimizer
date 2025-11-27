@@ -321,7 +321,14 @@ struct StatScreenApp {
         if let Some(i) = self.selected_row {
             let row = OPTIONS_OFFSET + i;
             let column = COLUMN_START + self.buffer.len() as u16;
-            frame.set_cursor_position(Position::new(column, row));
+            if self.highlight_selection {
+                let width = self.buffer.len() as u16;
+                let rect = Rect::new(COLUMN_START, row, width, 1);
+                frame.render_widget(Block::default().style(Style::default().reversed()), rect);
+            } else {
+                frame.set_cursor_position(Position::new(column, row));
+            }
+
         }
     }
 

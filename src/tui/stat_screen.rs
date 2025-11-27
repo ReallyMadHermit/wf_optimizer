@@ -323,8 +323,12 @@ struct StatScreenApp {
             let row = OPTIONS_OFFSET + i;
             let column = COLUMN_START + self.buffer.len() as u16;
             if self.highlight_selection {
-                let width = self.buffer.len() as u16;
-                let rect = Rect::new(COLUMN_START, row, width, 1);
+                let (start, width) = if self.negative_input {
+                    (COLUMN_START - 1, self.buffer.len() as u16 + 1)
+                } else {
+                    (COLUMN_START, self.buffer.len() as u16)
+                };
+                let rect = Rect::new(start, row, width, 1);
                 frame.render_widget(Block::default().style(Style::default().reversed()), rect);
             } else {
                 frame.set_cursor_position(Position::new(column, row));
@@ -355,11 +359,6 @@ struct StatScreenApp {
         };
 
         let mut string_buffer = String::with_capacity(field_name.len() + 8);
-        if stat_value < 0 {
-            string_buffer.push('-');
-        } else if !selected {
-            string_buffer.push('+');
-        }
         if selected {
             if self.negative_input {
                 string_buffer.push('-');
@@ -367,8 +366,15 @@ struct StatScreenApp {
                 string_buffer.push('+');
             }
             string_buffer += &self.buffer;
-            string_buffer.push(' ');
+            if !self.highlight_selection {
+                string_buffer.push(' ');
+            }
         } else {
+            if stat_value < 0 {
+                string_buffer.push('-');
+            } else {
+                string_buffer.push('+');
+            }
             string_buffer += &value_string;
         }
         string_buffer += name_prefix;

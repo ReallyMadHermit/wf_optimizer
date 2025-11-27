@@ -4,7 +4,7 @@ use ratatui::layout::Constraint::Min;
 use ratatui::prelude::Constraint::Length;
 use crate::mod_parsing::ModStatType;
 
-const VALUE_LENGTH: usize = 6;
+const VALUE_LENGTH: usize = 8;
 const OPTIONS_OFFSET: u16 = 2;
 const COLUMN_START: u16 = 2;
 

@@ -7,6 +7,7 @@ use crate::mod_parsing::ModStatType;
 const VALUE_LENGTH: usize = 8;
 const OPTIONS_OFFSET: u16 = 2;
 const COLUMN_START: u16 = 2;
+const DISPLAY_CAPACITY: usize = 128;
 
 const BUFF_STATS: [ModStatType; 11] = [
     ModStatType::Damage,
@@ -466,6 +467,35 @@ pub struct StatFields {
             }
         }
         false
+    }
+
+    pub fn display(&self) -> String {
+        let mut string = String::with_capacity(DISPLAY_CAPACITY);
+        for option in self.get_all() {
+            let (stat, value) = option.unwrap_or_default();
+            if value == 0 {
+                continue;
+            } else if value > 0 {
+                string.push('+');
+            } else {
+                string.push('-');
+            }
+            match stat {
+                ModStatType::None => {},
+                ModStatType::FinalCritDamage => {
+                    string += &((value.abs() as f32) / 100.0 ).to_string();
+                },
+                _ => {
+                    string += &value.abs().to_string();
+                }
+            }
+            string += stat.stat_prefix();
+            string += stat.to_str();
+            string += ", ";
+        }
+        string.pop();
+        string.pop();
+        string
     }
 
 }

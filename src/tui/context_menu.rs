@@ -367,17 +367,19 @@ struct ContextMenuApp {
                 field_string.push_str(NUMBERS[self.status_count as usize]);
             },
             FieldType::AppliedBuffs => {
-                if self.buff_stats.is_none() {
-                    field_string.push_str("None; click to edit");
+                if let Some(stat_fields) = &self.buff_stats {
+                    let display_string = stat_fields.display();
+                    field_string.push_str(&display_string);
                 } else {
-                    field_string.push_str("PLACE HOLDERRRR");
+                    field_string.push_str("None; click to edit");
                 }
             },
             FieldType::RivenStats => {
-                if self.riven_stats.is_none() {
-                    field_string.push_str("None; click to edit");
+                if let Some(stat_fields) = &self.riven_stats {
+                    let display_string = stat_fields.display();
+                    field_string.push_str(&display_string);
                 } else {
-                    field_string.push_str("PLACE HOLDERRRR");
+                    field_string.push_str("None; click to edit");
                 }
             }
         }

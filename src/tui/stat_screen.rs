@@ -267,10 +267,10 @@ struct StatScreenApp {
         match stat_field {
             ModStatType::None => {},
             ModStatType::FinalCritDamage => {
-                self.stat_fields.fields[row as usize] = Some((stat_field, (input_number.abs() * 100.0).round() as i16));
+                self.stat_fields.fields[row as usize] = Some((stat_field, (input_number * 100.0).round() as i16));
             },
             _ => {
-                self.stat_fields.fields[row as usize] = Some((stat_field, input_number.abs().round() as i16));
+                self.stat_fields.fields[row as usize] = Some((stat_field, input_number.round() as i16));
             }
         }
     }

@@ -240,11 +240,6 @@ struct StatScreenApp {
     }
 
     fn push_buffer(&mut self) {
-        if self.buffer.is_empty() {
-            self.negative_input = false;
-            self.selected_row = None;
-            return;
-        }
         let row = if let Some(row) = self.selected_row {
             row
         } else {
@@ -261,6 +256,8 @@ struct StatScreenApp {
             } else {
                 f
             }
+        } else if self.buffer.is_empty() {
+            0.0
         } else {
             return;
         };
@@ -270,10 +267,10 @@ struct StatScreenApp {
         match stat_field {
             ModStatType::None => {},
             ModStatType::FinalCritDamage => {
-                self.stat_fields.fields[row as usize] = Some((stat_field, (input_number * 100.0).round() as i16));
+                self.stat_fields.fields[row as usize] = Some((stat_field, (input_number.abs() * 100.0).round() as i16));
             },
             _ => {
-                self.stat_fields.fields[row as usize] = Some((stat_field, input_number.round() as i16));
+                self.stat_fields.fields[row as usize] = Some((stat_field, input_number.abs().round() as i16));
             }
         }
     }

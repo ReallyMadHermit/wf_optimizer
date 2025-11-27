@@ -145,12 +145,12 @@ struct StatScreenApp {
                 if let Some(row) = self.selected_row {
                     self.push_buffer();
                     if self.stat_fields.contains(row + 1) {
-                        self.selected_row = Some(row + 1);
+                        self.left_click(row + 1);
                     } else {
-                        self.selected_row = Some(0);
+                        self.left_click(0);
                     }
                 } else {
-                    self.selected_row = Some(0);
+                    self.left_click(0);
                 }
             },
             KeyCode::Esc => {

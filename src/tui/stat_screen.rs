@@ -235,6 +235,7 @@ struct StatScreenApp {
         if self.highlight_selection {
             self.buffer.clear();
             self.negative_input = false;
+            self.highlight_selection = false;
         }
     }
 

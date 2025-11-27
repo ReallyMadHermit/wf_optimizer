@@ -146,11 +146,14 @@ struct StatScreenApp {
                     self.push_buffer();
                     if self.stat_fields.contains(row + 1) {
                         self.left_click(row + 1);
+                        self.hovered_row = row + 3;
                     } else {
                         self.left_click(0);
+                        self.hovered_row = 2;
                     }
                 } else {
                     self.left_click(0);
+                    self.hovered_row = 2;
                 }
             },
             KeyCode::Esc => {

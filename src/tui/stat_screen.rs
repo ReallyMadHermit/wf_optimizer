@@ -266,6 +266,7 @@ struct StatScreenApp {
         };
         self.buffer.clear();
         self.selected_row = None;
+        self.negative_input = false;
 
         match stat_field {
             ModStatType::None => {},

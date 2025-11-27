@@ -72,7 +72,7 @@ pub fn stat_screen_tui(
         }
     }
 
-    if app.stat_fields.has_values {
+    if app.stat_fields.has_values() {
         Some(app.stat_fields)
     } else {
         None
@@ -418,23 +418,18 @@ struct StatScreenApp {
 pub struct StatFields {
     fields: [Option<(ModStatType, i16)>; 12],
     len: u8,
-    has_values: bool
 } impl StatFields {
 
     fn default() -> Self {
         Self {
             fields: [None; 12],
             len: 0,
-            has_values: false
         }
     }
 
     fn push(&mut self, stat_type: ModStatType, value: i16) {
         self.fields[self.len as usize] = Some((stat_type, value));
         self.len +=1;
-        if value != 0 {
-            self.has_values = true;
-        }
     }
 
     fn get_all(&self) -> &[Option<(ModStatType, i16)>] {
@@ -451,6 +446,16 @@ pub struct StatFields {
 
     fn contains(&self, field_id: u16) -> bool {
         (0..self.len as u16).contains(&field_id)
+    }
+
+    fn has_values(&self) -> bool {
+        for option in self.get_all() {
+            let (stat, value) = option.unwrap_or_default();
+            if value != 0 {
+                return true;
+            }
+        }
+        false
     }
 
 }

@@ -4,6 +4,10 @@ use ratatui::layout::Constraint::Min;
 use ratatui::prelude::Constraint::Length;
 use crate::mod_parsing::ModStatType;
 
+const VALUE_LENGTH: usize = 6;
+const OPTIONS_OFFSET: u16 = 2;
+const COLUMN_START: u16 = 2;
+
 const BUFF_STATS: [ModStatType; 11] = [
     ModStatType::Damage,
     ModStatType::Elemental,
@@ -51,7 +55,7 @@ pub fn stat_screen_tui(
         if let Ok(event) = event {
             match event {
                 Event::Key(key_event) => {
-                    
+                    app.handle_key_event(key_event);
                 },
                 Event::Mouse(mouse_event) => {
                     app.handle_mouse_event(mouse_event);
@@ -80,11 +84,81 @@ struct StatScreenApp {
     stat_fields: StatFields,
     buffer: String,
     hovered_row: u16,
-    selected_field: Option<ModStatType>,
+    selected_row: Option<u16>,
     running: bool,
     redraw: bool,
-    riven: bool
+    riven: bool,
+    negative_input: bool,  // if the value in the buffer is a negative number (we don't store '-')
+    highlight_selection: bool  // if over-writing an existing field value
 } impl StatScreenApp {
+
+    fn handle_key_event(&mut self, key_event: KeyEvent) {
+        if key_event.kind != KeyEventKind::Press {
+            return;
+        }
+        self.redraw = true;
+        match key_event.code {
+            KeyCode::Char(char) => {
+                match char {
+                    '0'..='9' => {
+                        self.clear_test();
+                        self.buffer.push(char);
+                    },
+                    '.' => {
+                        if !self.buffer.is_empty() {
+                            self.buffer.push(char);
+                        }
+                    }
+                    '-' => {
+                        if !self.negative_input {
+                            self.clear_test();
+                            self.negative_input = true;
+                        }
+                    },
+                    '+' => {
+                        if self.negative_input {
+                            self.clear_test();
+                            self.negative_input = false;
+                        }
+                    },
+                    _ => {}
+                }
+            },
+            KeyCode::Backspace | KeyCode::Delete => {
+                if self.selected_row.is_none() {
+                    self.running = false;
+                } else if self.buffer.is_empty() {
+                    self.negative_input = false;
+                } else {
+                    self.clear_test();
+                    self.buffer.pop();
+                }
+            },
+            KeyCode::Enter => {
+                if self.selected_row.is_some() {
+                    self.push_buffer();
+                } else {
+                    self.running = false;
+                }
+            }
+            KeyCode::Tab => {
+                if let Some(row) = self.selected_row {
+                    self.push_buffer();
+                    if self.stat_fields.contains(row + 1) {
+                        self.selected_row = Some(row + 1);
+                    } else {
+                        self.selected_row = Some(0);
+                    }
+                } else {
+                    self.selected_row = Some(0);
+                }
+            },
+            KeyCode::Esc => {
+                self.running = false;
+            },
+            _ => {}
+        }
+    }
 
     fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
         let row = mouse_event.row;
@@ -108,16 +182,97 @@ struct StatScreenApp {
     }
 
     fn click(&mut self, left: bool) {
-        let field_id = if self.hovered_row >= 2 {
-            self.hovered_row - 2
+        if self.hovered_row >= 2 && self.stat_fields.contains(self.hovered_row - 2) {
+            let field_id = self.hovered_row - 2;
+            self.push_buffer();
+            if left {
+                self.left_click(field_id);
+            } else {
+                self.right_click(field_id);
+            }
+        }
+    }
+
+    fn left_click(&mut self, field_id: u16) {
+        let (stat, value) = self.stat_fields.get(field_id).unwrap_or_default();
+        if stat != ModStatType::None {
+            self.selected_row = Some(field_id);
+        } else {
+            return;
+        }
+        if value < 0 {
+            self.negative_input = true;
+        }
+        if value != 0 {
+            self.highlight_selection = true;
+            match stat {
+                ModStatType::FinalCritDamage => {
+                    self.buffer += &(value as f32 / 100.0).abs().to_string();
+                },
+                _ => {
+                    self.buffer += &value.abs().to_string();
+                }
+            }
+        } else {
+            self.highlight_selection = false;
+        }
+    }
+
+    fn right_click(&mut self, field_id: u16) {
+        if let Some(row) = self.selected_row {
+            if field_id == row {
+                self.selected_row = None;
+                self.buffer.clear();
+            }
+        }
+        let (stat, value) = self.stat_fields.get(field_id).unwrap_or_default();
+        if stat != ModStatType::None {
+            self.stat_fields.fields[field_id as usize] = Some((stat, 0));
+        }
+    }
+
+    fn clear_test(&mut self) {
+        if self.highlight_selection {
+            self.buffer.clear();
+            self.negative_input = false;
+        }
+    }
+
+    fn push_buffer(&mut self) {
+        if self.buffer.is_empty() {
+            self.negative_input = false;
+            self.selected_row = None;
+            return;
+        }
+        let row = if let Some(row) = self.selected_row {
+            row
+        } else {
+            self.buffer.clear();
+            self.negative_input = false;
+            self.selected_row = None;
+            return;
+        };
+
+        let stat_field = self.stat_fields.get(row).unwrap_or_default().0;
+        let input_number = if let Ok(f) = self.buffer.parse::<f32>() {
+            if self.negative_input {
+                -f
+            } else {
+                f
+            }
         } else {
             return;
         };
-        if field_id < self.stat_fields.len as u16 {
-            if left {
-                self.selected_field = Some(self.stat_fields.get()[field_id as usize].unwrap().0);
-            } else {
-                self.selected_field = None;
+        self.buffer.clear();
+        self.selected_row = None;
+
+        match stat_field {
+            ModStatType::None => {},
+            ModStatType::FinalCritDamage => {
+                self.stat_fields.fields[row as usize] = Some((stat_field, (input_number * 100.0).round() as i16));
+            },
+            _ => {
+                self.stat_fields.fields[row as usize] = Some((stat_field, input_number.round() as i16));
             }
         }
     }
@@ -146,20 +301,12 @@ struct StatScreenApp {
     }
 
     fn draw_fields(&mut self, frame: &mut Frame, area: Rect) {
-        let stat_fields = self.stat_fields.get();
+        let stat_fields = self.stat_fields.get_all();
         let mut fields: Vec<ListItem> = Vec::with_capacity(stat_fields.len());
-        let selected_field = if let Some(field) = self.selected_field {
-            field
-        } else {
-            ModStatType::None
-        };
         for (i, option) in stat_fields.iter().enumerate() {
-            let &(stat, value) = if let Some(pair) = option {
-                pair
-            } else {
-                &(ModStatType::None, 0)
-            };
-            let row_string = self.write_row_string(stat, value, stat == selected_field);
+            let (stat, value) = option.unwrap_or_default();
+            let selected = self.selected_row == Some(i as u16);
+            let row_string = self.write_row_string(stat, value, selected);
             let content = Line::from(Span::styled(row_string, self.get_row_style(i)));
             let line = ListItem::new(content);
             fields.push(line);
@@ -170,11 +317,16 @@ struct StatScreenApp {
             "Buff Stats"
         };
         frame.render_widget(List::new(fields).block(Block::bordered().title(title)), area);
+        if let Some(i) = self.selected_row {
+            let row = OPTIONS_OFFSET + i;
+            let column = COLUMN_START + self.buffer.len() as u16;
+            frame.set_cursor_position(Position::new(column, row));
+        }
     }
 
     fn get_row_style(&self, field_number: usize) -> Style {
-        if self.hovered_row >= 2 {
-            let field_id = (self.hovered_row - 2) as usize;
+        if self.hovered_row >= OPTIONS_OFFSET {
+            let field_id = (self.hovered_row - OPTIONS_OFFSET) as usize;
             if field_id == field_number {
                 return Style::default().reversed();
             }
@@ -194,16 +346,26 @@ struct StatScreenApp {
         };
 
         let mut string_buffer = String::with_capacity(field_name.len() + 8);
-        if selected {
-            string_buffer += &self.buffer;
-        } else if stat_value < 0 {
+        if stat_value < 0 {
             string_buffer.push('-');
-            string_buffer += &value_string;
-        } else {
+        } else if !selected {
             string_buffer.push('+');
+        }
+        if selected {
+            if self.negative_input {
+                string_buffer.push('-');
+            } else {
+                string_buffer.push('+');
+            }
+            string_buffer += &self.buffer;
+            string_buffer.push(' ');
+        } else {
             string_buffer += &value_string;
         }
         string_buffer += name_prefix;
+        while string_buffer.len() < VALUE_LENGTH {
+            string_buffer.push(' ');
+        }
         string_buffer += field_name;
         string_buffer
     }
@@ -213,10 +375,12 @@ struct StatScreenApp {
             stat_fields,
             buffer: String::with_capacity(10),
             hovered_row: 0,
-            selected_field: None,
+            selected_row: None,
             running: true,
             redraw: true,
-            riven
+            riven,
+            negative_input: false,
+            highlight_selection: false
         }
     }
 
@@ -234,10 +398,12 @@ struct StatScreenApp {
             stat_fields,
             buffer: String::with_capacity(10),
             hovered_row: 0,
-            selected_field: None,
+            selected_row: None,
             running: true,
             redraw: false,
-            riven
+            riven,
+            negative_input: false,
+            highlight_selection: false
         }
     }
 
@@ -266,8 +432,20 @@ pub struct StatFields {
         }
     }
 
-    fn get(&self) -> &[Option<(ModStatType, i16)>] {
+    fn get_all(&self) -> &[Option<(ModStatType, i16)>] {
         &self.fields[0..self.len as usize]
+    }
+
+    fn get(&self, field_id: u16) -> Option<(ModStatType, i16)> {
+        if self.contains(field_id) {
+            self.fields[field_id as usize]
+        } else {
+            None
+        }
+    }
+
+    fn contains(&self, field_id: u16) -> bool {
+        (0..self.len as u16).contains(&field_id)
     }
 
 }

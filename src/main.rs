@@ -13,8 +13,8 @@ mod context_core;
 mod build_calc;
 mod buff_effect;
 mod tui;
-mod legacy;
-mod memory;
+// mod legacy;
+// mod memory;
 
 fn main() {
     _ = stdout().execute(SetCursorStyle::BlinkingUnderScore);

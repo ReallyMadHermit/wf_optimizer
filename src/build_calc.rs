@@ -201,6 +201,9 @@ pub struct GunModSums {
             ModStatType::Bane => {
                 self.bane += stat_value;
             },
+            ModStatType::AmmoEfficiency => {
+                self.ammo_efficiency += stat_value;
+            }
             _ => {}
         };
     }

@@ -3,6 +3,8 @@ use ratatui::crossterm::cursor::SetCursorStyle;
 use ratatui::crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use ratatui::crossterm::ExecutableCommand;
 use ratatui::crossterm::terminal;
+use crate::build_calc::calculate_builds;
+use crate::mod_parsing::LoadedMods;
 
 mod data;
 mod combinatorics;
@@ -23,11 +25,20 @@ fn main() {
     
     let mut terminal = ratatui::init();
     let gun_data = tui::weapon_search_menu::weapon_search_tui(&mut terminal, None);
-    tui::context_menu::context_menu_tui(&mut terminal, gun_data);
+    let (modding_context, gun_data) =
+        tui::context_menu::context_menu_tui(&mut terminal, gun_data);
     
     ratatui::restore();
     _ = stdout().execute(DisableMouseCapture);
     _ = terminal::disable_raw_mode();
+    let loaded_mods = LoadedMods::new(&modding_context);
+    let showcase = calculate_builds(
+        &loaded_mods,
+        &gun_data.gun_stats,
+        &modding_context,
+        None
+    );
+    showcase.print_top_builds(&loaded_mods);
     // if let Some(g) = r {
     //     println!("{}, {}", g.name, g.fire_mode);
     // }

@@ -28,7 +28,9 @@ const NUMBERS: [&str; 14] = [
 ];
 
 
-pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<GunData>) {
+pub fn context_menu_tui(
+    terminal: &mut DefaultTerminal, selected_weapon: Option<GunData>
+) -> (ModdingContext, GunData) {
     let mut app = ContextMenuApp::new(selected_weapon);
     _ = terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
@@ -38,6 +40,11 @@ pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<
                 Event::Mouse(mouse_event) => {
                     app.handle_mouse_event(mouse_event);
                 },
+                Event::Key(key_event) => {
+                    if key_event.code == KeyCode::Esc {
+                        app.running = false;
+                    }
+                }
                 Event::Resize(_, _) => {
                     app.redraw = true;
                 },
@@ -67,6 +74,7 @@ pub fn context_menu_tui(terminal: &mut DefaultTerminal, selected_weapon: Option<
             app.redraw = false;
         }
     }
+    (app.get_modding_context(), app.weapon_selection.unwrap())
 }
 
 

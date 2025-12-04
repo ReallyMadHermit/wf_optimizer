@@ -23,6 +23,10 @@ pub struct LoadedMods {
         &self.mod_data[self.mod_count as usize..]
     }
 
+    pub fn get_arcane_names(&self) -> &[&str] {
+        &self.mod_names[self.mod_count as usize..]
+    }
+
     pub fn new(modding_context: &ModdingContext) -> Self {
         let mut start = Instant::now();
         // if modding_context.debug_numbers {

@@ -3,176 +3,208 @@ use crate::combinatorics::BuildCombo;
 use crate::context_core::{DamageCriteria, ModdingContext, WeaponType};
 use crate::mod_parsing::{LoadedMods, ModStatType};
 use crate::weapon_select::GunStats;
+use crate::tui::build_organization_structs::{BuildShowcase, BucketManager};
 
-pub fn get_highest_damage(
-    loaded_mods: &LoadedMods,
-    base_gun_stats: &GunStats,
-    modding_context: &ModdingContext,
-    base_sums: Option<GunModSums>,
-) -> Option<u32> {
-    calculate_builds(
-        loaded_mods, base_gun_stats, modding_context, base_sums
-    ).first().map(|top| u32::MAX - top.inverse_damage)
-}
+// pub fn get_highest_damage(
+//     loaded_mods: &LoadedMods,
+//     base_gun_stats: &GunStats,
+//     modding_context: &ModdingContext,
+//     base_sums: Option<GunModSums>,
+// ) -> Option<u32> {
+//     calculate_builds(
+//         loaded_mods, base_gun_stats, modding_context, base_sums
+//     ).first().map(|top| u32::MAX - top.inverse_damage)
+// }
 
 pub fn calculate_builds(
     loaded_mods: &LoadedMods,
     base_gun_stats: &GunStats,
     modding_context: &ModdingContext,
     base_sums: Option<GunModSums>
-) -> Vec<SortingHelper> {
-    let sums = if let Some(sums) = base_sums {
-        sums
-    } else {
-        GunModSums::from_conditions(modding_context.conditions)
-    };
-    // if modding_context.debug_numbers {
-    //     print!("Calculating damage...");
-    // };
-    let mut start = Instant::now();
-    let mut results = match modding_context.damage_criteria {
-        DamageCriteria::PerShot => calculate_shot_damage(loaded_mods, base_gun_stats, sums),
-        DamageCriteria::BurstDPS => {calculate_burst_damage(loaded_mods, base_gun_stats, sums)},
-        DamageCriteria::SustainedDPS => {calculate_sustained_damage(loaded_mods, base_gun_stats, sums)}
-    };
-    // if modding_context.debug_numbers {
-    //     let d = start.elapsed();
-    //     println!(" Done! {:?}", d);
-    //     print!("Sorting results...");
-    //     start = Instant::now();
-    // };
-    results.sort_by_key(|build| build.inverse_damage);
-    // if modding_context.debug_numbers {
-    //     let d = start.elapsed();
-    //     println!(" Done! {:?}", d);
-    // }
-    results
-}
+) -> BuildShowcase {
+    let base_sums = base_sums.unwrap_or_default();
+    let arcanes = loaded_mods.get_arcane_list();
 
-#[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone)]
-pub struct SortingHelper {
-    pub inverse_damage: u32,
-    pub index: u32
-} impl SortingHelper {
-
-    pub fn new(damage: f32, index: usize) -> Self {
-        Self {
-            inverse_damage: u32::MAX - damage.round() as u32,
-            index: index as u32
+    let mut bucket_manager = BucketManager::new(arcanes.len());
+    for (combo_index, mod_combo) in loaded_mods.mod_combinations.iter().enumerate() {
+        let mut combo_sums = base_sums;
+        combo_sums.add_many_mods(mod_combo, loaded_mods);
+        let modded_stats = apply_mod_sum(base_gun_stats, &combo_sums);
+        let gun_damage = get_damage(modding_context, &modded_stats, &combo_sums);
+        bucket_manager.add(gun_damage, combo_index, 0);
+        for (arcane_index, arcane_stats) in arcanes.iter().enumerate() {
+            let mut arcane_sums = combo_sums;
+            for &(stat_type, value) in arcane_stats.get() {
+                arcane_sums.apply_mod(stat_type, value);
+            }
+            let modded_stats = apply_mod_sum(base_gun_stats, &arcane_sums);
+            let gun_damage = get_damage(modding_context, &modded_stats, &arcane_sums);
+            bucket_manager.add(gun_damage, combo_index, arcane_index+1);
         }
     }
-
-    pub fn damage(&self) -> u32 {
-        u32::MAX - self.inverse_damage
-    }
-
+    BuildShowcase::from_manager(&bucket_manager)
+    // let mut showcase = match modding_context.damage_criteria {
+    //     DamageCriteria::PerShot => calculate_shot_damage(loaded_mods, base_gun_stats, sums),
+    //     DamageCriteria::BurstDPS => {calculate_burst_damage(loaded_mods, base_gun_stats, sums)},
+    //     DamageCriteria::SustainedDPS => {calculate_sustained_damage(loaded_mods, base_gun_stats, sums)}
+    // };
 }
 
-fn calculate_shot_damage(
-    loaded_mods: &LoadedMods,
-    base_gun_stats: &GunStats,
-    base_sums: GunModSums
-) -> Vec<SortingHelper> {
-    let mut builds = Vec::with_capacity(loaded_mods.mod_combinations.len());
-    for (index, build_combo) in loaded_mods.mod_combinations.iter().enumerate() {
-        let mut mod_sums = base_sums.clone();
-        mod_sums.add_many_mods(build_combo, loaded_mods);
-        // if let Some(a) = build_combo.arcane {
-        //     mod_sums.add_mod(a, loaded_mods);
-        // };
-        let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
-        builds.push(SortingHelper::new(shot_damage, index));
-    };
-    builds
-}
-
-fn calculate_burst_damage(
-    loaded_mods: &LoadedMods,
-    base_gun_stats: &GunStats,
-    base_sums: GunModSums
-) -> Vec<SortingHelper> {
-    let mut builds = Vec::with_capacity(loaded_mods.mod_combinations.len());
-    for (index, build_combo) in loaded_mods.mod_combinations.iter().enumerate() {
-        let mut mod_sums = base_sums.clone();
-        mod_sums.add_many_mods(build_combo, loaded_mods);
-        // if let Some(a) = build_combo.arcane {
-        //     mod_sums.add_mod(a, loaded_mods);
-        // };
-        let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
-        let burst_damage = modded_stats.burst_damage(shot_damage);
-        builds.push(SortingHelper::new(burst_damage, index));
-    };
-    builds
-}
-
-fn calculate_sustained_damage(
-    loaded_mods: &LoadedMods,
-    base_gun_stats: &GunStats,
-    base_sums: GunModSums
-) -> Vec<SortingHelper> {
-    let mut builds = Vec::with_capacity(loaded_mods.mod_combinations.len());
-    for (index, build_combo) in loaded_mods.mod_combinations.iter().enumerate() {
-        let mut mod_sums = base_sums.clone();
-        mod_sums.add_many_mods(build_combo, loaded_mods);
-        // if let Some(a) = build_combo.arcane {
-        //     mod_sums.add_mod(a, loaded_mods);
-        // };
-        let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
-        let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
-        let burst_damage = modded_stats.burst_damage(shot_damage);
-        let sustained_damage = modded_stats.sustained_dps(burst_damage);
-        builds.push(SortingHelper::new(sustained_damage, index));
-    };
-    builds
-}
-
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
-pub struct ModScores {
-    pub arcane: Option<i16>,
-    pub mod_scores: [(i16, u8); 8]  // (riven score, mod id)
-} impl ModScores {
-    pub fn new(
-        loaded_mods: &LoadedMods,
-        base_gun_stats: &GunStats,
-        build_combo: &[u8],
-        damage_criteria: DamageCriteria,
-        base_sums: &GunModSums
-    ) -> Self {
-        let mut full_sums = base_sums.clone();
-        full_sums.apply_build_combo(build_combo, loaded_mods);
-        let full_damage = calculate_single_build(base_gun_stats, &full_sums, damage_criteria);
-
-        let mut mod_scores = [(0, 0); 8];
-        for (i, &mod_id) in build_combo.iter().enumerate() {
-            let mut lesser_sums = full_sums.clone();
-            lesser_sums.remove_mod(mod_id, loaded_mods);
-            let lesser_damage = calculate_single_build(base_gun_stats, &lesser_sums, damage_criteria);
-            mod_scores[i] = (i16::MAX - ((full_damage / lesser_damage - 1.0) * 1000.0).round() as i16, mod_id);
-        };
-
-        mod_scores.sort_by_key(|&(score, _)| score);
-        for i in 0..8usize {
-            mod_scores[i].0 = i16::MAX - mod_scores[i].0;
-        };
-
-        // let arcane = if let Some(a) = build_combo.arcane {
-        //     let mut lesser_sums = full_sums.clone();
-        //     lesser_sums.remove_mod(a, loaded_mods);
-        //     let lesser_damage = calculate_single_build(base_gun_stats, &lesser_sums, damage_criteria);
-        //     Some(((full_damage / lesser_damage - 1.0) * 1000.0).round() as i16)
-        // } else {
-        //     None
-        // };
-
-        Self {
-            arcane: None,
-            mod_scores
+fn get_damage(modding_context: &ModdingContext, modded_gun_stats: &GunStats, mod_sums: &GunModSums) -> f32 {
+    match modding_context.damage_criteria {
+        DamageCriteria::PerShot => {
+            modded_gun_stats.shot_damage(mod_sums.empowered, mod_sums.bane)
+        },
+        DamageCriteria::BurstDPS => {
+            modded_gun_stats.burst_damage(
+                modded_gun_stats.shot_damage(mod_sums.empowered, mod_sums.bane
+                )
+            )
+        },
+        DamageCriteria::SustainedDPS => {
+            modded_gun_stats.sustained_dps(
+                modded_gun_stats.burst_damage(
+                    modded_gun_stats.shot_damage(mod_sums.empowered, mod_sums.bane
+                    )
+                )
+            )
         }
-
     }
 }
+
+// #[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone)]
+// pub struct SortingHelper {
+//     pub inverse_damage: u32,
+//     pub index: u32
+// } impl SortingHelper {
+//
+//     pub fn new(damage: f32, index: usize) -> Self {
+//         Self {
+//             inverse_damage: u32::MAX - damage.round() as u32,
+//             index: index as u32
+//         }
+//     }
+//
+//     pub fn damage(&self) -> u32 {
+//         u32::MAX - self.inverse_damage
+//     }
+//
+// }
+
+// fn calculate_shot_damage(
+//     loaded_mods: &LoadedMods,
+//     base_gun_stats: &GunStats,
+//     base_sums: GunModSums
+// ) -> BucketManager {
+//     let arcanes = loaded_mods.get_arcane_list();
+//     let mut bucket_manager = BucketManager::new(arcanes.len());
+//     let mut combo_sums = base_sums;
+//     let mut arcane_sums = base_sums;
+//     let mut modded_stats = base_gun_stats.clone();
+//     for (combo_index, mod_combo) in loaded_mods.mod_combinations.iter().enumerate() {
+//         combo_sums = base_sums;
+//         combo_sums.add_many_mods(mod_combo, loaded_mods);
+//         modded_stats = apply_mod_sum(&base_gun_stats, &combo_sums);
+//     }
+//     for (index, build_combo) in loaded_mods.mod_combinations.iter().enumerate() {
+//         let mut mod_sums = base_sums.clone();
+//         mod_sums.add_many_mods(build_combo, loaded_mods);
+//         // if let Some(a) = build_combo.arcane {
+//         //     mod_sums.add_mod(a, loaded_mods);
+//         // };
+//         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
+//         let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
+//         builds.push(SortingHelper::new(shot_damage, index));
+//     };
+//     builds
+// }
+
+// fn calculate_burst_damage(
+//     loaded_mods: &LoadedMods,
+//     base_gun_stats: &GunStats,
+//     base_sums: GunModSums
+// ) -> Vec<SortingHelper> {
+//     let mut builds = Vec::with_capacity(loaded_mods.mod_combinations.len());
+//     for (index, build_combo) in loaded_mods.mod_combinations.iter().enumerate() {
+//         let mut mod_sums = base_sums.clone();
+//         mod_sums.add_many_mods(build_combo, loaded_mods);
+//         // if let Some(a) = build_combo.arcane {
+//         //     mod_sums.add_mod(a, loaded_mods);
+//         // };
+//         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
+//         let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
+//         let burst_damage = modded_stats.burst_damage(shot_damage);
+//         builds.push(SortingHelper::new(burst_damage, index));
+//     };
+//     builds
+// }
+
+// fn calculate_sustained_damage(
+//     loaded_mods: &LoadedMods,
+//     base_gun_stats: &GunStats,
+//     base_sums: GunModSums
+// ) -> Vec<SortingHelper> {
+//     let mut builds = Vec::with_capacity(loaded_mods.mod_combinations.len());
+//     for (index, build_combo) in loaded_mods.mod_combinations.iter().enumerate() {
+//         let mut mod_sums = base_sums.clone();
+//         mod_sums.add_many_mods(build_combo, loaded_mods);
+//         // if let Some(a) = build_combo.arcane {
+//         //     mod_sums.add_mod(a, loaded_mods);
+//         // };
+//         let modded_stats = apply_mod_sum(base_gun_stats, &mod_sums);
+//         let shot_damage = modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane);
+//         let burst_damage = modded_stats.burst_damage(shot_damage);
+//         let sustained_damage = modded_stats.sustained_dps(burst_damage);
+//         builds.push(SortingHelper::new(sustained_damage, index));
+//     };
+//     builds
+// }
+
+// #[derive(Ord, PartialOrd, Eq, PartialEq)]
+// pub struct ModScores {
+//     pub arcane: Option<i16>,
+//     pub mod_scores: [(i16, u8); 8]  // (riven score, mod id)
+// } impl ModScores {
+//     pub fn new(
+//         loaded_mods: &LoadedMods,
+//         base_gun_stats: &GunStats,
+//         build_combo: &[u8],
+//         damage_criteria: DamageCriteria,
+//         base_sums: &GunModSums
+//     ) -> Self {
+//         let mut full_sums = base_sums.clone();
+//         full_sums.apply_build_combo(build_combo, loaded_mods);
+//         let full_damage = calculate_single_build(base_gun_stats, &full_sums, damage_criteria);
+//
+//         let mut mod_scores = [(0, 0); 8];
+//         for (i, &mod_id) in build_combo.iter().enumerate() {
+//             let mut lesser_sums = full_sums.clone();
+//             lesser_sums.remove_mod(mod_id, loaded_mods);
+//             let lesser_damage = calculate_single_build(base_gun_stats, &lesser_sums, damage_criteria);
+//             mod_scores[i] = (i16::MAX - ((full_damage / lesser_damage - 1.0) * 1000.0).round() as i16, mod_id);
+//         };
+//
+//         mod_scores.sort_by_key(|&(score, _)| score);
+//         for i in 0..8usize {
+//             mod_scores[i].0 = i16::MAX - mod_scores[i].0;
+//         };
+//
+//         // let arcane = if let Some(a) = build_combo.arcane {
+//         //     let mut lesser_sums = full_sums.clone();
+//         //     lesser_sums.remove_mod(a, loaded_mods);
+//         //     let lesser_damage = calculate_single_build(base_gun_stats, &lesser_sums, damage_criteria);
+//         //     Some(((full_damage / lesser_damage - 1.0) * 1000.0).round() as i16)
+//         // } else {
+//         //     None
+//         // };
+//
+//         Self {
+//             arcane: None,
+//             mod_scores
+//         }
+//
+//     }
+// }
 
 fn calculate_single_build(
     base_gun_stats: &GunStats,
@@ -253,11 +285,11 @@ pub struct GunModSums {
 
     fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
         for &mod_id in weapon_mods {
-            self.add_mod(mod_id, loaded_mods);
+            self.add_mod_id(mod_id, loaded_mods);
         };
     }
 
-    fn add_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
+    fn add_mod_id(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
         let mod_data = loaded_mods.get_data(mod_id);
         for &(stat, value) in mod_data {
             self.apply_mod(stat, value)

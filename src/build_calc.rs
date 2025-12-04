@@ -10,7 +10,7 @@ pub fn calculate_builds(
     modding_context: &ModdingContext,
     base_sums: Option<GunModSums>
 ) -> BuildShowcase {
-    let base_sums = base_sums.unwrap_or_default();
+    let base_sums = base_sums.unwrap_or_else(GunModSums::new);
     let arcanes = loaded_mods.get_arcane_list();
 
     let mut bucket_manager = BucketManager::new(arcanes.len());
@@ -55,7 +55,7 @@ fn get_damage(modding_context: &ModdingContext, base_gun_stats: &GunStats, mod_s
     }
 }
 
-#[derive(Clone, Copy, Default)]  // TODO: parse innervate
+#[derive(Clone, Copy)]  // TODO: parse innervate
 pub struct GunModSums {
     pub damage: i16,
     pub ele_damage: i16,
@@ -78,7 +78,7 @@ pub struct GunModSums {
     pub final_crit_mod: i16
 } impl GunModSums {
 
-    pub fn default() -> Self {
+    pub fn new() -> Self {
         GunModSums {
             damage: 100,
             ele_damage: 100,
@@ -103,7 +103,7 @@ pub struct GunModSums {
     }
     
     pub fn from_conditions(conditions: u8) -> Self {
-        let mut sums = Self::default();
+        let mut sums = Self::new();
         sums.conditions = conditions;
         sums
     }

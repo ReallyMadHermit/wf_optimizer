@@ -9,30 +9,32 @@ pub struct BuildCombo {
 }
 
 // TODO: test if filters are faster to do here than as .retain()
-pub fn generate_combinations(index_count: u8, arcane_count: u8) -> Vec<BuildCombo>  {
+pub fn generate_combinations(index_count: u8) -> Vec<[u8; 8]>  {
     let combination_count = get_combination_count(
         index_count as usize,
         8
     );
-    let size = if arcane_count > 0 {
-        combination_count * arcane_count as usize
-    } else {
-        combination_count
-    };
-    let mut combinations: Vec<BuildCombo> = Vec::with_capacity(size);
+    // let size = if arcane_count > 0 {
+    //     combination_count * arcane_count as usize
+    // } else {
+    //     combination_count
+    // };
+    // let mut combinations: Vec<BuildCombo> = Vec::with_capacity(size);
+    let mut combinations: Vec<[u8; 8]> = Vec::with_capacity(combination_count);
     let mut live_array: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 6];
     for _ in 0..combination_count {
         live_array[7] += 1;
         if live_array[7] == index_count {
             array_flipper(&mut live_array);
         };
-        if arcane_count < 1 {
-            combinations.push(BuildCombo::new(live_array, None));
-        } else {
-            for a in 0..arcane_count {
-                combinations.push(BuildCombo::new(live_array, Some(index_count + a)));
-            };
-        };
+        combinations.push(live_array);
+        // if arcane_count < 1 {
+        //     combinations.push(BuildCombo::new(live_array, None));
+        // } else {
+        //     for a in 0..arcane_count {
+        //         combinations.push(BuildCombo::new(live_array, Some(index_count + a)));
+        //     };
+        // };
     };
     combinations
 }

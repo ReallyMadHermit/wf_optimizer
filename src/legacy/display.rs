@@ -19,14 +19,15 @@ pub fn show_top_builds_scored(
     println!("The format is as follows:\nDamage\nArcane\nMod, Mod, Mod, etc...\
         \nThe (numbers) otherwise are a mod-score, higher is more impactful.\n");
     for &helper in sorting_helpers[0..count].iter() {
-        let build_combo = loaded_mods.combinations[helper.index as usize];
-        let arcane_name = if let Some(i) = build_combo.arcane {
-            loaded_mods.get_name(i)
-        } else {
-            "No Arcane"
-        };
+        let build_combo = loaded_mods.mod_combinations[helper.index as usize];
+        // let arcane_name = if let Some(i) = build_combo.arcane {
+        //     loaded_mods.get_name(i)
+        // } else {
+        //     "No Arcane"
+        // };
+        let arcane_name = "No Arcane";
         let mod_scores = ModScores::new(
-            loaded_mods, gun_stats, build_combo, modding_context.damage_criteria, &sums
+            loaded_mods, gun_stats, &build_combo, modding_context.damage_criteria, &sums
         );
         let arcane_score = mod_scores.arcane.unwrap_or_default();
         let scores = mod_scores.mod_scores;

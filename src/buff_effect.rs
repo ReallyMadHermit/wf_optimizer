@@ -78,7 +78,7 @@ fn parse_buffs(input_string: String) -> Option<Vec<(ModStatType, i16)>> {
 
 impl GunModSums {
     fn from_buffs(buffs: &[(ModStatType, i16)]) -> Self {
-        let mut stat_sums = Self::new();
+        let mut stat_sums = Self::default();
         for &(stat, value) in buffs {
             stat_sums.apply_mod(stat, value);
         };

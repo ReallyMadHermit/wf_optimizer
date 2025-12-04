@@ -19,10 +19,10 @@ pub fn cli_workflow_entry() {
         } else {
             None
         };
-        if modding_context.debug_numbers {
-            println!("Printing GunData...");
-            gun_data.print();
-        };
+        // if modding_context.debug_numbers {
+        //     println!("Printing GunData...");
+        //     gun_data.print();
+        // };
         if modding_context.riven {
             riven_input_loop(gun_data, modding_context, buff_sums);
         } else {
@@ -30,9 +30,9 @@ pub fn cli_workflow_entry() {
             let loaded_mods = LoadedMods::new(&modding_context);
             let build_scores = calculate_builds(
                 &loaded_mods, &gun_data.gun_stats, &modding_context, buff_sums);
-            if modding_context.debug_numbers {
-                println!("Total calc time: {:?}", start_total.elapsed());
-            };
+            // if modding_context.debug_numbers {
+            //     println!("Total calc time: {:?}", start_total.elapsed());
+            // };
             let count = UserInput::looped_integer_prompt(
                 "Done! How many results do you want to see? Press enter to show 6.",
                 1, build_scores.len(), 6);
@@ -174,17 +174,17 @@ fn riven_input_loop(gun_data: GunData, modding_context: ModdingContext, buff_sum
 fn generate_reference_score(modding_context: &ModdingContext, gun_data: &GunStats, base_sums: Option<GunModSums>) -> f32 {
     let mut reference_context = modding_context.clone();
     reference_context.riven = false;
-    reference_context.debug_numbers = false;
-    let start = Instant::now();
-    if modding_context.debug_numbers {
-        print!("Generating reference score...");
-    };
+    // reference_context.debug_numbers = false;
+    // let start = Instant::now();
+    // if modding_context.debug_numbers {
+    //     print!("Generating reference score...");
+    // };
     let reference_mods = LoadedMods::new(&reference_context);
     let score = get_highest_damage(&reference_mods, gun_data, &reference_context, base_sums);
-    if modding_context.debug_numbers {
-        let d = start.elapsed();
-        println!(" Done! {:?}", d);
-    };
+    // if modding_context.debug_numbers {
+    //     let d = start.elapsed();
+    //     println!(" Done! {:?}", d);
+    // };
     if let Some(i) = score {
         i as f32
     } else {

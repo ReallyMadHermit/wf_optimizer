@@ -13,17 +13,21 @@ pub struct LoadedMods {
     mod_names: Vec<&'static str>,
     mod_data: Vec<ModData>,
     included_mods: Option<[Option<u8>; 4]>,
-    pub combinations: Vec<BuildCombo>,
+    pub mod_combinations: Vec<[u8; 8]>,
     pub mod_count: u8,
     pub arcane_count: u8,
     riven_index: Option<u8>
 } impl LoadedMods {
 
+    pub fn get_arcane_list(&self) -> &[ModData] {
+        &self.mod_data[self.mod_count as usize..]
+    }
+
     pub fn new(modding_context: &ModdingContext) -> Self {
         let mut start = Instant::now();
-        if modding_context.debug_numbers {
-            print!("Parsing mods...")
-        };
+        // if modding_context.debug_numbers {
+        //     print!("Parsing mods...")
+        // };
         let mod_lines: Vec<&'static str> = GUN_MODS.lines().collect();
         let arcane_lines: Vec<&'static str> = GUN_ARCANES.lines().collect();
         let mod_range = &mod_lines[1..];
@@ -44,24 +48,24 @@ pub struct LoadedMods {
         let mut loaded_mods = LoadedMods::empty(size);
         Self::parse_mods(&mut loaded_mods, mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, arcane_range, arcane_scores, true);
-        if modding_context.debug_numbers {
-            let d = start.elapsed();
-            println!(" Done! Loaded {} mods in {:?}", loaded_mods.mod_data.len(), d);
-            print!("Calculating Combinatorics...");
-            start = Instant::now();
-        };
+        // if modding_context.debug_numbers {
+        //     let d = start.elapsed();
+        //     println!(" Done! Loaded {} mods in {:?}", loaded_mods.mod_data.len(), d);
+        //     print!("Calculating Combinatorics...");
+        //     start = Instant::now();
+        // };
         loaded_mods.calculate_combinatorics();
-        if modding_context.debug_numbers {
-            let d = start.elapsed();
-            println!(" Done! {} Combinations in {:?}", loaded_mods.combinations.len(), d);
-            print!("Filtering Combinations...");
-            start = Instant::now();
-        };
+        // if modding_context.debug_numbers {
+        //     let d = start.elapsed();
+        //     println!(" Done! {} Combinations in {:?}", loaded_mods.mod_combinations.len(), d);
+        //     print!("Filtering Combinations...");
+        //     start = Instant::now();
+        // };
         loaded_mods.filter_loaded_mods(modding_context);
-        if modding_context.debug_numbers {
-            let d = start.elapsed();
-            println!(" Done! {} remaining {:?}", loaded_mods.combinations.len(), d);
-        }
+        // if modding_context.debug_numbers {
+        //     let d = start.elapsed();
+        //     println!(" Done! {} remaining {:?}", loaded_mods.mod_combinations.len(), d);
+        // }
         loaded_mods
     }
 
@@ -215,7 +219,7 @@ impl LoadedMods {
             mod_names: Vec::with_capacity(size),
             mod_data: Vec::with_capacity(size),
             included_mods: None,
-            combinations: Vec::new(),
+            mod_combinations: Vec::new(),
             mod_count: 0,
             arcane_count: 0,
             riven_index: None
@@ -223,7 +227,7 @@ impl LoadedMods {
     }
 
     fn calculate_combinatorics(&mut self) {
-        self.combinations = generate_combinations(self.mod_count, self.arcane_count);
+        self.mod_combinations = generate_combinations(self.mod_count);
     }
 
     fn len(&self) -> usize {
@@ -299,7 +303,7 @@ impl LoadedMods {
         let mut include = false;
         let kills_behavior = ModBehavior::from_str(behavior_slice[0]);
         let aiming_behavior = ModBehavior::from_str(behavior_slice[1]);
-        let headshot_behavior = ModBehavior::from_str(behavior_slice[2]);
+        // let headshot_behavior = ModBehavior::from_str(behavior_slice[2]);
         let semi_behavior = ModBehavior::from_str(behavior_slice[3]);
         let acuity_behavior = ModBehavior::from_str(behavior_slice[4]);
         let amalgam_behavior = ModBehavior::from_str(behavior_slice[5]);
@@ -309,7 +313,7 @@ impl LoadedMods {
         for (behavior, truth) in [
             (kills_behavior, modding_context.kills),
             (aiming_behavior, modding_context.aiming),
-            (headshot_behavior, modding_context.headshot),
+            // (headshot_behavior, modding_context.headshot),
             (semi_behavior, modding_context.semi),
             (acuity_behavior, modding_context.acuity),
             (amalgam_behavior, modding_context.prefer_amalgam),
@@ -341,10 +345,10 @@ impl LoadedMods {
             return;
         };
         if let Some(included) = &self.included_mods {
-            self.combinations.retain(|combo| Self::contains_required_mods(&combo.mod_combo, included))
+            self.mod_combinations.retain(|combo| Self::contains_required_mods(&combo, included))
         };
-        self.combinations.retain(|combo| !Self::contains_illegal_pair(&combo.mod_combo, &pairs));
-        self.combinations.shrink_to_fit();
+        self.mod_combinations.retain(|combo| !Self::contains_illegal_pair(&combo, &pairs));
+        self.mod_combinations.shrink_to_fit();
     }
 
     fn contains_required_mods(combo: &[u8; 8], included_mods: &[Option<u8>; 4]) -> bool {

@@ -192,7 +192,7 @@ pub struct GunModSums {
             ModStatType::ReloadSpeed => {
                 self.reload += stat_value;
             },
-            ModStatType::Headshot => {  // TODO: this is how Secondary Surge applies, resolve that
+            ModStatType::Headshot => {
                 let eff = 100 + stat_value.abs();
                 let m = eff as f32 / 100.0;
                 if stat_value > 0 {

@@ -1,7 +1,7 @@
 use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
 use ratatui::crossterm::event::MouseButton;
 use ratatui::layout::Constraint::{Fill, Length, Percentage, Min};
-use crate::context_core::{DamageCriteria, ModdingContext};
+use crate::context_core::{DamageCriteria, ModdingContext, WeaponType};
 use crate::tui::stat_screen::StatFields;
 use crate::weapon_select::GunData;
 use crate::tui::weapon_search_menu::weapon_search_tui;
@@ -94,6 +94,28 @@ struct ContextMenuApp {
     buff_stats: Option<StatFields>,
     riven_stats: Option<StatFields>,
 } impl ContextMenuApp {
+    
+    fn get_modding_context(&self) -> ModdingContext {
+        let (gun_type, semi) = if let Some(g) = &self.weapon_selection {
+            (g.gun_stats.gun_type, g.semi)
+        } else {
+            (WeaponType::All, false)
+        };
+        ModdingContext {
+            weapon_type: gun_type,
+            damage_criteria: self.damage_criteria,
+            kills: self.has_kills,
+            aiming: self.ads,
+            semi,
+            acuity: self.acuity,
+            prefer_amalgam: self.amalgam,
+            riven: self.riven_stats.is_some(),
+            bane: self.bane > 0,
+            prime_bane: self.bane > 1,
+            buffs: self.buff_stats.is_some(),
+            conditions: self.status_count
+        }
+    }
 
     fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
         // update mouse_row

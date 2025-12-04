@@ -56,24 +56,6 @@ fn get_damage(modding_context: &ModdingContext, modded_gun_stats: &GunStats, mod
     }
 }
 
-
-fn calculate_single_build(
-    base_gun_stats: &GunStats,
-    mod_sums: &GunModSums,
-    damage_criteria: DamageCriteria
-) -> f32 {
-    let stats = apply_mod_sum(base_gun_stats, mod_sums);
-    let damage = stats.shot_damage(mod_sums.empowered, mod_sums.bane);
-    if damage_criteria == DamageCriteria::PerShot {
-        return damage;
-    };
-    let burst = stats.burst_damage(damage);
-    if damage_criteria == DamageCriteria::BurstDPS {
-        return burst;
-    };
-    stats.sustained_dps(burst)
-}
-
 #[derive(Clone, Copy, Default)]  // TODO: parse innervate
 pub struct GunModSums {
     pub damage: i16,

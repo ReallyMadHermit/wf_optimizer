@@ -64,6 +64,20 @@ pub struct BuildShowcase {
         }
     }
 
+    pub fn print_all_builds(&self, loaded_mods: &LoadedMods) {
+        let arcanes = loaded_mods.get_arcane_names();
+        for (index, list) in self.all_builds.iter().enumerate() {
+            if index == 0 {
+                println!("No Arcane");
+            } else {
+                println!("{}", arcanes[index-1]);
+            }
+            for build in list {
+                println!("{}", build.get_damage())
+            }
+        }
+    }
+
 }
 
 

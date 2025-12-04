@@ -17,16 +17,14 @@ pub fn calculate_builds(
     for (combo_index, mod_combo) in loaded_mods.mod_combinations.iter().enumerate() {
         let mut combo_sums = base_sums;
         combo_sums.add_many_mods(mod_combo, loaded_mods);
-        let modded_stats = apply_mod_sum(base_gun_stats, &combo_sums);
-        let gun_damage = get_damage(modding_context, &modded_stats, &combo_sums);
+        let gun_damage = get_damage(modding_context, base_gun_stats, &combo_sums);
         bucket_manager.add(gun_damage, combo_index, 0);
         for (arcane_index, arcane_stats) in arcanes.iter().enumerate() {
             let mut arcane_sums = combo_sums;
             for &(stat_type, value) in arcane_stats.get() {
                 arcane_sums.apply_mod(stat_type, value);
             }
-            let modded_stats = apply_mod_sum(base_gun_stats, &arcane_sums);
-            let gun_damage = get_damage(modding_context, &modded_stats, &arcane_sums);
+            let gun_damage = get_damage(modding_context, base_gun_stats, &arcane_sums);
             bucket_manager.add(gun_damage, combo_index, arcane_index+1);
         }
     }
@@ -34,21 +32,22 @@ pub fn calculate_builds(
 }
 
 
-fn get_damage(modding_context: &ModdingContext, modded_gun_stats: &GunStats, mod_sums: &GunModSums) -> f32 {
+fn get_damage(modding_context: &ModdingContext, base_gun_stats: &GunStats, mod_sums: &GunModSums) -> f32 {
+    let modded_stats = apply_mod_sum(base_gun_stats, mod_sums);
     match modding_context.damage_criteria {
         DamageCriteria::PerShot => {
-            modded_gun_stats.shot_damage(mod_sums.empowered, mod_sums.bane)
+            modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane)
         },
         DamageCriteria::BurstDPS => {
-            modded_gun_stats.burst_damage(
-                modded_gun_stats.shot_damage(mod_sums.empowered, mod_sums.bane
+            modded_stats.burst_damage(
+                modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane
                 )
             )
         },
         DamageCriteria::SustainedDPS => {
-            modded_gun_stats.sustained_dps(
-                modded_gun_stats.burst_damage(
-                    modded_gun_stats.shot_damage(mod_sums.empowered, mod_sums.bane
+            modded_stats.sustained_dps(
+                modded_stats.burst_damage(
+                    modded_stats.shot_damage(mod_sums.empowered, mod_sums.bane
                     )
                 )
             )
@@ -107,13 +106,6 @@ pub struct GunModSums {
         let mut sums = Self::default();
         sums.conditions = conditions;
         sums
-    }
-
-    fn apply_build_combo(&mut self, build_combo: &[u8], loaded_mods: &LoadedMods) {
-        // if let Some(a) = build_combo.arcane {
-        //     self.add_mod(a, loaded_mods);
-        // };
-        self.add_many_mods(&build_combo, loaded_mods);
     }
 
     fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {

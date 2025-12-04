@@ -101,12 +101,6 @@ pub struct GunModSums {
             final_crit_mod: 0
         }
     }
-    
-    pub fn from_conditions(conditions: u8) -> Self {
-        let mut sums = Self::new();
-        sums.conditions = conditions;
-        sums
-    }
 
     fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
         for &mod_id in weapon_mods {

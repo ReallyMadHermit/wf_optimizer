@@ -74,7 +74,7 @@ fn calculate_single_build(
     stats.sustained_dps(burst)
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default)]  // TODO: parse innervate
 pub struct GunModSums {
     pub damage: i16,
     pub ele_damage: i16,

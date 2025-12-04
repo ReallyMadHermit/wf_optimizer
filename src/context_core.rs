@@ -85,6 +85,10 @@ impl WeaponType {
 
 impl DamageCriteria {
 
+    pub(crate) fn default() -> DamageCriteria {
+        Self::PerShot
+    }
+
     pub fn criteria_quiz() -> DamageCriteria {
         println!();
         println!("Okay, what are we optimizing this for?");

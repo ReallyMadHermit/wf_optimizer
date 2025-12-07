@@ -1,0 +1,159 @@
+use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
+use ratatui::crossterm::event::MouseButton;
+use ratatui::layout::Constraint::{Fill, Min};
+use ratatui::prelude::Constraint::{Length, Percentage};
+use crate::build_calc::{calculate_builds, GunModSums};
+use crate::context_core::ModdingContext;
+use crate::mod_parsing::LoadedMods;
+use crate::tui::build_organization_structs::BuildShowcase;
+use crate::weapon_select::GunData;
+
+const EXIT_KEYS: [KeyCode; 3] = [KeyCode::Backspace, KeyCode::Esc, KeyCode::Enter];
+const BACK_TEXT: &str = "<== Go Back";
+
+fn build_display_tui(
+    terminal: &mut DefaultTerminal,
+    gun_data: &GunData,
+    modding_context: ModdingContext,
+    base_sums: Option<GunModSums>
+) {
+    let loaded_mods = LoadedMods::new(&modding_context);
+    let arcane_names = loaded_mods.get_arcane_names();
+    let showcase = calculate_builds(
+        &loaded_mods, &gun_data.gun_stats, &modding_context, None
+    );
+    let mut app = BuildDisplayApp::new(showcase);
+    terminal.draw(|frame| app.draw(frame)).unwrap();
+
+    while app.redraw {
+        let event = event::read();
+        if let Ok(event) = event {
+            match event {
+                Event::Mouse(mouse_event) => {
+                    app.handle_mouse_event(mouse_event);
+                },
+                Event::Key(key_event) => {
+                    if EXIT_KEYS.contains(&key_event.code) {
+                        app.running = false;
+                    }
+                },
+                Event::Resize(_, _) => {
+                    app.redraw = true;
+                },
+                _ => {}
+            }
+        }
+    }
+}
+
+
+struct BuildDisplayApp {
+    mouse_row: u16,
+    mouse_column: u16,
+    top_selection: u16,
+    build_selection: u16,
+    top_clicked: bool,
+    build_clicked: bool,
+    showcase: BuildShowcase,
+    running: bool,
+    redraw: bool
+} impl BuildDisplayApp {
+
+    fn draw(&self, frame: &mut Frame) {
+        // "best builds" refers to the per-arcane selection
+        // "builds" refers to the top-8 builds for a given arcane
+        // "mods" refers to the mods used in a given build
+        // outer refers to the area a box will be drawn in
+        // inner refers to the area inside a box
+        // area refers to the space content will go
+        // except top and bottom area since those are simple regions without whole naming schemes
+        let vertical_layout = Layout::vertical([
+            Length(3),
+            Fill(1)
+        ]);
+        let [top_area, bottom_area] = vertical_layout.areas(frame.area());
+        self.draw_help(frame, top_area);
+        let bottom_inner = self.draw_lower_box(frame, bottom_area);
+        let inner_layout = Layout::horizontal([
+            Percentage(30),
+            Fill(1)
+        ]);
+        let [best_builds_area, builds_outer_area] = inner_layout.areas(bottom_inner);
+        self.draw_best_inner(frame, best_builds_area);
+        let builds_inner = self.draw_builds_box(frame, builds_outer_area);
+        let final_layout = Layout::horizontal([
+            Percentage(50),
+            Fill(1)
+        ]);
+        let [builds_area, mods_outer] = final_layout.areas(builds_inner);
+        self.draw_builds_inner(frame, builds_area);
+        let mods_area = self.draw_mods_outer(frame, mods_outer);
+        self.draw_mods_inner(frame, mods_area);
+    }
+
+    // draws lower-box, returns inner area
+    fn draw_lower_box(&self, frame: &mut Frame, bottom_area: Rect) -> Rect {
+        let bottom_block = Block::bordered().title("Top Builds");
+        let bottom_inner = bottom_block.inner(bottom_area);
+        frame.render_widget(bottom_block, bottom_area);
+        bottom_inner
+    }
+
+    // draws builds box, returns inner area
+    fn draw_builds_box(&self, frame: &mut Frame, builds_area: Rect) -> Rect {
+        let builds_block = Block::bordered().title("ARcaneNameGoHEre");
+        let builds_inner = builds_block.inner(builds_area);
+        frame.render_widget(builds_block, builds_area);
+        builds_inner
+    }
+
+    // draws mods box, returns inner area
+    fn draw_mods_outer(&self, frame: &mut Frame, composition_area: Rect) -> Rect {
+        let composition_block = Block::bordered().title("ArcaneName #X");
+        let composition_inner = composition_block.inner(composition_area);
+        frame.render_widget(composition_block, composition_area);
+        composition_inner
+
+    }
+
+    fn draw_best_inner(&self, frame: &mut Frame, area: Rect) {
+
+    }
+
+    fn draw_builds_inner(&self, frame: &mut Frame, area: Rect) {
+
+    }
+
+    fn draw_mods_inner(&self, frame: &mut Frame, area: Rect) {
+
+    }
+
+    // draws upper area
+    fn draw_help(&self, frame: &mut Frame, top_area: Rect) {
+        let top_layout = Layout::horizontal([
+            Fill(1),
+            Length(BACK_TEXT.len() as u16 + 2)
+        ]);
+        let [help_area, button_area] = top_layout.areas(top_area);
+    }
+
+    fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
+        self.mouse_row = mouse_event.row;
+        self.mouse_column = mouse_event.column;
+    }
+
+    fn new(build_showcase: BuildShowcase) -> Self {
+        Self {
+            mouse_row: 0,
+            mouse_column: 0,
+            top_selection: 0,
+            build_selection: 0,
+            top_clicked: false,
+            build_clicked: false,
+            showcase: build_showcase,
+            running: true,
+            redraw: false
+        }
+    }
+
+}

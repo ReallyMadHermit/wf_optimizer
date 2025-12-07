@@ -138,7 +138,7 @@ struct BuildDisplayApp<'a> {
             } else {
                 Style::default()
             };
-            let content = Line::from(Span::styled(build_string, style));
+            let content = Line::styled(build_string, style);
             list.push(ListItem::new(content));
         }
         frame.render_widget(List::new(list), area);

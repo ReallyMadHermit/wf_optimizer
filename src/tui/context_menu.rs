@@ -70,7 +70,10 @@ pub fn context_menu_tui(
                     app.riven_stats = new_riven;
                 },
                 GoToTerm::SubmitBuild => {
-                    build_display_tui(terminal);
+                    if let Some(gun_data) = &app.weapon_selection {
+                        let modding_context = app.get_modding_context();
+                        build_display_tui(terminal, gun_data, modding_context, None);
+                    }
                 }
             }
             app.go_to = None;

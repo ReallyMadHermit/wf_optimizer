@@ -95,7 +95,7 @@ struct BuildDisplayApp<'a> {
 
     // draws lower-box, returns inner area
     fn draw_lower_box(&self, frame: &mut Frame, bottom_area: Rect) -> Rect {
-        let bottom_block = Block::bordered().title("Top Acanes");
+        let bottom_block = Block::bordered().title("Top Arcanes");
         let bottom_inner = bottom_block.inner(bottom_area);
         frame.render_widget(bottom_block, bottom_area);
         bottom_inner
@@ -103,7 +103,8 @@ struct BuildDisplayApp<'a> {
 
     // draws builds box, returns inner area
     fn draw_builds_box(&self, frame: &mut Frame, builds_area: Rect) -> Rect {
-        let builds_block = Block::bordered().title(self.get_selected_arcane_name());
+        let title_text = format!("{} Builds", self.get_selected_arcane_name());
+        let builds_block = Block::bordered().title(title_text);
         let builds_inner = builds_block.inner(builds_area);
         frame.render_widget(builds_block, builds_area);
         builds_inner
@@ -111,7 +112,8 @@ struct BuildDisplayApp<'a> {
 
     // draws mods box, returns inner area
     fn draw_mods_outer(&self, frame: &mut Frame, composition_area: Rect) -> Rect {
-        let composition_block = Block::bordered().title("ArcaneName #X");
+        let title_text = format!("{} - #{}",self.get_selected_arcane_name(),  self.build_selection+1);
+        let composition_block = Block::bordered().title(title_text);
         let composition_inner = composition_block.inner(composition_area);
         frame.render_widget(composition_block, composition_area);
         composition_inner
@@ -145,7 +147,7 @@ struct BuildDisplayApp<'a> {
     }
 
     fn draw_builds_inner(&self, frame: &mut Frame, area: Rect) {
-        let arcane_name = self.get_selected_arcane_name();
+
     }
 
     fn draw_mods_inner(&self, frame: &mut Frame, area: Rect) {

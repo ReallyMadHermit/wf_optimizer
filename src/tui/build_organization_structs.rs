@@ -7,7 +7,7 @@ const ARC: usize = ARCANE_RESULTS_COUNT;
 pub struct BuildShowcase {
     top_builds: Vec<BuildSorter>,  // top build BuildDamage references refer to index in all_builds
     all_builds: Vec<[BuildSorter; ARC]>,  // references here refer to combo id
-    len: usize
+    pub len: usize
 } impl BuildShowcase {
 
     pub fn from_manager(bucket_manager: &BucketManager) -> Self {
@@ -145,7 +145,7 @@ struct BuildBucket {
 
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone)]
-struct BuildSorter {
+pub struct BuildSorter {
     inverse_damage: u32,
     reference: u32
 } impl BuildSorter {
@@ -164,11 +164,11 @@ struct BuildSorter {
         }
     }
 
-    fn get_damage(&self) -> u32 {
+    pub fn get_damage(&self) -> u32 {
         u32::MAX - self.inverse_damage
     }
 
-    fn get_reference(&self) -> usize {
+    pub fn get_reference(&self) -> usize {
         self.reference as usize
     }
 

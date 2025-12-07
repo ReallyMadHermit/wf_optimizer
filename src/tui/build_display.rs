@@ -24,8 +24,7 @@ fn build_display_tui(
     );
     let mut app = BuildDisplayApp::new(showcase);
     terminal.draw(|frame| app.draw(frame)).unwrap();
-
-    while app.redraw {
+    while app.running {
         let event = event::read();
         if let Ok(event) = event {
             match event {

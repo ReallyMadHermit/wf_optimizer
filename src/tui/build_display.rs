@@ -5,24 +5,26 @@ use ratatui::prelude::Constraint::{Length, Percentage};
 use crate::build_calc::{calculate_builds, GunModSums};
 use crate::context_core::ModdingContext;
 use crate::mod_parsing::LoadedMods;
-use crate::tui::build_organization_structs::BuildShowcase;
+use crate::tui::build_organization_structs::{BucketManager, BuildShowcase};
 use crate::weapon_select::GunData;
 
-const EXIT_KEYS: [KeyCode; 3] = [KeyCode::Backspace, KeyCode::Esc, KeyCode::Enter];
+const EXIT_KEYS: [KeyCode; 2] = [KeyCode::Backspace, KeyCode::Esc];
 const BACK_TEXT: &str = "<== Go Back";
 
-fn build_display_tui(
+pub fn build_display_tui(
     terminal: &mut DefaultTerminal,
-    gun_data: &GunData,
-    modding_context: ModdingContext,
-    base_sums: Option<GunModSums>
+    // gun_data: &GunData,
+    // modding_context: ModdingContext,
+    // base_sums: Option<GunModSums>
 ) {
-    let loaded_mods = LoadedMods::new(&modding_context);
-    let arcane_names = loaded_mods.get_arcane_names();
-    let showcase = calculate_builds(
-        &loaded_mods, &gun_data.gun_stats, &modding_context, None
-    );
-    let mut app = BuildDisplayApp::new(showcase);
+    // let loaded_mods = LoadedMods::new(&modding_context);
+    // let arcane_names = loaded_mods.get_arcane_names();
+    // let showcase = calculate_builds(
+    //     &loaded_mods, &gun_data.gun_stats, &modding_context, None
+    // );
+    // let mut app = BuildDisplayApp::new(showcase);
+
+    let mut app = BuildDisplayApp::new(BuildShowcase::from_manager(&BucketManager::new(1)));
     terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
         let event = event::read();

@@ -6,6 +6,7 @@ use crate::tui::stat_screen::StatFields;
 use crate::weapon_select::GunData;
 use crate::tui::weapon_search_menu::weapon_search_tui;
 use crate::tui::stat_screen::stat_screen_tui;
+use crate::tui::build_display::build_display_tui;
 
 const DISPLAY_STRING_LENGTH: usize = 64;
 const LABEL_LENGTH: usize = 18;
@@ -43,6 +44,8 @@ pub fn context_menu_tui(
                 Event::Key(key_event) => {
                     if key_event.code == KeyCode::Esc {
                         app.running = false;
+                    } else if key_event.code == KeyCode::Enter {
+                        app.go_to = Some(GoToTerm::SubmitBuild);
                     }
                 }
                 Event::Resize(_, _) => {
@@ -65,6 +68,9 @@ pub fn context_menu_tui(
                 GoToTerm::RivenStats => {
                     let new_riven = stat_screen_tui(terminal, app.riven_stats, true);
                     app.riven_stats = new_riven;
+                },
+                GoToTerm::SubmitBuild => {
+                    build_display_tui(terminal);
                 }
             }
             app.go_to = None;
@@ -82,7 +88,8 @@ pub fn context_menu_tui(
 enum GoToTerm {
     WeaponSelect,
     BuffStats,
-    RivenStats
+    RivenStats,
+    SubmitBuild
 }
 
 

@@ -1,4 +1,5 @@
 use std::io::stdout;
+use std::time::Instant;
 use ratatui::crossterm::cursor::SetCursorStyle;
 use ratatui::crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use ratatui::crossterm::ExecutableCommand;
@@ -31,6 +32,7 @@ fn main() {
     ratatui::restore();
     _ = stdout().execute(DisableMouseCapture);
     _ = terminal::disable_raw_mode();
+    let start = Instant::now();
     let loaded_mods = LoadedMods::new(&modding_context);
     let showcase = calculate_builds(
         &loaded_mods,
@@ -38,7 +40,10 @@ fn main() {
         &modding_context,
         None
     );
+    println!("Done! {:?} elapsed", start.elapsed());
+    gun_data.print();
     showcase.print_top_builds(&loaded_mods);
+    showcase.print_all_builds(&loaded_mods);
     // if let Some(g) = r {
     //     println!("{}, {}", g.name, g.fire_mode);
     // }

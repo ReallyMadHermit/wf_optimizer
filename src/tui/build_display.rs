@@ -155,11 +155,12 @@ struct BuildDisplayApp<'a> {
     }
 
     fn get_selected_arcane_name(&self) -> &str {
-        if self.top_selection == 0 {
+        let arcanes = self.loaded_mods.get_arcane_names();
+        let arcane_id = self.showcase.get_top_builds()[self.top_selection as usize].get_reference();
+        if arcane_id == 0 {
             "No Arcane"
         } else {
-            let arcanes = self.loaded_mods.get_arcane_names();
-            arcanes[(self.top_selection-1) as usize]
+            arcanes[arcane_id - 1]
         }
     }
 

@@ -147,7 +147,22 @@ struct BuildDisplayApp<'a> {
     }
 
     fn draw_builds_inner(&self, frame: &mut Frame, area: Rect) {
-
+        let top_build = self.showcase.get_top_builds()[self.top_selection as usize];
+        let builds = self.showcase.get_build_list(top_build.get_reference());
+        let len = builds.len();
+        let mut list: Vec<ListItem> = Vec::with_capacity(len);
+        for i in 0..len {
+            let build = builds[i];
+            let build_string = build.get_damage().separate_with_commas();
+            let style = if i == self.build_selection as usize {
+                Style::default().reversed()
+            } else {
+                Style::default()
+            };
+            let content = Line::styled(build_string, style);
+            list.push(ListItem::new(content));
+        }
+        frame.render_widget(List::new(list), area);
     }
 
     fn draw_mods_inner(&self, frame: &mut Frame, area: Rect) {

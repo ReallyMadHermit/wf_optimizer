@@ -26,19 +26,6 @@ pub struct BuildShowcase {
         Self { top_builds, all_builds, len }
     }
 
-    pub fn get_build(&self, arcane_id: usize, build_id: Option<usize>) -> Option<BuildSorter> {
-        if arcane_id >= self.top_builds.len() {
-            return None
-        } else if let Some(id) = build_id {
-            if id >= self.all_builds.len() {
-                return None
-            }
-            return Some(self.all_builds[arcane_id][id])
-        }
-        let build_index = self.top_builds[arcane_id].get_reference();
-        Some(self.all_builds[arcane_id][build_index])
-    }
-
     pub fn get_top_builds(&self) -> &[BuildSorter] {
         &self.top_builds
     }

@@ -1,6 +1,6 @@
 use crate::mod_parsing::LoadedMods;
 
-const ARCANE_RESULTS_COUNT: usize = 8;
+const ARCANE_RESULTS_COUNT: usize = 16;  // in testing, this is used very efficiently
 const ARC: usize = ARCANE_RESULTS_COUNT;
 
 
@@ -104,7 +104,7 @@ struct BuildBucket {
     fn add(&mut self, new_damage: f32, new_reference: usize) -> f32 {
         let mut min_index = 0;
         let mut min_damage = self.damage_array[min_index];
-        for i in 1..8 {
+        for i in 1..ARC {
             if self.damage_array[i] < min_damage {
                 min_damage = self.damage_array[i];
                 min_index = i;

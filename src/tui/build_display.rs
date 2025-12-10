@@ -114,7 +114,7 @@ struct BuildDisplayApp<'a> {
 
     // draws lower-box, returns inner area
     fn draw_lower_box(&self, frame: &mut Frame, bottom_area: Rect) -> Rect {
-        let bottom_block = Block::bordered().title("Top Arcanes");
+        let bottom_block = Block::bordered().title("Arcane Selection");
         let bottom_inner = bottom_block.inner(bottom_area);
         frame.render_widget(bottom_block, bottom_area);
         bottom_inner
@@ -260,6 +260,14 @@ struct BuildDisplayApp<'a> {
         ]);
         let [help_area, button_area] = top_layout.areas(top_area);
         self.draw_button(frame, button_area);
+        let list = List::new(
+            [
+                "The leftmost panel selects arcanes",
+                "The middle section shows builds for that arcane",
+                "The last panel scores the ModPower™ of mods in the build, more is better"
+            ]
+        );
+        frame.render_widget(list, help_area);
     }
 
     fn draw_button(&mut self, frame: &mut Frame, button_area: Rect) {

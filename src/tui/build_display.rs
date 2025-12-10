@@ -1,12 +1,11 @@
-use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
-use ratatui::crossterm::event::MouseButton;
-use ratatui::layout::Constraint::{Fill, Min};
+use ratatui::{crossterm::event::{self, Event, KeyCode, MouseEvent}, layout::{Layout, Rect}, style::{Style, Stylize}, text::Line, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
+use ratatui::layout::Constraint::Fill;
 use ratatui::prelude::Constraint::{Length, Percentage};
 use thousands::Separable;
 use crate::build_calc::{calculate_builds, get_damage, GunModSums};
 use crate::context_core::ModdingContext;
 use crate::mod_parsing::LoadedMods;
-use crate::tui::build_organization_structs::{BucketManager, BuildShowcase, ARC};
+use crate::tui::build_organization_structs::{BuildShowcase, ARC};
 use crate::tui::clicked;
 use crate::weapon_select::GunData;
 
@@ -21,7 +20,6 @@ pub fn build_display_tui(
     base_sums: Option<GunModSums>
 ) {
     let loaded_mods = LoadedMods::new(&modding_context);
-    let arcane_names = loaded_mods.get_arcane_names();
     let showcase = calculate_builds(
         &loaded_mods, &gun_data.gun_stats, &modding_context, None
     );
@@ -51,13 +49,6 @@ pub fn build_display_tui(
             app.redraw = false;
         }
     }
-}
-
-
-enum CursorRange{
-    InTopBuilds,
-    InBuilds,
-    Outside
 }
 
 

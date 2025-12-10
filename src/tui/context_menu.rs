@@ -116,6 +116,7 @@ struct ContextMenuApp {
     go_to: Option<GoToTerm>,
     buff_stats: Option<StatFields>,
     riven_stats: Option<StatFields>,
+    button_start: u16
 } impl ContextMenuApp {
 
     fn get_mod_sums(&self, modding_context: &ModdingContext) -> GunModSums {
@@ -186,6 +187,9 @@ struct ContextMenuApp {
         // fetch hovered field
         let field = if let Some(field) = FieldType::get_type(row) {
             field
+        } else if self.hovered_row >= self.button_start && clicked(mouse_event.kind) > 0 {
+            self.go_to = Some(GoToTerm::SubmitBuild);
+            return;
         } else {
             return;
         };
@@ -321,7 +325,8 @@ struct ContextMenuApp {
             redraw: false,
             go_to: None,
             buff_stats: None,
-            riven_stats: None
+            riven_stats: None,
+            button_start: 0
         }
     }
 
@@ -339,6 +344,7 @@ struct ContextMenuApp {
         // ]).split(vertical_layout[1]);
         self.draw_instructions(frame, help_area);
         self.draw_fields(frame, field_area);
+        self.draw_button(frame, buttons_area);
     }
 
     fn draw_instructions(&mut self, frame: &mut Frame, area: Rect) {
@@ -372,6 +378,21 @@ struct ContextMenuApp {
             fields.push(line);
         };
         frame.render_widget(List::new(fields).block(Block::bordered().title("Settings")), area);
+    }
+
+    fn draw_button(&mut self, frame: &mut Frame, area: Rect) {
+        self.button_start = area.y;
+        let button_text = if self.weapon_selection.is_some() {
+            "Click to Calculate! (this might not be instant...)"
+        } else {
+            "Yo dawg, pick a weapon"
+        };
+        let content = Paragraph::new(button_text).bold().block(Block::bordered()).centered();
+        if self.hovered_row >= area.y && self.weapon_selection.is_some() {
+            frame.render_widget(content.reversed(), area);
+        } else {
+            frame.render_widget(content, area)
+        }
     }
 
     fn get_row_style(&self, rendered_field: FieldType) -> Style {

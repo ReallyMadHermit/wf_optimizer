@@ -205,7 +205,7 @@ struct BuildDisplayApp<'a> {
                 all_mod_ids.push(mod_id);
             }
             if top_build.get_reference() > 0 {
-                all_mod_ids.push(top_build.get_reference() as u8 + self.loaded_mods.arcane_count - 1);
+                all_mod_ids.push(top_build.get_reference() as u8 + self.loaded_mods.mod_count - 1);
             }
             all_mod_ids
         };

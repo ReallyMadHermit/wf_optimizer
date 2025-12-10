@@ -123,6 +123,14 @@ struct ContextMenuApp {
         if modding_context.conditions > 0 {
             sums.conditions = modding_context.conditions;
         }
+        if let Some(buff_stats) = &self.buff_stats {
+            let all = buff_stats.get_all();
+            for &(stat, value) in all {
+                if value != 0 {
+                    sums.apply_mod(stat, value);
+                }
+            }
+        }
         sums
     }
 

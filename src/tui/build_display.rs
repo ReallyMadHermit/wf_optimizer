@@ -270,7 +270,6 @@ struct BuildDisplayApp<'a> {
             let new = self.mouse_row - TOP_START;
             if self.top_selection != new && new < self.showcase.len as u16 {
                 self.top_selection = new;
-                self.build_selection = 0;
                 self.redraw = true;
             }
         } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end {

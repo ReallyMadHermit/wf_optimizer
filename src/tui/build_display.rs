@@ -282,16 +282,17 @@ struct BuildDisplayApp<'a> {
     }
 
     fn update_selections(&mut self) -> CursorRange {
-        if self.mouse_row >= TOP_START && self.mouse_column <= self.top_end {
+        if self.mouse_row >= TOP_START && self.mouse_column <= self.top_end && !self.top_clicked {
             let new = self.mouse_row - TOP_START;
             if self.top_selection != new && new < self.showcase.len as u16{
                 self.top_selection = new;
+                self.build_selection = 0;
                 self.redraw = true;
                 CursorRange::InTopBuilds
             } else {
                 CursorRange::Outside
             }
-        } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end {
+        } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end && !self.build_clicked {
             let new = self.mouse_row - (TOP_START+1);
             if self.build_selection != new && new < ARC as u16{
                 self.build_selection = new;

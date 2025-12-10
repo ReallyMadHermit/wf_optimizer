@@ -191,7 +191,7 @@ struct StatScreenApp {
     }
 
     fn left_click(&mut self, field_id: u16) {
-        let (stat, value) = self.stat_fields.get(field_id).unwrap_or_default();
+        let (stat, value) = self.stat_fields.get(field_id);
         if stat != ModStatType::None {
             self.selected_row = Some(field_id);
         } else {
@@ -222,9 +222,9 @@ struct StatScreenApp {
                 self.buffer.clear();
             }
         }
-        let (stat, value) = self.stat_fields.get(field_id).unwrap_or_default();
+        let (stat, value) = self.stat_fields.get(field_id);
         if stat != ModStatType::None {
-            self.stat_fields.fields[field_id as usize] = Some((stat, 0));
+            self.stat_fields.fields[field_id as usize] = (stat, 0);
         }
     }
 
@@ -246,7 +246,7 @@ struct StatScreenApp {
             return;
         };
 
-        let stat_field = self.stat_fields.get(row).unwrap_or_default().0;
+        let stat_field = self.stat_fields.get(row).0;
         let input_number = if let Ok(f) = self.buffer.parse::<f32>() {
             if self.negative_input {
                 -f
@@ -265,10 +265,10 @@ struct StatScreenApp {
         match stat_field {
             ModStatType::None => {},
             ModStatType::FinalCritDamage => {
-                self.stat_fields.fields[row as usize] = Some((stat_field, (input_number * 100.0).round() as i16));
+                self.stat_fields.fields[row as usize] = (stat_field, (input_number * 100.0).round() as i16);
             },
             _ => {
-                self.stat_fields.fields[row as usize] = Some((stat_field, input_number.round() as i16));
+                self.stat_fields.fields[row as usize] = (stat_field, input_number.round() as i16);
             }
         }
     }
@@ -299,8 +299,7 @@ struct StatScreenApp {
     fn draw_fields(&mut self, frame: &mut Frame, area: Rect) {
         let stat_fields = self.stat_fields.get_all();
         let mut fields: Vec<ListItem> = Vec::with_capacity(stat_fields.len());
-        for (i, option) in stat_fields.iter().enumerate() {
-            let (stat, value) = option.unwrap_or_default();
+        for (i, &(stat, value)) in stat_fields.iter().enumerate() {
             let selected = self.selected_row == Some(i as u16);
             let row_string = self.write_row_string(stat, value, selected);
             let content = Line::from(Span::styled(row_string, self.get_row_style(i)));
@@ -420,31 +419,31 @@ struct StatScreenApp {
 
 
 pub struct StatFields {
-    fields: [Option<(ModStatType, i16)>; 12],
+    fields: [(ModStatType, i16); 12],
     len: u8,
 } impl StatFields {
 
     fn default() -> Self {
         Self {
-            fields: [None; 12],
+            fields: [(ModStatType::None, 0); 12],
             len: 0,
         }
     }
 
     fn push(&mut self, stat_type: ModStatType, value: i16) {
-        self.fields[self.len as usize] = Some((stat_type, value));
+        self.fields[self.len as usize] = (stat_type, value);
         self.len +=1;
     }
 
-    fn get_all(&self) -> &[Option<(ModStatType, i16)>] {
+    pub fn get_all(&self) -> &[(ModStatType, i16)] {
         &self.fields[0..self.len as usize]
     }
 
-    fn get(&self, field_id: u16) -> Option<(ModStatType, i16)> {
+    fn get(&self, field_id: u16) -> (ModStatType, i16) {
         if self.contains(field_id) {
             self.fields[field_id as usize]
         } else {
-            None
+            (ModStatType::None, 0)
         }
     }
 
@@ -453,8 +452,7 @@ pub struct StatFields {
     }
 
     fn has_values(&self) -> bool {
-        for option in self.get_all() {
-            let (stat, value) = option.unwrap_or_default();
+        for &(_, value) in self.get_all() {
             if value != 0 {
                 return true;
             }
@@ -464,8 +462,7 @@ pub struct StatFields {
 
     pub fn display(&self) -> String {
         let mut string = String::with_capacity(DISPLAY_CAPACITY);
-        for option in self.get_all() {
-            let (stat, value) = option.unwrap_or_default();
+        for &(stat, value) in self.get_all() {
             if value == 0 {
                 continue;
             } else if value > 0 {

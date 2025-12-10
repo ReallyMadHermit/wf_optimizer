@@ -7,6 +7,7 @@ use crate::weapon_select::GunData;
 use crate::tui::weapon_search_menu::weapon_search_tui;
 use crate::tui::stat_screen::stat_screen_tui;
 use crate::tui::build_display::build_display_tui;
+use super::clicked;
 
 const DISPLAY_STRING_LENGTH: usize = 64;
 const LABEL_LENGTH: usize = 18;
@@ -149,18 +150,10 @@ struct ContextMenuApp {
             return;
         };
         // check for clicking
-        let clicked: i8 = if let MouseEventKind::Down(button) = mouse_event.kind {
-            if button == MouseButton::Left {
-                1
-            } else {
-                -1
-            }
-        } else {
-            0
-        };
+        let clicked_side: i8 = clicked(mouse_event.kind);
         // interpret click
-        if clicked != 0 {
-            self.click(field, clicked > 0);
+        if clicked_side != 0 {
+            self.click(field, clicked_side > 0);
             self.redraw = true;
         }
     }

@@ -3,6 +3,7 @@ use ratatui::crossterm::event::MouseButton;
 use ratatui::layout::Constraint::Min;
 use ratatui::prelude::Constraint::Length;
 use crate::mod_parsing::ModStatType;
+use super::clicked;
 
 const VALUE_LENGTH: usize = 8;
 const OPTIONS_OFFSET: u16 = 2;
@@ -170,17 +171,9 @@ struct StatScreenApp {
             self.hovered_row = row;
             self.redraw = true;
         }
-        let clicked: i8 = if let MouseEventKind::Down(button) = mouse_event.kind {
-            if button == MouseButton::Left {
-                1
-            } else {
-                -1
-            }
-        } else {
-            0
-        };
-        if clicked != 0 {
-            self.click(clicked > 0);
+        let clicked_side: i8 = clicked(mouse_event.kind);
+        if clicked_side != 0 {
+            self.click(clicked_side > 0);
             self.redraw = true;
         }
     }

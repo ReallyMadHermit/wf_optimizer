@@ -3,7 +3,7 @@ use ratatui::crossterm::event::MouseButton;
 use ratatui::layout::Constraint::{Fill, Min};
 use ratatui::prelude::Constraint::{Length, Percentage};
 use thousands::Separable;
-use crate::build_calc::{calculate_builds, GunModSums};
+use crate::build_calc::{calculate_builds, get_damage, GunModSums};
 use crate::context_core::ModdingContext;
 use crate::mod_parsing::LoadedMods;
 use crate::tui::build_organization_structs::{BucketManager, BuildShowcase};
@@ -23,7 +23,7 @@ pub fn build_display_tui(
     let showcase = calculate_builds(
         &loaded_mods, &gun_data.gun_stats, &modding_context, None
     );
-    let mut app = BuildDisplayApp::new(&showcase, &loaded_mods);
+    let mut app = BuildDisplayApp::new(&showcase, &loaded_mods, gun_data, &modding_context);
     // let mut app = BuildDisplayApp::new(BuildShowcase::from_manager(&BucketManager::new(1)));
     terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
@@ -57,6 +57,8 @@ struct BuildDisplayApp<'a> {
     build_clicked: bool,
     showcase: &'a BuildShowcase,
     loaded_mods: &'a LoadedMods,
+    gun_data: &'a GunData,
+    modding_context: &'a ModdingContext,
     running: bool,
     redraw: bool
 } impl<'a> BuildDisplayApp<'a> {
@@ -166,7 +168,53 @@ struct BuildDisplayApp<'a> {
     }
 
     fn draw_mods_inner(&self, frame: &mut Frame, area: Rect) {
+        let strings = self.compose_scores();
+        let mut list: Vec<ListItem> = Vec::with_capacity(strings.len());
+        for string in strings {
+            list.push(ListItem::new(string));
+        }
+        frame.render_widget(List::new(list), area);
+    }
 
+    fn compose_scores(&self) -> Vec<String> {
+        // get specific mods
+        let top_build = self.showcase.get_top_builds()[self.top_selection as usize];
+        let builds = self.showcase.get_build_list(top_build.get_reference());
+        let selected_build = builds[self.build_selection as usize];
+        let mod_comp = self.loaded_mods.mod_combinations[selected_build.get_reference()];
+        let mut all_mod_ids = Vec::with_capacity(9);
+        for mod_id in mod_comp {
+            all_mod_ids.push(mod_id);
+        }
+        if top_build.get_reference() > 0 {
+            all_mod_ids.push(top_build.get_reference() as u8 + self.loaded_mods.arcane_count - 1);
+        }
+        // compute stats
+        let mut full_sums = GunModSums::new();
+        full_sums.add_many_mods(&all_mod_ids, self.loaded_mods);
+        let full_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &full_sums);
+        let mut mod_scores: Vec<(u8, i16)> = Vec::with_capacity(9);
+        for mod_id in all_mod_ids {
+            let mut reduced_sums = full_sums;
+            reduced_sums.remove_mod(mod_id, self.loaded_mods);
+            let reduced_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &reduced_sums);
+            let damage_factor = full_damage/reduced_damage;
+            let score = ((damage_factor - 1.0) * 1000.0).round() as i16;
+            mod_scores.push((mod_id, score));
+        }
+        mod_scores.sort_by_key(|pair|-pair.1);
+        // turn to string
+        let mut strings: Vec<String> = Vec::with_capacity(9);
+        for (mod_id, score) in mod_scores {
+            let mut string = String::with_capacity(40);
+            let number_string = score.separate_with_commas();
+            string.push_str(self.loaded_mods.get_name(mod_id));
+            string.push_str(" (");
+            string.push_str(&number_string);
+            string.push(')');
+            strings.push(string);
+        }
+        strings
     }
 
     fn get_selected_arcane_name(&self) -> &str {
@@ -193,7 +241,9 @@ struct BuildDisplayApp<'a> {
         self.mouse_column = mouse_event.column;
     }
 
-    fn new(showcase: &'a BuildShowcase, loaded_mods: &'a LoadedMods) -> Self {
+    fn new(
+        showcase: &'a BuildShowcase, loaded_mods: &'a LoadedMods, gun_data: &'a GunData, modding_context: &'a ModdingContext
+    ) -> Self {
         Self {
             mouse_row: 0,
             mouse_column: 0,
@@ -203,6 +253,8 @@ struct BuildDisplayApp<'a> {
             build_clicked: false,
             showcase,
             loaded_mods,
+            gun_data,
+            modding_context,
             running: true,
             redraw: false
         }

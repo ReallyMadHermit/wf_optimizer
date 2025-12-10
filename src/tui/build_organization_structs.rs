@@ -1,4 +1,5 @@
-use crate::mod_parsing::LoadedMods;
+use crate::build_calc::GunModSums;
+use crate::mod_parsing::{LoadedMods, ModData};
 
 const ARCANE_RESULTS_COUNT: usize = 16;  // in testing, this is used very efficiently
 const ARC: usize = ARCANE_RESULTS_COUNT;

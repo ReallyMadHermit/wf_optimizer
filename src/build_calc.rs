@@ -32,7 +32,7 @@ pub fn calculate_builds(
 }
 
 
-fn get_damage(modding_context: &ModdingContext, base_gun_stats: &GunStats, mod_sums: &GunModSums) -> f32 {
+pub fn get_damage(modding_context: &ModdingContext, base_gun_stats: &GunStats, mod_sums: &GunModSums) -> f32 {
     let modded_stats = apply_mod_sum(base_gun_stats, mod_sums);
     match modding_context.damage_criteria {
         DamageCriteria::PerShot => {
@@ -102,20 +102,20 @@ pub struct GunModSums {
         }
     }
 
-    fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
+    pub fn add_many_mods(&mut self, weapon_mods: &[u8], loaded_mods: &LoadedMods) {
         for &mod_id in weapon_mods {
             self.add_mod_id(mod_id, loaded_mods);
         };
     }
 
-    fn add_mod_id(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
+    pub fn add_mod_id(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
         let mod_data = loaded_mods.get_data(mod_id);
         for &(stat, value) in mod_data {
             self.apply_mod(stat, value)
         };
     }
 
-    fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
+    pub fn remove_mod(&mut self, mod_id: u8, loaded_mods: &LoadedMods) {
         let mod_data = loaded_mods.get_data(mod_id);
         for &(stat, value) in mod_data {
             self.apply_mod(stat, -value)

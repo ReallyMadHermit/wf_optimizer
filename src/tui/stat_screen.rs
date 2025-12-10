@@ -91,7 +91,8 @@ struct StatScreenApp {
     redraw: bool,
     riven: bool,
     negative_input: bool,  // if the value in the buffer is a negative number (we don't store '-')
-    highlight_selection: bool  // if over-writing an existing field value
+    highlight_selection: bool,  // if over-writing an existing field value
+    button_start: u16
 } impl StatScreenApp {
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
@@ -187,6 +188,8 @@ struct StatScreenApp {
             } else {
                 self.right_click(field_id);
             }
+        } else if self.hovered_row >= self.button_start {
+            self.running = false;
         }
     }
 
@@ -283,6 +286,17 @@ struct StatScreenApp {
         let [help_area, field_area, button_area] = vertical_layout.areas(frame.area());
         self.draw_instructions(frame, help_area);
         self.draw_fields(frame, field_area);
+        self.draw_button(frame, button_area);
+    }
+
+    fn draw_button(&mut self, frame: &mut Frame, area: Rect) {
+        self.button_start = area.y;
+        let content = Paragraph::new("Save and return").bold().block(Block::bordered()).centered();
+        if self.hovered_row >= area.y {
+            frame.render_widget(content.reversed(), area);
+        } else {
+            frame.render_widget(content, area);
+        }
     }
 
     fn draw_instructions(&mut self, frame: &mut Frame, area: Rect) {
@@ -388,7 +402,8 @@ struct StatScreenApp {
             redraw: true,
             riven,
             negative_input: false,
-            highlight_selection: false
+            highlight_selection: false,
+            button_start: 0
         }
     }
 
@@ -411,7 +426,8 @@ struct StatScreenApp {
             redraw: false,
             riven,
             negative_input: false,
-            highlight_selection: false
+            highlight_selection: false,
+            button_start: 0
         }
     }
 

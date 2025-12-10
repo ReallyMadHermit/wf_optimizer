@@ -11,7 +11,7 @@ use crate::tui::clicked;
 use crate::weapon_select::GunData;
 
 const EXIT_KEYS: [KeyCode; 2] = [KeyCode::Backspace, KeyCode::Esc];
-const BACK_TEXT: &str = "<== Go Back";
+const BACK_TEXT: &str = "  <== Go Back  ";
 const TOP_START: u16 = 4;
 
 pub fn build_display_tui(
@@ -73,7 +73,9 @@ struct BuildDisplayApp<'a> {
     running: bool,
     redraw: bool,
     top_end: u16,
-    builds_end: u16
+    builds_end: u16,
+    button_start: u16,
+    button_lit: bool
 } impl<'a> BuildDisplayApp<'a> {
 
     fn draw(&mut self, frame: &mut Frame) {
@@ -251,18 +253,44 @@ struct BuildDisplayApp<'a> {
     }
 
     // draws upper area
-    fn draw_help(&self, frame: &mut Frame, top_area: Rect) {
+    fn draw_help(&mut self, frame: &mut Frame, top_area: Rect) {
         let top_layout = Layout::horizontal([
             Fill(1),
             Length(BACK_TEXT.len() as u16 + 2)
         ]);
         let [help_area, button_area] = top_layout.areas(top_area);
+        self.draw_button(frame, button_area);
+    }
+
+    fn draw_button(&mut self, frame: &mut Frame, button_area: Rect) {
+        self.button_start = button_area.x;
+        let content = Paragraph::new(BACK_TEXT).bold().block(Block::bordered());
+        if self.button_lit {
+            frame.render_widget(content.reversed(), button_area);
+        } else {
+            frame.render_widget(content, button_area);
+        }
     }
 
     fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
         self.mouse_row = mouse_event.row;
         self.mouse_column = mouse_event.column;
         self.update_selections();
+        if self.is_over_button() {
+            if clicked(mouse_event.kind) != 0 {
+                self.running = false;
+            } else if !self.button_lit {
+                self.button_lit = true;
+                self.redraw = true;
+            }
+        } else if self.button_lit {
+            self.button_lit = false;
+            self.redraw = true;
+        }
+    }
+
+    fn is_over_button(&self) -> bool {
+        self.mouse_row <= 2 && self.mouse_column >= self.button_start
     }
 
     fn update_selections(&mut self) {
@@ -274,7 +302,7 @@ struct BuildDisplayApp<'a> {
             }
         } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end {
             let new = self.mouse_row - (TOP_START+1);
-            if self.build_selection != new && new < ARC as u16{
+            if self.build_selection != new && new < ARC as u16 {
                 self.build_selection = new;
                 self.redraw = true;
             }
@@ -296,7 +324,9 @@ struct BuildDisplayApp<'a> {
             running: true,
             redraw: false,
             top_end: 0,
-            builds_end: 0
+            builds_end: 0,
+            button_start: 0,
+            button_lit: false
         }
     }
 

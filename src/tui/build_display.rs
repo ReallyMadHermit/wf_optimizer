@@ -1,6 +1,5 @@
 use ratatui::{crossterm::event::{self, Event, KeyCode, MouseEvent}, layout::{Layout, Rect}, style::{Style, Stylize}, text::Line, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
-use ratatui::layout::Constraint::Fill;
-use ratatui::prelude::Constraint::{Length, Percentage};
+use ratatui::layout::Constraint::{Fill, Min, Length, Percentage};
 use thousands::Separable;
 use crate::build_calc::{calculate_builds, get_damage, GunModSums};
 use crate::context_core::ModdingContext;
@@ -83,7 +82,7 @@ struct BuildDisplayApp<'a> {
         self.draw_help(frame, top_area);
         let bottom_inner = self.draw_lower_box(frame, bottom_area);
         let inner_layout = Layout::horizontal([
-            Percentage(30),
+            Length(32),
             Fill(1)
         ]);
         let [best_builds_area, builds_outer_area] = inner_layout.areas(bottom_inner);
@@ -91,7 +90,7 @@ struct BuildDisplayApp<'a> {
         self.draw_best_inner(frame, best_builds_area);
         let builds_inner = self.draw_builds_box(frame, builds_outer_area);
         let final_layout = Layout::horizontal([
-            Percentage(50),
+            Percentage(40),
             Fill(1)
         ]);
         let [builds_area, mods_outer] = final_layout.areas(builds_inner);

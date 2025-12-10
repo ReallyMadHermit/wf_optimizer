@@ -6,11 +6,13 @@ use thousands::Separable;
 use crate::build_calc::{calculate_builds, get_damage, GunModSums};
 use crate::context_core::ModdingContext;
 use crate::mod_parsing::LoadedMods;
-use crate::tui::build_organization_structs::{BucketManager, BuildShowcase};
+use crate::tui::build_organization_structs::{BucketManager, BuildShowcase, ARC};
+use crate::tui::clicked;
 use crate::weapon_select::GunData;
 
 const EXIT_KEYS: [KeyCode; 2] = [KeyCode::Backspace, KeyCode::Esc];
 const BACK_TEXT: &str = "<== Go Back";
+const TOP_START: u16 = 4;
 
 pub fn build_display_tui(
     terminal: &mut DefaultTerminal,
@@ -25,7 +27,7 @@ pub fn build_display_tui(
     );
     let mut app = BuildDisplayApp::new(&showcase, &loaded_mods, gun_data, &modding_context);
     // let mut app = BuildDisplayApp::new(BuildShowcase::from_manager(&BucketManager::new(1)));
-    terminal.draw(|frame| app.draw(frame)).unwrap();
+    _ = terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
         let event = event::read();
         if let Ok(event) = event {
@@ -44,7 +46,18 @@ pub fn build_display_tui(
                 _ => {}
             }
         }
+        if app.redraw {
+            _ = terminal.draw(|frame| app.draw(frame)).unwrap();
+            app.redraw = false;
+        }
     }
+}
+
+
+enum CursorRange{
+    InTopBuilds,
+    InBuilds,
+    Outside
 }
 
 
@@ -60,10 +73,12 @@ struct BuildDisplayApp<'a> {
     gun_data: &'a GunData,
     modding_context: &'a ModdingContext,
     running: bool,
-    redraw: bool
+    redraw: bool,
+    top_end: u16,
+    builds_end: u16
 } impl<'a> BuildDisplayApp<'a> {
 
-    fn draw(&self, frame: &mut Frame) {
+    fn draw(&mut self, frame: &mut Frame) {
         // "best builds" refers to the per-arcane selection
         // "builds" refers to the top-8 builds for a given arcane
         // "mods" refers to the mods used in a given build
@@ -83,6 +98,7 @@ struct BuildDisplayApp<'a> {
             Fill(1)
         ]);
         let [best_builds_area, builds_outer_area] = inner_layout.areas(bottom_inner);
+        self.top_end = builds_outer_area.x;
         self.draw_best_inner(frame, best_builds_area);
         let builds_inner = self.draw_builds_box(frame, builds_outer_area);
         let final_layout = Layout::horizontal([
@@ -90,6 +106,7 @@ struct BuildDisplayApp<'a> {
             Fill(1)
         ]);
         let [builds_area, mods_outer] = final_layout.areas(builds_inner);
+        self.builds_end = mods_outer.x;
         self.draw_builds_inner(frame, builds_area);
         let mods_area = self.draw_mods_outer(frame, mods_outer);
         self.draw_mods_inner(frame, mods_area);
@@ -245,8 +262,47 @@ struct BuildDisplayApp<'a> {
     }
 
     fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
+        let clicked_side = clicked(mouse_event.kind);
+        if clicked_side < 0 {
+            self.top_clicked = false;
+            self.build_clicked = false;
+        }
         self.mouse_row = mouse_event.row;
         self.mouse_column = mouse_event.column;
+        let area = self.update_selections();
+        match area {
+            CursorRange::InBuilds => {
+
+            },
+            CursorRange::InTopBuilds => {
+
+            },
+            CursorRange::Outside => {}
+        }
+    }
+
+    fn update_selections(&mut self) -> CursorRange {
+        if self.mouse_row >= TOP_START && self.mouse_column <= self.top_end {
+            let new = self.mouse_row - TOP_START;
+            if self.top_selection != new && new < self.showcase.len as u16{
+                self.top_selection = new;
+                self.redraw = true;
+                CursorRange::InTopBuilds
+            } else {
+                CursorRange::Outside
+            }
+        } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end {
+            let new = self.mouse_row - (TOP_START+1);
+            if self.build_selection != new && new < ARC as u16{
+                self.build_selection = new;
+                self.redraw = true;
+                CursorRange::InBuilds
+            } else {
+                CursorRange::Outside
+            }
+        } else {
+            CursorRange::Outside
+        }
     }
 
     fn new(
@@ -264,7 +320,9 @@ struct BuildDisplayApp<'a> {
             gun_data,
             modding_context,
             running: true,
-            redraw: false
+            redraw: false,
+            top_end: 0,
+            builds_end: 0
         }
     }
 

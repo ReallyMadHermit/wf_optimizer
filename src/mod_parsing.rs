@@ -178,8 +178,17 @@ impl Default for ModStatType {
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct ModData {
     stats: [(ModStatType, i16); 4],
-    count: u8
+    pub count: u8
 } impl ModData {
+
+    pub fn new() -> Self {
+        Self::empty()
+    }
+
+    pub fn push(&mut self, mod_stat_type: ModStatType, value: i16) {
+        self.stats[self.count as usize] = (mod_stat_type, value);
+        self.count += 1;
+    }
 
     pub fn get(&self) -> &[(ModStatType, i16)] {
         &self.stats[0..self.count as usize]
@@ -507,11 +516,6 @@ impl ModData {
         mod_data.push(stat_type_1, stat_value_1);
         mod_data.push(stat_type_2, stat_value_2);
         mod_data
-    }
-
-    fn push(&mut self, mod_stat_type: ModStatType, value: i16) {
-        self.stats[self.count as usize] = (mod_stat_type, value);
-        self.count += 1;
     }
 
 }

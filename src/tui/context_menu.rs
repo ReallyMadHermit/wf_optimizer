@@ -1,7 +1,9 @@
 use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
 use ratatui::crossterm::event::MouseButton;
 use ratatui::layout::Constraint::{Fill, Length, Percentage, Min};
+use crate::build_calc::GunModSums;
 use crate::context_core::{DamageCriteria, ModdingContext, WeaponType};
+use crate::mod_parsing::{LoadedMods, ModData};
 use crate::tui::stat_screen::StatFields;
 use crate::weapon_select::GunData;
 use crate::tui::weapon_search_menu::weapon_search_tui;
@@ -73,7 +75,9 @@ pub fn context_menu_tui(
                 GoToTerm::SubmitBuild => {
                     if let Some(gun_data) = &app.weapon_selection {
                         let modding_context = app.get_modding_context();
-                        build_display_tui(terminal, gun_data, modding_context, None);
+                        let mod_sums = app.get_mod_sums(&modding_context);
+                        let loaded_mods = app.get_loaded_mods(&modding_context);
+                        build_display_tui(terminal, gun_data, modding_context, loaded_mods, Some(mod_sums));
                     }
                 }
             }
@@ -113,6 +117,34 @@ struct ContextMenuApp {
     buff_stats: Option<StatFields>,
     riven_stats: Option<StatFields>,
 } impl ContextMenuApp {
+
+    fn get_mod_sums(&self, modding_context: &ModdingContext) -> GunModSums {
+        let mut sums = GunModSums::new();
+        if modding_context.conditions > 0 {
+            sums.conditions = modding_context.conditions;
+        }
+        sums
+    }
+
+    fn get_loaded_mods(&self, modding_context: &ModdingContext) -> LoadedMods {
+        let mut loaded_mods = LoadedMods::new(modding_context);
+        if let Some(riven_stats) = &self.riven_stats {
+            let all = riven_stats.get_all();
+            let mut riven_data = ModData::new();
+            for &(stat, value) in all {
+                if value == 0 {
+                    continue;
+                } else {
+                    riven_data.push(stat, value);
+                }
+                if riven_data.count >= 4 {
+                    break;
+                }
+            }
+            loaded_mods.update_riven(riven_data);
+        }
+        loaded_mods
+    }
     
     fn get_modding_context(&self) -> ModdingContext {
         let (gun_type, semi) = if let Some(g) = &self.weapon_selection {

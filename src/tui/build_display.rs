@@ -17,13 +17,10 @@ pub fn build_display_tui(
     terminal: &mut DefaultTerminal,
     gun_data: &GunData,
     modding_context: ModdingContext,
+    loaded_mods: LoadedMods,
     base_sums: Option<GunModSums>
 ) {
-    let loaded_mods = LoadedMods::new(&modding_context);
-    let showcase = calculate_builds(
-        &loaded_mods, &gun_data.gun_stats, &modding_context, None
-    );
-    let mut app = BuildDisplayApp::new(&showcase, &loaded_mods, gun_data, &modding_context);
+    let mut app = BuildDisplayApp::new(gun_data, modding_context, loaded_mods, base_sums);
     // let mut app = BuildDisplayApp::new(BuildShowcase::from_manager(&BucketManager::new(1)));
     _ = terminal.draw(|frame| app.draw(frame)).unwrap();
     while app.running {
@@ -57,10 +54,11 @@ struct BuildDisplayApp<'a> {
     mouse_column: u16,
     top_selection: u16,
     build_selection: u16,
-    showcase: &'a BuildShowcase,
-    loaded_mods: &'a LoadedMods,
+    showcase: BuildShowcase,
+    loaded_mods: LoadedMods,
     gun_data: &'a GunData,
-    modding_context: &'a ModdingContext,
+    modding_context: ModdingContext,
+    base_sums: Option<GunModSums>,
     running: bool,
     redraw: bool,
     top_end: u16,
@@ -203,14 +201,14 @@ struct BuildDisplayApp<'a> {
 
         // compute stats
         let mod_scores = {
-            let mut full_sums = GunModSums::new();
-            full_sums.add_many_mods(&all_mod_ids, self.loaded_mods);
-            let full_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &full_sums);
+            let mut full_sums = self.base_sums.unwrap_or_else(GunModSums::new);
+            full_sums.add_many_mods(&all_mod_ids, &self.loaded_mods);
+            let full_damage = get_damage(&self.modding_context, &self.gun_data.gun_stats, &full_sums);
             let mut mod_scores: Vec<(u8, i16)> = Vec::with_capacity(9);
             for mod_id in all_mod_ids {
                 let mut reduced_sums = full_sums;
-                reduced_sums.remove_mod(mod_id, self.loaded_mods);
-                let reduced_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &reduced_sums);
+                reduced_sums.remove_mod(mod_id, &self.loaded_mods);
+                let reduced_damage = get_damage(&self.modding_context, &self.gun_data.gun_stats, &reduced_sums);
                 let damage_factor = full_damage/reduced_damage;
                 let score = ((damage_factor - 1.0) * 1000.0).round() as i16;
                 mod_scores.push((mod_id, score));
@@ -309,8 +307,11 @@ struct BuildDisplayApp<'a> {
     }
 
     fn new(
-        showcase: &'a BuildShowcase, loaded_mods: &'a LoadedMods, gun_data: &'a GunData, modding_context: &'a ModdingContext
+        gun_data: &'a GunData, modding_context: ModdingContext, loaded_mods: LoadedMods, base_sums: Option<GunModSums>
     ) -> Self {
+        let showcase = calculate_builds(
+            &loaded_mods, &gun_data.gun_stats, &modding_context, base_sums
+        );
         Self {
             mouse_row: 0,
             mouse_column: 0,
@@ -320,6 +321,7 @@ struct BuildDisplayApp<'a> {
             loaded_mods,
             gun_data,
             modding_context,
+            base_sums,
             running: true,
             redraw: false,
             top_end: 0,

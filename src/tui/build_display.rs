@@ -220,7 +220,7 @@ struct BuildDisplayApp<'a> {
         let mut strings: Vec<String> = Vec::with_capacity(9);
         for (mod_id, score) in mod_scores {
             let mut string = String::with_capacity(40);
-            let number_string = score.separate_with_commas();
+            let number_string = score.to_string();
             string.push_str(self.loaded_mods.get_name(mod_id));
             string.push_str(" (");
             string.push_str(&number_string);

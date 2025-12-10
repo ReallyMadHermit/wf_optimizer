@@ -66,8 +66,6 @@ struct BuildDisplayApp<'a> {
     mouse_column: u16,
     top_selection: u16,
     build_selection: u16,
-    top_clicked: bool,
-    build_clicked: bool,
     showcase: &'a BuildShowcase,
     loaded_mods: &'a LoadedMods,
     gun_data: &'a GunData,
@@ -262,47 +260,25 @@ struct BuildDisplayApp<'a> {
     }
 
     fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
-        let clicked_side = clicked(mouse_event.kind);
-        if clicked_side < 0 {
-            self.top_clicked = false;
-            self.build_clicked = false;
-        }
         self.mouse_row = mouse_event.row;
         self.mouse_column = mouse_event.column;
-        let area = self.update_selections();
-        match area {
-            CursorRange::InBuilds => {
-
-            },
-            CursorRange::InTopBuilds => {
-
-            },
-            CursorRange::Outside => {}
-        }
+        self.update_selections();
     }
 
-    fn update_selections(&mut self) -> CursorRange {
-        if self.mouse_row >= TOP_START && self.mouse_column <= self.top_end && !self.top_clicked {
+    fn update_selections(&mut self) {
+        if self.mouse_row >= TOP_START && self.mouse_column <= self.top_end {
             let new = self.mouse_row - TOP_START;
-            if self.top_selection != new && new < self.showcase.len as u16{
+            if self.top_selection != new && new < self.showcase.len as u16 {
                 self.top_selection = new;
                 self.build_selection = 0;
                 self.redraw = true;
-                CursorRange::InTopBuilds
-            } else {
-                CursorRange::Outside
             }
-        } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end && !self.build_clicked {
+        } else if self.mouse_row > TOP_START && self.mouse_column < self.builds_end {
             let new = self.mouse_row - (TOP_START+1);
             if self.build_selection != new && new < ARC as u16{
                 self.build_selection = new;
                 self.redraw = true;
-                CursorRange::InBuilds
-            } else {
-                CursorRange::Outside
             }
-        } else {
-            CursorRange::Outside
         }
     }
 
@@ -314,8 +290,6 @@ struct BuildDisplayApp<'a> {
             mouse_column: 0,
             top_selection: 0,
             build_selection: 0,
-            top_clicked: false,
-            build_clicked: false,
             showcase,
             loaded_mods,
             gun_data,

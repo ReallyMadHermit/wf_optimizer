@@ -302,9 +302,15 @@ struct StatScreenApp {
     fn draw_instructions(&mut self, frame: &mut Frame, area: Rect) {
         let msg = vec![
             "Left Click".bold(),
-            " a stat to edit its value, ".into(),
+            " selects to edit, ".into(),
             "Right Click".bold(),
-            " to clear its value.".into()
+            " clears.  ".into(),
+            "Tab".bold(),
+            ", ".into(),
+            "Esc".bold(),
+            ", and ".into(),
+            "Enter".bold(),
+            " do things, too.".into()
         ];
         let line = Line::from(msg).patch_style(Style::default());
         frame.render_widget(line, area);

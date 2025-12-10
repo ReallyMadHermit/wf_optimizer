@@ -178,31 +178,39 @@ struct BuildDisplayApp<'a> {
 
     fn compose_scores(&self) -> Vec<String> {
         // get specific mods
-        let top_build = self.showcase.get_top_builds()[self.top_selection as usize];
-        let builds = self.showcase.get_build_list(top_build.get_reference());
-        let selected_build = builds[self.build_selection as usize];
-        let mod_comp = self.loaded_mods.mod_combinations[selected_build.get_reference()];
-        let mut all_mod_ids = Vec::with_capacity(9);
-        for mod_id in mod_comp {
-            all_mod_ids.push(mod_id);
-        }
-        if top_build.get_reference() > 0 {
-            all_mod_ids.push(top_build.get_reference() as u8 + self.loaded_mods.arcane_count - 1);
-        }
+        let all_mod_ids = {
+            let top_build = self.showcase.get_top_builds()[self.top_selection as usize];
+            let builds = self.showcase.get_build_list(top_build.get_reference());
+            let selected_build = builds[self.build_selection as usize];
+            let mod_comp = self.loaded_mods.mod_combinations[selected_build.get_reference()];
+            let mut all_mod_ids = Vec::with_capacity(9);
+            for mod_id in mod_comp {
+                all_mod_ids.push(mod_id);
+            }
+            if top_build.get_reference() > 0 {
+                all_mod_ids.push(top_build.get_reference() as u8 + self.loaded_mods.arcane_count - 1);
+            }
+            all_mod_ids
+        };
+
         // compute stats
-        let mut full_sums = GunModSums::new();
-        full_sums.add_many_mods(&all_mod_ids, self.loaded_mods);
-        let full_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &full_sums);
-        let mut mod_scores: Vec<(u8, i16)> = Vec::with_capacity(9);
-        for mod_id in all_mod_ids {
-            let mut reduced_sums = full_sums;
-            reduced_sums.remove_mod(mod_id, self.loaded_mods);
-            let reduced_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &reduced_sums);
-            let damage_factor = full_damage/reduced_damage;
-            let score = ((damage_factor - 1.0) * 1000.0).round() as i16;
-            mod_scores.push((mod_id, score));
-        }
-        mod_scores.sort_by_key(|pair|-pair.1);
+        let mod_scores = {
+            let mut full_sums = GunModSums::new();
+            full_sums.add_many_mods(&all_mod_ids, self.loaded_mods);
+            let full_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &full_sums);
+            let mut mod_scores: Vec<(u8, i16)> = Vec::with_capacity(9);
+            for mod_id in all_mod_ids {
+                let mut reduced_sums = full_sums;
+                reduced_sums.remove_mod(mod_id, self.loaded_mods);
+                let reduced_damage = get_damage(self.modding_context, &self.gun_data.gun_stats, &reduced_sums);
+                let damage_factor = full_damage/reduced_damage;
+                let score = ((damage_factor - 1.0) * 1000.0).round() as i16;
+                mod_scores.push((mod_id, score));
+            }
+            mod_scores.sort_by_key(|pair|-pair.1);
+            mod_scores
+        };
+
         // turn to string
         let mut strings: Vec<String> = Vec::with_capacity(9);
         for (mod_id, score) in mod_scores {

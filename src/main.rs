@@ -26,24 +26,11 @@ fn main() {
     
     let mut terminal = ratatui::init();
     let gun_data = tui::weapon_search_menu::weapon_search_tui(&mut terminal, None);
-    let (modding_context, gun_data) =
-        tui::context_menu::context_menu_tui(&mut terminal, gun_data);
+    tui::context_menu::context_menu_tui(&mut terminal, gun_data);
     
     ratatui::restore();
     _ = stdout().execute(DisableMouseCapture);
     _ = terminal::disable_raw_mode();
-    let start = Instant::now();
-    let loaded_mods = LoadedMods::new(&modding_context);
-    let showcase = calculate_builds(
-        &loaded_mods,
-        &gun_data.gun_stats,
-        &modding_context,
-        None
-    );
-    println!("Done! {:?} elapsed", start.elapsed());
-    gun_data.print();
-    showcase.print_top_builds(&loaded_mods);
-    showcase.print_all_builds(&loaded_mods);
     // if let Some(g) = r {
     //     println!("{}, {}", g.name, g.fire_mode);
     // }

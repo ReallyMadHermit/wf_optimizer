@@ -519,6 +519,7 @@ Rifle,Veldt,Normal Attack,TRUE,546,80,26,3.67,1.8,1,0,90,0.22,2.2,0.22,0,0,0,0
 Pistol,Velox,Normal Attack,FALSE,434,40,62,15,2.6,1,0,24,0.14,1.8,0.22,0,0,0,0
 Pistol,Velox Prime,Normal Attack,FALSE,520,40,70,17,2.6,1,0,27,0.14,2,0.32,0,0,0,0
 Pistol,Vesper 77,Normal Attack,TRUE,210,60,8,2.08,2.4,1,0,180,0.24,2.6,0.26,0,0,0,0
+Rifle,Vinquibus,Normal Attack,TRUE,80,8,8,1.5,3,1,0,400,0.4,3.2,20,0,0,0,0
 Pistol,Viper,Normal Attack,FALSE,420,40,14,14.38,0.7,1,0,17,0.15,1.5,0.11,0,0,0,0
 Pistol,Viper Wraith,Normal Attack,FALSE,420,40,20,14.38,0.8,1,0,18,0.19,2,0.09,0,0,0,0
 Rifle,Vulkar,Normal Attack,TRUE,72,15,6,1.5,3,1,1,225,0.2,2,0.25,0,0,0,0

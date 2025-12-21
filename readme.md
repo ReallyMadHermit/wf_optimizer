@@ -1,1 +1,1 @@
-if you are seeing this, you really should not
+work in progress brute-force weapon optimizer for hit game Warframe, featuring support for buffs and riven mods, plus a nice TUI that's super fast and awesome!

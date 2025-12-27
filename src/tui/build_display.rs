@@ -102,7 +102,8 @@ struct BuildDisplayApp<'a> {
 
     // draws lower-box, returns inner area
     fn draw_lower_box(&self, frame: &mut Frame, bottom_area: Rect) -> Rect {
-        let bottom_block = Block::bordered().title("Arcane Selection");
+        let title = format!("{}; {} - {}", self.gun_data.name, self.gun_data.fire_mode, self.modding_context.damage_criteria.str()).bold();
+        let bottom_block = Block::bordered().title(title);
         let bottom_inner = bottom_block.inner(bottom_area);
         frame.render_widget(bottom_block, bottom_area);
         bottom_inner

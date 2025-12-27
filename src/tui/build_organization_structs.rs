@@ -1,5 +1,3 @@
-use crate::mod_parsing::LoadedMods;
-
 const ARCANE_RESULTS_COUNT: usize = 16;  // in testing, this is used very efficiently
 pub const ARC: usize = ARCANE_RESULTS_COUNT;
 
@@ -35,33 +33,6 @@ pub struct BuildShowcase {
             &[]
         } else {
             &self.all_builds[arcane_id]
-        }
-    }
-
-    pub fn print_top_builds(&self, loaded_mods: &LoadedMods) {
-        let arcanes = loaded_mods.get_arcane_names();
-        for build in &self.top_builds{
-            let arcane_name = if build.reference == 0 {
-                "No arcane"
-            } else {
-                arcanes[build.get_reference()-1]
-            };
-            let build_damage = build.get_damage();
-            println!("{}: {}", arcane_name, build_damage);
-        }
-    }
-
-    pub fn print_all_builds(&self, loaded_mods: &LoadedMods) {
-        let arcanes = loaded_mods.get_arcane_names();
-        for (index, list) in self.all_builds.iter().enumerate() {
-            if index == 0 {
-                println!("No Arcane");
-            } else {
-                println!("{}", arcanes[index-1]);
-            }
-            for build in list {
-                println!("{}", build.get_damage())
-            }
         }
     }
 

@@ -64,13 +64,9 @@ struct WeaponSearchApp {
             self.mouse = pos;
             self.redraw = true;
         }
-        let clicked = matches!(mouse_event.kind, MouseEventKind::Down(_));
         if let MouseEventKind::Down(button) = mouse_event.kind {
             self.handle_click(button);
         }
-        // if clicked && self.clicked_result().is_some() {
-        //     self.handle_click();
-        // }
     }
 
     fn handle_click(&mut self, button: MouseButton) {
@@ -201,15 +197,7 @@ struct WeaponSearchApp {
                     .contains(&input)
         );
     }
-
-    fn clicked_result(&self) -> Option<u16> {
-        if self.mouse.0 >= SELECTION_START && (self.mouse.0 - SELECTION_START) < self.display {
-            Some(self.mouse.0 - SELECTION_START)
-        } else {
-            None
-        }
-    }
-
+    
 }
 
 fn get_weapon_names() -> Vec<(&'static str, &'static str)> {

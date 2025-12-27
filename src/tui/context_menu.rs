@@ -542,28 +542,3 @@ enum FieldType {
     }
 
 }
-
-
-fn field_label(field_name: &str) -> String {
-    let mut buffer = String::with_capacity(DISPLAY_STRING_LENGTH);
-    buffer.push_str(field_name);
-    while buffer.len() < LABEL_LENGTH {
-        buffer.push('.');
-    };
-    buffer.push_str(": ");
-    buffer
-}
-
-
-fn display<'a>(
-    field_name: &'static str, field_contents: &'static str, hovered: bool
-) -> ListItem<'a> {
-    let mut buffer = field_label(field_name);
-    buffer.push_str(field_contents);
-    let style = if hovered {
-        Style::default().reversed()
-    } else {
-        Style::default()
-    };
-    ListItem::new(Line::from(Span::styled(buffer, style)))
-}

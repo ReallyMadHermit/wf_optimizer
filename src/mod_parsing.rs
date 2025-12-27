@@ -1,5 +1,4 @@
-use std::time::Instant;
-use crate::combinatorics::{generate_combinations, BuildCombo};
+use crate::combinatorics::{generate_combinations};
 use crate::data::{GUN_MODS, GUN_ARCANES};
 use crate::context_core::{ModdingContext, WeaponType};
 
@@ -28,10 +27,6 @@ pub struct LoadedMods {
     }
 
     pub fn new(modding_context: &ModdingContext) -> Self {
-        let mut start = Instant::now();
-        // if modding_context.debug_numbers {
-        //     print!("Parsing mods...")
-        // };
         let mod_lines: Vec<&'static str> = GUN_MODS.lines().collect();
         let arcane_lines: Vec<&'static str> = GUN_ARCANES.lines().collect();
         let mod_range = &mod_lines[1..];
@@ -52,24 +47,8 @@ pub struct LoadedMods {
         let mut loaded_mods = LoadedMods::empty(size);
         Self::parse_mods(&mut loaded_mods, mod_range, mod_scores, false);
         Self::parse_mods(&mut loaded_mods, arcane_range, arcane_scores, true);
-        // if modding_context.debug_numbers {
-        //     let d = start.elapsed();
-        //     println!(" Done! Loaded {} mods in {:?}", loaded_mods.mod_data.len(), d);
-        //     print!("Calculating Combinatorics...");
-        //     start = Instant::now();
-        // };
         loaded_mods.calculate_combinatorics();
-        // if modding_context.debug_numbers {
-        //     let d = start.elapsed();
-        //     println!(" Done! {} Combinations in {:?}", loaded_mods.mod_combinations.len(), d);
-        //     print!("Filtering Combinations...");
-        //     start = Instant::now();
-        // };
         loaded_mods.filter_loaded_mods(modding_context);
-        // if modding_context.debug_numbers {
-        //     let d = start.elapsed();
-        //     println!(" Done! {} remaining {:?}", loaded_mods.mod_combinations.len(), d);
-        // }
         loaded_mods
     }
 
@@ -192,34 +171,6 @@ pub struct ModData {
 
     pub fn get(&self) -> &[(ModStatType, i16)] {
         &self.stats[0..self.count as usize]
-    }
-
-    pub fn from_riven_str(input: &str) -> Option<Self> {
-        let upper = input.to_ascii_uppercase();
-        let mut mod_data = Self::empty();
-        let mut stat_type = ModStatType::None;
-        let mut stat_value = 0i16;
-        let mut value_flag = false;
-        let mut type_flag = false;
-        for s in upper.split(" ") {
-            if let Ok(i) = s.parse() {
-                stat_value = i;
-                value_flag = true;
-            } else {
-                stat_type = ModStatType::from_riven_str(s);
-                type_flag = true;
-            };
-            if value_flag & type_flag {
-                mod_data.push(stat_type, stat_value);
-                value_flag = false;
-                type_flag = false;
-            };
-        };
-        if mod_data.count > 0 {
-            Some(mod_data)
-        } else {
-            None
-        }
     }
 
 }
@@ -477,25 +428,7 @@ impl ModStatType {
             }
         }
     }
-
-    fn from_riven_str(s: &str) -> Self {
-        match s {
-            "C" => Self::Cold,
-            "CC" => Self::CritChance,
-            "CD" => Self::CritDamage,
-            "D" => Self::Damage,
-            "E" => Self::Shock,
-            "H" => Self::Heat,
-            "FR" => Self::FireRate,
-            "MC" => Self::MagazineCapacity,
-            "MS" => Self::Multishot,
-            "T" => Self::Toxic,
-            "RS" => Self::ReloadSpeed,
-            "SC" => Self::StatusChance,
-            _ => Self::None
-        }
-    }
-
+    
 }
 
 impl ModData {

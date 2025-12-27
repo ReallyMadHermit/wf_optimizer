@@ -224,7 +224,7 @@ struct StatScreenApp {
                 self.buffer.clear();
             }
         }
-        let (stat, value) = self.stat_fields.get(field_id);
+        let (stat, _) = self.stat_fields.get(field_id);
         if stat != ModStatType::None {
             self.stat_fields.fields[field_id as usize] = (stat, 0);
         }

@@ -1,5 +1,5 @@
 use ratatui::{crossterm::event::{self, Event, KeyCode, MouseEvent}, layout::{Layout, Rect}, style::{Style, Stylize}, text::Line, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
-use ratatui::layout::Constraint::{Fill, Min, Length, Percentage};
+use ratatui::layout::Constraint::{Fill, Length, Percentage};
 use thousands::Separable;
 use crate::build_calc::{calculate_builds, get_damage, GunModSums};
 use crate::context_core::ModdingContext;

@@ -1,6 +1,5 @@
-use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
-use ratatui::crossterm::event::MouseButton;
-use ratatui::layout::Constraint::{Fill, Length, Percentage, Min};
+use ratatui::{crossterm::event::{self, Event, KeyCode, MouseEvent}, layout::{Layout, Rect}, style::{Style, Stylize}, text::{Line, Span}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
+use ratatui::layout::Constraint::{Length, Min};
 use crate::build_calc::GunModSums;
 use crate::context_core::{DamageCriteria, ModdingContext, WeaponType};
 use crate::mod_parsing::{LoadedMods, ModData};

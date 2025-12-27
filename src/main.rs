@@ -1,5 +1,3 @@
-use ratatui::crossterm::ExecutableCommand;
-
 mod data;
 mod combinatorics;
 mod cli_inputs;

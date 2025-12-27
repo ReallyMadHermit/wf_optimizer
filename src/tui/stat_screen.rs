@@ -1,5 +1,4 @@
-use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent, MouseEventKind}, layout::{Constraint, Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span, Text}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
-use ratatui::crossterm::event::MouseButton;
+use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyEvent, MouseEvent}, layout::{Layout, Position, Rect}, style::{Style, Stylize}, text::{Line, Span}, widgets::{Block, List, ListItem, Paragraph}, DefaultTerminal, Frame};
 use ratatui::layout::Constraint::Min;
 use ratatui::prelude::Constraint::Length;
 use crate::mod_parsing::ModStatType;

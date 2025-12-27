@@ -1,8 +1,6 @@
 # wf optimizer
 ## Who needs fancy algorithms when a problem can be brute-forced?!
 That's right! Why spend time trying any build when you could instead just try *all* the builds!
-
-[Watch a quick demo here](./demo/recorded_demo.mp4) or check out the screenshots and information below:
 ### Start by searching a weapon
 ![Weapon search](./demo/weapon_search.png)
 ### Tweak your desired build criteria and usage context...

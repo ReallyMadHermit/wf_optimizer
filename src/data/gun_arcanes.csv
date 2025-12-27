@@ -1,6 +1,6 @@
 Type,Name,Type1,Value1,Type2,Value2,Kills?,Aiming?,Headshot?,Semi?,Acuity?,Prefer Amalgam?,Riven?,BADMATCH,Bane?,Primed Bane?
-All,Deadhead,Damage,360,Headshot,30,!EXC,!EXC,!EXC,,,,,,,
-All,Deadhead(w/o kills),Headshot,30,None,0,EXC,,!EXC,,,,,,,
+All,Deadhead,Damage,360,Headshot,30,!EXC,,,,,,,,,
+All,Deadhead(w/o kills),Headshot,30,None,0,EXC,,,,,,,,,
 All,Merciless,Damage,360,ReloadSpeed,30,!EXC,,,,,,,,,
 All,Merciless(w/o kills),ReloadSpeed,30,None,0,EXC,,,,,,,,,
 Pistol,Akimbo Slipshot,AmmoEfficiency,65,None,0,,,,,,,,,,

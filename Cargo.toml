@@ -1,24 +1,19 @@
-[package]
-name = "warframe_optimizer"
-version = "0.3.0"
-edition = "2021"
+package.name = "warframe_optimizer"
+package.version = "0.3.0"
+package.edition = "2021"
 
-[dependencies]
-#crossterm = "0.29.0"
-ratatui = "0.29.0"
-rayon = "1.11.0"
-thousands = "0.2.0"
+dependencies.ratatui = "0.29.0"
+dependencies.rayon = "1.11.0"
+dependencies.thousands = "0.2.0"
 
 # Enable a large amount of optimization in the dev profile for dependencies.
-[profile.dev.package."*"]
-opt-level = 3
+profile.dev.package."*".opt-level = 3
 
-[profile.release]
-opt-level = 3
-lto = "fat"
-codegen-units = 1
-panic = "abort"
-strip = true
-incremental = false
-debug = false
-overflow-checks = false
+profile.release.opt-level = 3
+profile.release.lto = "fat"
+profile.release.codegen-units = 1
+profile.release.panic = "abort"
+profile.release.strip = true
+profile.release.incremental = false
+profile.release.debug = false
+profile.release.overflow-checks = false

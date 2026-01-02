@@ -1,6 +1,8 @@
 package.name = "warframe_optimizer"
 package.version = "0.3.0"
 package.edition = "2021"
+package.repository = "https://github.com/ReallyMadHermit/wf_optimizer"
+package.license = "CC-BY-NC-SA 4.0"
 
 dependencies.ratatui = "0.29.0"
 dependencies.rayon = "1.11.0"

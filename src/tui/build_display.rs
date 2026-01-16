@@ -204,13 +204,13 @@ struct BuildDisplayApp<'a> {
             let mut full_sums = self.base_sums.unwrap_or_else(GunModSums::new);
             full_sums.add_many_mods(&all_mod_ids, &self.loaded_mods);
             let full_damage = get_damage(&self.modding_context, &self.gun_data.gun_stats, &full_sums);
-            let mut mod_scores: Vec<(u8, i16)> = Vec::with_capacity(9);
+            let mut mod_scores: Vec<(u8, i32)> = Vec::with_capacity(9);
             for mod_id in all_mod_ids {
                 let mut reduced_sums = full_sums;
                 reduced_sums.remove_mod(mod_id, &self.loaded_mods);
                 let reduced_damage = get_damage(&self.modding_context, &self.gun_data.gun_stats, &reduced_sums);
                 let damage_factor = full_damage/reduced_damage;
-                let score = ((damage_factor - 1.0) * 1000.0).round() as i16;
+                let score = ((damage_factor - 1.0) * 1000.0).round() as i32;
                 mod_scores.push((mod_id, score));
             }
             mod_scores.sort_by_key(|pair|-pair.1);

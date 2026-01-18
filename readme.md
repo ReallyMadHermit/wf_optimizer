@@ -50,6 +50,6 @@ change the riven stats between build calculations. The riven mod is also rated
 like any other mod, so you can just remember that number instead, if you prefer.
 
 <a href="https://github.com/ReallyMadHermit/wf_optimizer/">wf optimizer</a> 
-© 2025 by <a href="https://github.com/ReallyMadHermit">ReallyMadHermit</a> 
+© 2026 by <a href="https://github.com/ReallyMadHermit">ReallyMadHermit</a> 
 is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
 CC BY-NC-SA 4.0</a>
